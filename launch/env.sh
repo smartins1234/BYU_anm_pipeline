@@ -20,4 +20,4 @@ export PYTHONPATH=${PYTHONPATH}:${MEDIA_PROJECT_DIR}:${MEDIA_PIPE_DIR}
 
 export DCC_PIPE_LOADED=1
 
-echo "Initialized dccpipe environment."
+echo "Initialized BYU_anm_pipe environment."
