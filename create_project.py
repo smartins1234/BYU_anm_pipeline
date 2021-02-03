@@ -18,7 +18,7 @@ project_dict = {"reference_dir": "production/reference_geo/",
      "hda_dir": "production/hdas/",
      "usd_dir": "production/USD/",
      "email_password": "password",
-     "production_dir": "production/"}
+     "production_dir": "../production/"}
 
 
 '''
