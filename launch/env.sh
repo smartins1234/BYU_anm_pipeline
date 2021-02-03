@@ -11,8 +11,8 @@ do
   LAUNCHDIR="$(dirname "$LAUNCHDIR")"
 done
 
-SHELL_SCRIPT="$(dirname "$LAUNCHDIR")/config/unix/shell.sh activate"
-ENV_SCRIPT="$(dirname "$LAUNCHDIR")/config/unix/env.sh"
+SHELL_SCRIPT="$(dirname "$LAUNCHDIR")/config/shell.sh activate"
+ENV_SCRIPT="$(dirname "$LAUNCHDIR")/config/env.sh"
 source $SHELL_SCRIPT
 source $ENV_SCRIPT
 
