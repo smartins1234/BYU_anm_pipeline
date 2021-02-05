@@ -1,4 +1,4 @@
-import pipe.backend.pipeline_io as pipeline_io
+import pipe.am.pipeline_io as pipeline_io
 import os
 import sys
 import json
@@ -7,18 +7,17 @@ import subprocess
 
 project_dict = {"reference_dir": "production/reference_geo/",
      "name": "TestProject",
-     "assets_dir": "../production/assets/",
-     "users_dir": "../production/users/",
+     "assets_dir": "production/assets/",
+     "users_dir": "production/users/",
      "nickname": "test",
-     "crowds_dir": "../production/crowds/",
-     "tools_dir": "../production/tools/",
-     "templates_dir": "../production/templates/",
-     "shots_dir": "../production/rendered_shots/",
+     "crowds_dir": "production/crowds/",
+     "tools_dir": "production/tools/",
+     "templates_dir": "production/templates/",
+     "shots_dir": "production/rendered_shots/",
      "email_address": "a@b.com",
-     "hda_dir": "../production/hdas/",
-     "usd_dir": "../production/USD/",
+     "hda_dir": "production/hdas/",
      "email_password": "password",
-     "production_dir": "../production/"}
+     "production_dir": "production/"}
 
 
 '''
@@ -42,13 +41,12 @@ def create_project():
 
     pipeline_io.mkdir(pipe_dict["production_dir"])
     pipeline_io.mkdir(pipe_dict["assets_dir"])
-    #pipeline_io.mkdir(pipe_dict["crowds_dir"])
+    pipeline_io.mkdir(pipe_dict["crowds_dir"])
     pipeline_io.mkdir(pipe_dict["shots_dir"])
     pipeline_io.mkdir(pipe_dict["tools_dir"])
-    pipeline_io.mkdir(pipe_dict["usd_dir"])
-    #pipeline_io.mkdir(pipe_dict["users_dir"])
+    pipeline_io.mkdir(pipe_dict["users_dir"])
     pipeline_io.mkdir(pipe_dict["hda_dir"])
-    #pipeline_io.mkdir(pipe_dict["reference_dir"])
+    pipeline_io.mkdir(pipe_dict["reference_dir"])
 
     create_project_shortcuts(nickname=nickname, name=name)
 

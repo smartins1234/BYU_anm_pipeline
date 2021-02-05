@@ -1,4 +1,4 @@
-import pipe.backend.pipeline_io as pipeline_io
+import pipe.am.pipeline_io as pipeline_io
 import os
 import json
 import subprocess
