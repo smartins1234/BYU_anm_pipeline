@@ -71,10 +71,12 @@ function icon {
 	echo "Categories=Utility;Application;" >> ${FILENAME}.desktop
 
 	chmod 770 ${FILENAME}.desktop
+	echo ${FILENAME}
+	chmod +x ${SCRIPT}
 }
 
 
-#icon -n "${nickname}aya" ${PROJECT_NAME} ${PROJECT_PATH} Maya pipe/tools/_resources/dcc-maya-icon.png launch/unix/maya.sh
+icon -n "${nickname}aya" ${PROJECT_NAME} ${PROJECT_PATH} Maya icons/maya.png launch/maya.sh
 icon -n "${nickname}ini" ${PROJECT_NAME} ${PROJECT_PATH} Houdini icons/houdini.png launch/houdini.sh
 #icon -n "${nickname}uke" ${PROJECT_NAME} ${PROJECT_PATH} Nuke pipe/tools/_resources/dcc-nuke-icon.png launch/unix/nuke.sh
 #icon -n "${nickname}stancePainter" ${PROJECT_NAME} ${PROJECT_PATH} SubstancePainter pipe/tools/_resources/dcc-substancePainter-icon.png launch/unix/sbs.sh
