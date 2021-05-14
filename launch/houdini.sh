@@ -32,12 +32,12 @@ export HOUDINI_USE_HFS_PYTHON=1
 export JOB=${MEDIA_PROJECT_DIR}
 HOUDINI_TOOLS=${MEDIA_PROJECT_DIR}/pipe/tools/houdiniTools
 export PYTHONPATH=${PYTHONPATH}:${HOUDINI_TOOLS}
-export HOUDINI_PATH=${HOUDINI_PATH}:${HOUDINI_TOOLS}"/_custom;&":${HOUDINI_TOOLS}:${MEDIA_PROJECT_DIR}"/production;&":${MEDIA_PROJECT_DIR}"/production/hdas;&"
+export HOUDINI_PATH=${HOUDINI_PATH}:${HOUDINI_TOOLS}"/custom;&":${HOUDINI_TOOLS}:${MEDIA_PROJECT_DIR}"/production;&":${MEDIA_PROJECT_DIR}"/production/hdas;&"
 export HOUDINI_DSO_PATH=${HOUDINI_DSO_PATH}:${MEDIA_PROJECT_DIR}"/production/dso;&"
 
-export HOUDINI_MENU_PATH=${HOUDINI_TOOLS}"/_custom/menus;&"
+export HOUDINI_MENU_PATH=${HOUDINI_TOOLS}"/custom/menu;&"
 export HOUDINI_TOOLBAR_PATH=${MEDIA_PROJECT_DIR}"/production/tabs;&"
-export HOUDINI_UI_ICON_PATH=${MEDIA_PROJECT_DIR}"/pipe/tools/_resources/tool-icons;&"
+export HOUDINI_UI_ICON_PATH=${MEDIA_PROJECT_DIR}"icons/tool-icons;&"
 
 export RMANTREE="/opt/pixar/RenderManProServer-23.5"
 export RFHTREE="/opt/pixar/RenderManForHoudini-23.5"
