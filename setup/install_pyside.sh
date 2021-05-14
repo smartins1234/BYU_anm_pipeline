@@ -72,5 +72,5 @@ if [ "$(id -u)" -ne "0" ]
 fi
 
 shopt -s dotglob
-cp -r $USERHOME/.local/lib/python3.8/site-packages/*shiboken* $MEDIA_PROJECT_DIR/.venv/lib/python3.8/site-packages
-cp -r $USERHOME/.local/lib/python3.8/site-packages/*PySide2* $MEDIA_PROJECT_DIR/.venv/lib/python3.8/site-packages
+#cp -r $USERHOME/.local/lib/python3.8/site-packages/*shiboken* $MEDIA_PROJECT_DIR/.venv/lib/python3.8/site-packages
+#cp -r $USERHOME/.local/lib/python3.8/site-packages/*PySide2* $MEDIA_PROJECT_DIR/.venv/lib/python3.8/site-packages
