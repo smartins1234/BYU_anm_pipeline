@@ -1,0 +1,355 @@
+<mainMenu>
+	<menuBar>
+
+		<!-- ============================ Start DCC Tools Menu =========================== -->
+		<!-- if calling a tool that uses gui, need to reference the tool with hou.session to keep the tool in memory -->
+
+
+		<subMenu id="tools_menu">
+			<label>BYUPipe</label>
+
+		<!-- ============================ Start creator subMenu =========================== >
+		<subMenu id="creator_menu">
+			<label>Create</label>
+			<! ============================ Start Create Prop Tool =========================== >
+			<scriptItem id="h.createProp">
+				<label>Prop</label>
+				<scriptCode scriptType="python">
+					<![CDATA[
+from pipe.tools.houtools.creator import creator
+import hou
+creator = creator.Creator()
+hou.session.creator = creator
+creator.run(type="prop")
+					]]>
+				</scriptCode>
+			</scriptItem>
+			<! ============================ End Create Prop Tool =========================== >
+
+			<! ============================ Start Create Actor Tool =========================== >
+			<scriptItem id="h.createActor">
+				<label>Actor</label>
+				<scriptCode scriptType="python">
+					<![CDATA[
+from pipe.tools.houtools.creator import creator
+import hou
+creator = creator.Creator()
+hou.session.creator = creator
+creator.run(type="actor")
+					]]>
+				</scriptCode>
+			</scriptItem>
+			<! ============================ End Create Actor Tool =========================== >
+
+			<! ============================ Start Create Set Tool =========================== >
+			<scriptItem id="h.createSet">
+				<label>Set</label>
+				<scriptCode scriptType="python">
+					<![CDATA[
+from pipe.tools.houtools.creator import creator
+import hou
+creator = creator.Creator()
+hou.session.creator = creator
+creator.run(type="set")
+					]]>
+				</scriptCode>
+			</scriptItem>
+			<! ============================ End Create Set Tool =========================== >
+
+			<! ============================ Start Create Shot Tool =========================== >
+			<scriptItem id="h.createShot">
+				<label>Shot</label>
+				<scriptCode scriptType="python">
+					<![CDATA[
+from pipe.tools.houtools.creator import creator
+import hou
+creator = creator.Creator()
+hou.session.creator = creator
+creator.run(type="shot")
+					]]>
+				</scriptCode>
+			</scriptItem>
+			<! ============================ End Create Shot Tool =========================== >
+		</subMenu>
+		<! ============================ End creator subMenu =========================== >
+
+		<! ============================= <scriptItem>
+			<label>Manager</label>
+			<scriptCode scriptType="python">
+				<![CDATA[
+import pipe.app
+from pipe.app.manager import main
+
+import hou
+manager = main.Manager()
+hou.session.manager = manager
+manager.go()
+				]]>
+			</scriptCode>
+		</scriptItem> ============================ >
+
+		<! ============================ Start cloner subMenu =========================== -->
+		<subMenu id="cloner_menu">
+			<label>Clone</label>
+			<!-- ============================ Start Prop/Actor cloner Tool =========================== -->
+			<scriptItem id="h.checkout_asset">
+				<label>Asset</label>
+				<scriptCode scriptType="python">
+					<![CDATA[
+from pipe.tools.houdiniTools.cloner import cloner
+import hou
+cloner = cloner.Cloner()
+hou.session.cloner = cloner
+cloner.clone_asset()
+					]]>
+				</scriptCode>
+			</scriptItem>
+			<!-- ============================ End Prop/Actor cloner Tool =========================== -->
+
+			<!-- ============================ Start Set cloner Tool =========================== -->
+			<scriptItem id="h.checkout_set">
+				<label>Set</label>
+				<!--<scriptCode scriptType="python">
+					<![CDATA[
+from pipe.tools.houdiniTools.assembler import assembler
+import hou
+assembler = assembler.Assembler()
+hou.session.assembler = assembler
+assembler.clone_set()
+					]]>
+				</scriptCode> -->
+			</scriptItem>
+			<!-- ============================ End Set cloner Tool =========================== -->
+
+			<!-- ============================ Start Tool cloner Tool =========================== -->
+			<scriptItem id="h.cloner_tool">
+				<label>Tool</label>
+				<scriptCode scriptType="python">
+					<![CDATA[
+from pipe.tools.houtools.cloner import cloner
+import hou
+cloner = cloner.Cloner()
+hou.session.cloner = cloner
+cloner.clone_tool()
+					]]>
+				</scriptCode>
+			</scriptItem>
+			<!-- ============================ End Tool cloner Tool =========================== -->
+
+			<!-- ============================ Start Shot cloner Tool =========================== -->
+			<scriptItem id="h.cloner_shot">
+				<label>Shot</label>
+				<scriptCode scriptType="python">
+					<![CDATA[
+from pipe.tools.houtools.cloner import cloner
+import hou
+cloner = cloner.Cloner()
+hou.session.cloner = cloner
+cloner.clone_shot()
+]]>
+				</scriptCode>
+			</scriptItem>
+			<!-- ============================ End Shot cloner Tool =========================== -->
+		</subMenu>
+		<!-- ============================ End cloner subMenu =========================== -->
+
+		<!-- ============================ Start Publish subMenu =========================== -->
+		<subMenu id="publish_menu">
+			<label>Publish</label>
+			<!-- ============================ Start Prop/Actor Publish Tool =========================== -->
+			<scriptItem id="h.publishAsset">
+				<label>Prop/Actor</label>
+				<scriptCode scriptType="python">
+					<![CDATA[
+from pipe.tools.houtools.publisher import publisher
+import hou
+publisher = publisher.Publisher()
+hou.session.publisher = publisher
+publisher.publish_asset()
+					]]>
+				</scriptCode>
+			</scriptItem>
+			<!-- ============================ End Prop/Actor Publish Tool =========================== -->
+
+			<!-- ============================ Start Set Publish Tool =========================== -->
+			<scriptItem id="h.publishSet">
+				<label>Set</label>
+				<scriptCode scriptType="python">
+					<![CDATA[
+from pipe.tools.houtools.publisher import publisher
+import hou
+publisher = publisher.Publisher()
+hou.session.publisher = publisher
+publisher.publish_set()
+					]]>
+				</scriptCode>
+			</scriptItem>
+			<!-- ============================ End Set Publish Tool =========================== -->
+
+			<!-- ============================ Start Tool Publish Tool =========================== -->
+			<scriptItem id="h.publish_tool">
+				<label>Tool</label>
+				<expression>
+import hou
+good = len(hou.selectedNodes())==0
+return good
+				</expression>
+				<scriptCode scriptType="python">
+					<![CDATA[
+from pipe.tools.houtools.publisher import publisher
+import hou
+publisher = publisher.Publisher()
+hou.session.publisher = publisher
+publisher.publish_tool()
+					]]>
+				</scriptCode>
+			</scriptItem>
+			<!-- ============================ End Tool Publish Tool =========================== -->
+
+			<!-- ============================ Start Shot Publish Tool =========================== -->
+			<scriptItem id="h.publish_shot">
+				<label>Shot</label>
+				<scriptCode scriptType="python">
+					<![CDATA[
+from pipe.tools.houtools.publisher import publisher
+import hou
+publisher = publisher.Publisher()
+hou.session.publisher = publisher
+publisher.publish_shot()
+					]]>
+				</scriptCode>
+			</scriptItem>
+			<!-- ============================ End Shot Publish Tool =========================== -->
+		</subMenu>
+		<!-- ============================ End Publish subMenu =========================== -->
+
+		<!-- ============================ Start Stage subMenu =========================== -->
+		<subMenu id="stage_menu">
+			<label>Stage</label>
+			<!-- ============================ Start Initialize USD Stage Tool =========================== -->
+			<scriptItem id="h.initStage">
+				<label>Initialize USD Stage</label>
+				<scriptCode scriptType="python">
+					<![CDATA[
+from pipe.tools.houtools.stager import stager
+import hou
+stager = stager.Stager()
+hou.session.stager = stager
+stager.initializeStageNetwork()
+					]]>
+				</scriptCode>
+			</scriptItem>
+			<!-- ============================ End Initialize USD Stage Tool =========================== -->
+
+			<!-- ============================ Start Import Asset Tool =========================== -->
+			<scriptItem id="h.importAsset">
+				<label>Import Asset to Stage</label>
+				<scriptCode scriptType="python">
+					<![CDATA[
+from pipe.tools.houtools.stager import stager
+import hou
+stager = stager.Stager()
+hou.session.stager = stager
+stager.importAssetToStage()
+					]]>
+				</scriptCode>
+			</scriptItem>
+			<!-- ============================ End Import Asset Tool =========================== -->
+		</subMenu>
+		<!-- ============================ End Stage subMenu =========================== -->
+
+		<!-- ============================ Start Utilities subMenu =========================== -->
+		<subMenu id="utils_menu">
+			<label>Utilities</label>
+			<!-- ============================ Start Reload Scripts Tool =========================== -->
+			<scriptItem id="h.reload_scripts">
+				<label>Reload Scripts</label>
+				<scriptCode scriptType="python">
+					<![CDATA[
+from pipe.tools.houtools.utils import reload_scripts
+reload_scripts = reload_scripts.ReloadScripts()
+reload_scripts.run()
+					]]>
+				</scriptCode>
+			</scriptItem>
+			<!-- ============================ End Reload Scripts Tool =========================== -->
+
+			<!-- ============================ Start Create HDA Tool =========================== -->
+			<scriptItem id="h.create_hda">
+				<label>Create Digital Asset</label>
+				<scriptCode scriptType="python">
+					<![CDATA[
+from pipe.tools.houtools.utils import create_tool_hda
+create_tool_hda = CreateToolHda()
+create_tool_hda.run()
+					]]>
+				</scriptCode>
+			</scriptItem>
+			<!-- ============================ End Create HDA Tool =========================== -->
+
+			<!-- ============================ Start Snapshot Tool =========================== -->
+			<scriptItem id="h.snapshot_tool">
+				<label>Snapshot</label>
+				<scriptCode scriptType="python">
+					<![CDATA[
+from pipe.tools.houtools.utils.snapshot_tool import SnapshotTool
+import hou
+snapshot_tool = SnapshotTool()
+hou.session.snapshot_tool = snapshot_tool
+snapshot_tool.run()
+					]]>
+				</scriptCode>
+			</scriptItem>
+			<!-- ============================ End Snapshot Tool =========================== -->
+
+			<!-- ============================ Start Generate ROP Tool =========================== -->
+			<scriptItem id="h.generate_rop">
+				<label>Generate ROP</label>
+				<scriptCode scriptType="python">
+					<![CDATA[
+from pipe.tools.houtools.utils.generate_rop import GenerateROP
+import hou
+generate_rop = GenerateROP()
+hou.session.generate_rop = generate_rop
+generate_rop.go()
+					]]>
+				</scriptCode>
+			</scriptItem>
+			<!-- ============================ End Generate ROP Tool =========================== -->
+
+			<!-- ============================ Start Backup Lighting Tool =========================== -->
+			<scriptItem id="h.backup_lighting">
+				<label>Backup Light Linking</label>
+				<scriptCode scriptType="python">
+					<![CDATA[
+from pipe.tools.houtools.utils.backup_lighting import BackupLighting
+import hou
+backup_lighting = BackupLighting()
+hou.session.backup_lighting = backup_lighting
+backup_lighting.go()
+					]]>
+				</scriptCode>
+			</scriptItem>
+			<!-- ============================ End Backup Lighting Tool =========================== -->
+
+			<!-- ============================ Start Import Lighting Tool =========================== -->
+			<scriptItem id="h.import_lighting">
+				<label>Revert Light Linking to previous backup</label>
+				<scriptCode scriptType="python">
+					<![CDATA[
+from pipe.tools.houtools.utils.import_lighting import ImportLighting
+import hou
+import_lighting = ImportLighting()
+hou.session.import_lighting = import_lighting
+import_lighting.go()
+					]]>
+				</scriptCode>
+			</scriptItem>
+			<!-- ============================ End Import Lighting Tool =========================== -->
+		</subMenu>
+		<!-- ============================ End Utilities subMenu =========================== -->
+
+	</subMenu>
+	<!-- ============================ End DCC Tools Menu =========================== -->
+  </menuBar>
+</mainMenu>
