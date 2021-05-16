@@ -56,7 +56,7 @@ function icon {
 	fi
 
 	NOSPACES=${SOFTWARE_NAME// /-}
-	FILENAME=${PROJECT_PATH}"/dcc_${NOSPACES,,}"
+	FILENAME=${PROJECT_PATH}"/BYU${NOSPACES,,}"
 
 	echo "#!/usr/bin/env xdg-open" > ${FILENAME}.desktop
 	echo "[Desktop Entry]" >> ${FILENAME}.desktop
