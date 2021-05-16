@@ -1,0 +1,24 @@
+{
+	"shelfItems":[
+		{
+			"itemType":"button",
+			"icon":"clone.svg",
+			"annotation":"Clone an asset. Double-click to select a previous publish.",
+			"label":"clone",
+			"menu":1,
+			"menu_items":{"Asset":"clone_asset()", "Shot":"clone_shot()"},
+			"double-click":"clone()",
+			"tool":"mayatools.cloners.cloner",
+			"function":"MayaCloner.quick_clone()"
+		}, {
+			"itemType":"button",
+			"icon":"publish.svg",
+			"annotation":"Publish an asset. Double-click to publish and export.",
+			"label":"publish",
+			"menu":0,
+			"double-click":"publish()",
+			"tool":"mayatools.publishers.publisher",
+			"function":"MayaPublisher.publish_without_export()"
+		}
+	]
+}
