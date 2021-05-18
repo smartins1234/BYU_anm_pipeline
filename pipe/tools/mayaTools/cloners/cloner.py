@@ -35,13 +35,13 @@ class MayaCloner:
 
 	def non_gui_open(self, filePath=None, assetName='Temp'):
 		if filePath == None:
-			print 'no file'
+			print('no file')
 			return
 		if os.path.exists(filePath):
 			mc.file(filePath, open=True, force=True, ignoreVersion=True)
-			print "open file " + assetName
+			print("open file " + assetName)
 		else:
-			print 'File does not exist: '+assetName
+			print('File does not exist: '+assetName)
 
 	def clone_prop(self):
 		self.quick = True
@@ -184,13 +184,13 @@ class MayaCloner:
 					mc.file(new=True, force=True)
 					mc.file(rename=selected_scene_file)
 					mc.file(save=True, force=True)
-					print "New file: " + selected_scene_file
+					print("New file: " + selected_scene_file)
 				except Exception as e:
 					qd.error("That publish is missing. It may have been deleted to clear up space.", details=str(e))
 					return False
 			else:
 				mc.file(selected_scene_file, open=True, force=True, ignoreVersion=True)
-				print "File opened: " + selected_scene_file
+				print("File opened: " + selected_scene_file)
 
 			return True
 		else:

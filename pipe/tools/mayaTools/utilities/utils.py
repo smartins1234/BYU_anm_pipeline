@@ -286,12 +286,12 @@ def get_loaded_references():
     loaded=[]
 
     for ref in references:
-        print "Checking status of " + ref
+        print("Checking status of " + ref)
         try:
             if ref.isLoaded():
                 loaded.append(ref)
         except:
-            print "Warning: " + ref + " was not associated with a reference file"
+            print("Warning: " + ref + " was not associated with a reference file")
 
     print("loaded: ", loaded)
     return loaded

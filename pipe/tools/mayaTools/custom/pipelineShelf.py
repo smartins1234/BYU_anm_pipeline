@@ -1,40 +1,23 @@
-'''
-	Welcome to the Maya shelf script!
-
-	If you'd like to add a shelf button, you can add it to
-	shelf.json. Follow the example of the other buttons in there.
-	Remember, the icon should be a .svg and the function
-	must be implemented in the specified tool location
-'''
 import pymel.core as pm
 import os
 import sys
 import json
-from pipe.pipeHandlers.environment import Environment
-from pipe.tools.mayaTools.utilities.reload_scripts import *
+from pipe.tools.mayaTools.utils.reload_scripts import ReloadScripts
 
-
-environment = Environment()
-# PROJ = environment.get_project_name()
-SHELF_DIR = os.environ.get('MAYA_SHELF_DIR')
+print(os.environ.get("MAYA_SHELF_DIR"))
+SHELF_DIR = os.environ.get("MAYA_SHELF_DIR")
 ICON_DIR = os.environ.get('MAYA_ICONS_DIR')
-os.environ["DCC_ASSET_NAME"] = ""
-os.environ["DCC_DEPARTMENT"] = ""
+PROJ = "BYU Modeling"
 
-'''
-	Shelf building code. You shouldn't have to edit anything
-	below these lines. If you want to add a new shelf item,
-	follow the instructions at the top of this file.
-'''
-def load_shelf(shelfName, fileName):
-	delete_shelf(shelfName)
+def load_shelf():
+	delete_shelf()
 	ReloadScripts().go()
 
-	gShelfTopLevel = pm.mel.eval('global string $gShelfTopLevel; string $temp=$gShelfTopLevel')
-	pm.shelfLayout(shelfName, cellWidth=33, cellHeight=33, p=gShelfTopLevel)
+	gShelfTopLevel = pm.mel.eval("global string $gShelfTopLevel; string $temp=$gShelfTopLevel")
+	pm.shelfLayout(PROJ, cellWidth=33, cellHeight=33, p=gShelfTopLevel)
 
 	# Load in the buttons
-	json_file = open(os.path.join(SHELF_DIR, fileName))
+	json_file = file(os.path.join(SHELF_DIR, "shelf.json"))
 	data = json.loads(json_file.read())
 	for shelf_item in data['shelfItems']:
 		if shelf_item['itemType'] == 'button':
@@ -74,7 +57,6 @@ def load_shelf(shelfName, fileName):
 		else:
 			pm.separator(horizontal=False, style='shelf', enable=True, width=35, height=35, visible=1, enableBackground=0, backgroundColor=(0.2,0.2,0.2), highlightColor=(0.321569, 0.521569, 0.65098))
 
-
 	# Set default preferences
 	pm.env.optionVars['generateUVTilePreviewsOnSceneLoad'] = 1
 
@@ -93,6 +75,6 @@ def build_menu_string(command_base, menu_items):
 
 	return menu
 
-def delete_shelf(shelfName):
-	if pm.shelfLayout(shelfName, exists=True):
-		pm.deleteUI(shelfName)
+def delete_shelf():
+	if pm.shelfLayout(PROJ, exists=True):
+		pm.deleteUI(PROJ)
