@@ -201,7 +201,7 @@ class SelectFromMultipleLists(SelectFromList):
     def initializeDropdown(self):
         self.comboBox = QtWidgets.QComboBox()
         for label in self.labels:#[::-1]:
-            print "adding label {0}".format(label)
+            print("adding label {0}".format(label))
             self.comboBox.addItem(label)
         self.comboBox.currentIndexChanged.connect(self.switchList)
         self.vbox.addWidget(self.comboBox)
@@ -219,7 +219,7 @@ class SelectFromMultipleLists(SelectFromList):
         self.currLabel = newLabel
         self.listWidget.all_items = newList
         self.listWidget.shown_items = newList
-        print "newList: {0}".format(newList)
+        print("newList: {0}".format(newList))
         self.listWidget.set_list(newList)
         if not init and self.multiple_selection:
             self.textEdited(self.searchBox.text())
