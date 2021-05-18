@@ -3,7 +3,7 @@
 import os
 import shutil
 from pipe.pipeHandlers.environment import Environment
-import pipeline_io
+from pipe.pipeHandlers import pipeline_io
 
 
 class Checkout:
@@ -401,7 +401,7 @@ class Element:
         timestamp = pipeline_io.timestamp()
         try:
             shutil.copyfile(src, dst)
-        except Exception, e:
+        except Exception as e:
             print(str(e))
 
         new_version = self._datadict[self.LATEST_VERSION] + 1

@@ -4,7 +4,7 @@ import getpass
 import os
 import pwd
 
-import pipeline_io
+from pipe.pipeHandlers import pipeline_io
 
 class Environment:
 
