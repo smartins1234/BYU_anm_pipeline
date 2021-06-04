@@ -10,11 +10,11 @@ import pymel.core as pm
 import os
 import sys
 import json
-from pipe.pipeHandlers.environment import Environment
+# from pipe.pipeHandlers.environment import Environment
 from pipe.tools.mayaTools.utilities.reload_scripts import *
 
 
-environment = Environment()
+# environment = Environment()
 # PROJ = environment.get_project_name()
 SHELF_DIR = os.environ.get('MAYA_SHELF_DIR')
 ICON_DIR = os.environ.get('MAYA_ICONS_DIR')

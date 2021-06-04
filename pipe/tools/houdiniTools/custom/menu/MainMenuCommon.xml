@@ -258,10 +258,10 @@ stager.importAssetToStage()
 		</subMenu>
 		<!-- ============================ End Stage subMenu =========================== -->
 
-		<!-- ============================ Start Utilities subMenu =========================== -->
+		<!-- ============================ Start Utilities subMenu =========================== >
 		<subMenu id="utils_menu">
 			<label>Utilities</label>
-			<!-- ============================ Start Reload Scripts Tool =========================== -->
+			<! ============================ Start Reload Scripts Tool =========================== >
 			<scriptItem id="h.reload_scripts">
 				<label>Reload Scripts</label>
 				<scriptCode scriptType="python">
@@ -272,9 +272,9 @@ reload_scripts.run()
 					]]>
 				</scriptCode>
 			</scriptItem>
-			<!-- ============================ End Reload Scripts Tool =========================== -->
+			<! ============================ End Reload Scripts Tool =========================== >
 
-			<!-- ============================ Start Create HDA Tool =========================== -->
+			<! ============================ Start Create HDA Tool =========================== >
 			<scriptItem id="h.create_hda">
 				<label>Create Digital Asset</label>
 				<scriptCode scriptType="python">
@@ -285,9 +285,9 @@ create_tool_hda.run()
 					]]>
 				</scriptCode>
 			</scriptItem>
-			<!-- ============================ End Create HDA Tool =========================== -->
+			<! ============================ End Create HDA Tool =========================== >
 
-			<!-- ============================ Start Snapshot Tool =========================== -->
+			<! ============================ Start Snapshot Tool =========================== >
 			<scriptItem id="h.snapshot_tool">
 				<label>Snapshot</label>
 				<scriptCode scriptType="python">
@@ -300,9 +300,9 @@ snapshot_tool.run()
 					]]>
 				</scriptCode>
 			</scriptItem>
-			<!-- ============================ End Snapshot Tool =========================== -->
+			<! ============================ End Snapshot Tool =========================== >
 
-			<!-- ============================ Start Generate ROP Tool =========================== -->
+			<! ============================ Start Generate ROP Tool =========================== >
 			<scriptItem id="h.generate_rop">
 				<label>Generate ROP</label>
 				<scriptCode scriptType="python">
@@ -315,9 +315,9 @@ generate_rop.go()
 					]]>
 				</scriptCode>
 			</scriptItem>
-			<!-- ============================ End Generate ROP Tool =========================== -->
+			<! ============================ End Generate ROP Tool =========================== >
 
-			<!-- ============================ Start Backup Lighting Tool =========================== -->
+			<! ============================ Start Backup Lighting Tool =========================== >
 			<scriptItem id="h.backup_lighting">
 				<label>Backup Light Linking</label>
 				<scriptCode scriptType="python">
@@ -330,9 +330,9 @@ backup_lighting.go()
 					]]>
 				</scriptCode>
 			</scriptItem>
-			<!-- ============================ End Backup Lighting Tool =========================== -->
+			<! ============================ End Backup Lighting Tool =========================== >
 
-			<!-- ============================ Start Import Lighting Tool =========================== -->
+			<! ============================ Start Import Lighting Tool =========================== >
 			<scriptItem id="h.import_lighting">
 				<label>Revert Light Linking to previous backup</label>
 				<scriptCode scriptType="python">
@@ -345,9 +345,9 @@ import_lighting.go()
 					]]>
 				</scriptCode>
 			</scriptItem>
-			<!-- ============================ End Import Lighting Tool =========================== -->
+			<! ============================ End Import Lighting Tool =========================== >
 		</subMenu>
-		<!-- ============================ End Utilities subMenu =========================== -->
+		<! ============================ End Utilities subMenu =========================== -->
 
 	</subMenu>
 	<!-- ============================ End DCC Tools Menu =========================== -->

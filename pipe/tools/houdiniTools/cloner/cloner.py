@@ -1,17 +1,17 @@
 import hou
 import os
 # from PySide2 import QtGui, QtWidgets, QtCore
-import pipe.gui.quick_dialogs as qd
-import pipe.gui.select_from_list as sfl
+import pipe.pipeHandlers.quick_dialogs as qd
+import pipe.pipeHandlers.select_from_list as sfl
 
-from pipe.tools.houtools.utils.utils import *
-from pipe.tools.houtools.importer.importer import Importer
+#from pipe.tools.houdiniTools.utils.utils import *
+#from pipe.tools.houdiniTools.importer.importer import Importer
 
-from pipe.am.project import Project
-from pipe.am.body import Body
-from pipe.am.element import Element
-from pipe.am.environment import Department
-from pipe.am.environment import Environment
+from pipe.pipeHandlers.project import Project
+from pipe.pipeHandlers.body import Body
+from pipe.pipeHandlers.element import Element
+from pipe.pipeHandlers.environment import Department
+from pipe.pipeHandlers.environment import Environment
 
 
 class Cloner:
@@ -124,8 +124,8 @@ class Cloner:
     def clone_hda(self, hda=None):
         project = Project()
 
-        asset_list = project.list_props_and_actors()
-        self.item_gui = sfl.SelectFromList(l=asset_list, parent=houdini_main_window(), title="Select an asset to clone")
+        asset_list = project.list_asset()
+        self.item_gui = sfl.SelectFromList(l=asset_list, parent=hou.ui.mainQtWindow(), title="Select an asset to clone")
         self.item_gui.submitted.connect(self.asset_results)
 
     def get_department_paths(self, body):

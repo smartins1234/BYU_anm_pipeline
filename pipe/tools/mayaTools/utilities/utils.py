@@ -4,6 +4,7 @@ import os
 import glob
 import re
 from PySide2 import QtWidgets
+#from PySide6 import QtWidgets
 
 from pipe.pipeHandlers import *
 from pipe.pipeHandlers.environment import Environment
@@ -29,7 +30,7 @@ def setPublishEnvVar(asset_name, department="model"):
     Function used whenever a more complex gui is called within Maya
 '''
 def maya_main_window():
-    for obj in QtWidgets.qApp.topLevelWidgets():
+    for obj in QtWidgets.QApplication.topLevelWidgets():
         if obj.objectName() == 'MayaWindow':
             return obj
     raise RuntimeError('Could not find MayaWindow instance')
