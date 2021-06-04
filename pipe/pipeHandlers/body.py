@@ -13,7 +13,6 @@ class Body(object):
 	'''
 	Abstract class describing bodies that make up a project.
 	'''
-	# TODO allow users to subscribe to a body and recieve emails when changes are made
 	PIPELINE_FILENAME = '.body'
 
 	NAME = 'name'
@@ -247,6 +246,7 @@ class AssetType:
 	PROP = 'prop'
 	TOOL = 'tool'
 	SHOT = 'shot'
+	ASSET = 'asset'
 	ALL = [ACTOR, PROP, SET, SHOT, TOOL]
 	MAYA = [ACTOR, PROP, SET, SHOT]
 

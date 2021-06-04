@@ -39,6 +39,9 @@ export HOUDINI_MENU_PATH=${HOUDINI_TOOLS}"/custom/menu;&"
 export HOUDINI_TOOLBAR_PATH=${MEDIA_PROJECT_DIR}"/production/tabs;&"
 export HOUDINI_UI_ICON_PATH=${MEDIA_PROJECT_DIR}"icons/tool-icons;&"
 
+#export HOUDINI_USER_PREF_DIR=${MEDIA_PROJECT_DIR}"/production/users/"${USER}";&"
+export HOUDINI_DESK_PATH=${HOUDINI_DESK_PATH}:${HOUDINI_TOOLS}"/custom/menu;&"
+
 export RMANTREE="/opt/pixar/RenderManProServer-23.5"
 export RFHTREE="/opt/pixar/RenderManForHoudini-23.5"
 export RMAN_PROCEDURALPATH=$RFHTREE/18.5.351/openvdb:&
