@@ -5,9 +5,8 @@ try:
 except ImportError:
     from PySide2 import QtWidgets, QtGui, QtCore
 
-from .project import Project
+from pipe.pipeHandlers.project import Project
 import os
-
 
 def select_from_list(list, parent):  # TODO: finish this.
     window = QtWidgets.QWidget()
@@ -33,7 +32,7 @@ class ItemList(QtWidgets.QListWidget):
             self.addItem(item)
 
 
-class SelectFromList(QtWidgets.QWidget):
+class SelectFromList(QtWidgets.QDialog):
 
     '''
     submitted is a class variable that must be instantiated outside of __init__
@@ -42,7 +41,7 @@ class SelectFromList(QtWidgets.QWidget):
     submitted = QtCore.Signal(list)
 
     def __init__(self, parent=None, title="Select", l=[], multiple_selection=False, width=600, height=600):
-        super(SelectFromList, self).__init__()
+        super(SelectFromList, self).__init__(parent)
         if parent:
             self.parent = parent
         self.list = l
@@ -156,7 +155,7 @@ class SelectFromList(QtWidgets.QWidget):
     '''
     def submit(self):
         self.button.setText("Loading...")
-        icon_path = os.path.join(Project().get_project_dir(), "pipe", "tools", "_resources", "loading_indicator_transparent.gif")
+        icon_path = os.path.join(Project().get_project_dir(), "icons", "loading_indicator_transparent.gif")
         self.movie = QtGui.QMovie(icon_path)
         self.movie.frameChanged.connect(self.setButtonIcon)
         if not self.movie.loopCount() == -1:

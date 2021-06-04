@@ -97,12 +97,6 @@ class Project:
 		'''
 		return self._env.get_tools_dir()
 
-	def get_crowds_dir(self):
-		'''
-		return the absolute filepath to the crowds directory of this project
-		'''
-		return self._env.get_crowds_dir()
-
 		#TODO create a get tabs dir in the byuam environment module
 	def get_tabs_dir(self):
 		'''
@@ -165,16 +159,6 @@ class Project:
 		if not os.path.exists(filepath):
 			return None
 		return Tool(filepath)
-
-	def get_crowd_cycle(self, name):
-		'''
-		returns the crowd cycle object associated with the given name.
-		name -- the name of the crowd cycle
-		'''
-		filepath = os.path.join(self._env.get_crowds_dir(), name)
-		if not os.path.exists(filepath):
-			return None
-		return CrowdCycle(filepath)
 
 	def get_body(self, name):
 		'''
@@ -241,13 +225,6 @@ class Project:
 		'''
 		return self._create_body(name, Shot)
 
-	def create_crowd_cycle(self, name):
-		'''
-		creates a new tool with the given name, and returns the resulting tool object.
-		name -- the name of the new tool to create
-		'''
-		return self._create_body(name, CrowdCycle)
-
 	def create_tool(self, name):
 		'''
 		creates a new tool with the given name, and returns the resulting tool object.
@@ -277,14 +254,18 @@ class Project:
 
 		return bodylist
 
-	def list_assets(self, filter=None):
-		'''
-		returns a list of strings containing the names of all assets in this project
-		filter -- a tuple containing an attribute (string) relation (operator) and value
-		          e.g. (Asset.TYPE, operator.eq, AssetType.ACTOR). Only returns assets whose
-		          given attribute has the relation to the given desired value. Defaults to None.
-		'''
-		return self._list_bodies_in_dir(self._env.get_assets_dir(), filter)
+	def list_assets(self):
+		list = self._list_bodies_in_dir(self._env.get_assets_dir())
+		assets = []
+
+		for item in list:
+			asset = self.get_asset(item)
+			if asset.get_type() == AssetType.ASSET:
+				assets.append(str(item))
+
+		assets.sort(key=str.lower)
+
+		return assets
 
 	def list_shots(self, filter=None):
 		'''
@@ -293,7 +274,7 @@ class Project:
 				e.g. (Shot.FRAME_RANGE, operator.gt, 100). Only returns shots whose
 				given attribute has the relation to the given desired value. Defaults to None.
 		'''
-		list = self.list_assets()
+		list = self._list_bodies_in_dir(self._env.get_assets_dir())
 
 		shot_list = []
 
@@ -329,17 +310,11 @@ class Project:
 
 		return names
 
-	def list_crowd_cycles(self):
-		'''
-		returns a list of strings containing the names of all crowds cycles in this project
-		'''
-		return self._list_bodies_in_dir(self._env.get_crowds_dir())
-
 	def list_sets(self):
 		'''
 		returns a list of strings containing the names of all sets in this project
 		'''
-		list = self.list_assets()
+		list = self._list_bodies_in_dir(self._env.get_assets_dir())
 		set_list = []
 
 		for item in list:
@@ -351,19 +326,8 @@ class Project:
 
 		return set_list
 
-	def list_props_and_actors(self):
-		'''
-		returns a list of strings containing the names of all props/actors in this project
-		'''
-		pa_list = self.list_actors()
-		pa_list.extend(self.list_props())
-
-		pa_list.sort(key=str.lower)
-
-		return pa_list
-
 	def list_actors(self):
-		list = self.list_assets()
+		list = self._list_bodies_in_dir(self._env.get_assets_dir())
 		actors = []
 
 		for item in list:
@@ -376,7 +340,7 @@ class Project:
 		return actors
 
 	def list_props(self):
-		list = self.list_assets()
+		list = self._list_bodies_in_dir(self._env.get_assets_dir())
 		props = []
 
 		for item in list:
@@ -392,7 +356,7 @@ class Project:
 		'''
 		returns a list of strings containing the names of all bodies (assets and shots)
 		'''
-		return self.list_assets() + self.list_shots() + self.list_tools() + self.list_crowd_cycles()
+		return self._list_bodies_in_dir(self._env.get_assets_dir()) + self.list_shots() + self.list_tools() + self.list_crowd_cycles()
 
 	def list_users(self):
 		'''
@@ -464,7 +428,7 @@ class Project:
 		'''
 		delete the given asset
 		'''
-		if asset in self.list_assets():
+		if asset in self._list_bodies_in_dir(self._env.get_assets_dir()):
 			shutil.rmtree(os.path.join(self.get_asset_dir(), asset))
 
 	def delete_tool(self, tool):
