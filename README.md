@@ -2,9 +2,9 @@
 Pipeline Managment
 
 ## Description
-This is an adjusted version of the previous DCC pipe https://github.com/byu-animation/dccpipe.  
+This is a heavily modified version of the previous DCC pipe https://github.com/byu-animation/dccpipe.  
 
-The BYU_anm_pipeline has been simplified to run on the fedora operating system and allow for communication between several content creation softwares.  A major modification is that this pipe is built on a USD backbone https://github.com/PixarAnimationStudios/USD.  This referenced file system allows for adjustments to flow up and down the pipeline instead of the traditional waterfall pipelines.
+The BYU_anm_pipeline is designed to run on the Fedora operating system and allow for communication between several content creation softwares.  A major modification is that this pipe is built on a USD backbone https://github.com/PixarAnimationStudios/USD rather than a purely Alembic-based structure.  This referenced file system allows for adjustments to flow up and down the pipeline instead of the traditional waterfall pipelines.
 
 ## Install Instructions
 ### Basic install for developers
@@ -57,9 +57,10 @@ sudo config/unix/fedora/install.sh --installmissing
 
 
 ## Compatibility
-This project was inspired by previous BYU Animation pipeline repositories, such as [BYU Animation Tools](https://github.com/byu-animation/byu-animation-tools) and [BYU Pipeline Tools](https://github.com/byu-animation/byu-pipeline-tools). Therefore, it is created with a very specific use case. However, the pipeline is built in such a way that other distros/operating systems could be supported in a future release.
+This project is based off of the previous BYU Animation pipeline. [DCC Pipe.](https://github.com/byu-animation/dccpipe) That, in turn, succeeeded the previous pipeline repositories [BYU Animation Tools](https://github.com/byu-animation/byu-animation-tools) and [BYU Pipeline Tools](https://github.com/byu-animation/byu-pipeline-tools). This pipeline was created with a very specific use case, and is not intended to be used outside of the BYU Center for Animation labs. However, the pipeline is designed so that other distros/operating systems can be supported in a future release, given appropriate modifications.
 
 ### System Requirements
+### FIXME: update
 
 | Requirements    | Description                                                                         |
 |:----------------|:------------------------------------------------------------------------------------|
@@ -73,7 +74,7 @@ This project was inspired by previous BYU Animation pipeline repositories, such 
 \* Will be automatically installed using the `--installmissing/-im` flag.
 
 ### Supported DCC's
-### FIXME: Update 2018 to 2019 and 17.5 to 18.0
+### FIXME: update
 
 | DCC                             | Version | Module          |
 |:--------------------------------|--------:|:----------------|
@@ -83,6 +84,7 @@ This project was inspired by previous BYU Animation pipeline repositories, such 
 | Allegorithmic Substance Painter | 2018.3  | pipe.tools.sbs  |
 
 ### Packages Managed by Pipenv
+### FIXME: update
 Note: All packages will be installed in the project's directory in the .venv folder.
 
 | Pipenv Package | `--dev` only |
