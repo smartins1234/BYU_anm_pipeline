@@ -1,16 +1,11 @@
 import hou
 import os
-# from PySide2 import QtGui, QtWidgets, QtCore
 import pipe.pipeHandlers.quick_dialogs as qd
 import pipe.pipeHandlers.select_from_list as sfl
-
-#from pipe.tools.houdiniTools.utils.utils import *
-#from pipe.tools.houdiniTools.importer.importer import Importer
 
 from pipe.pipeHandlers.project import Project
 from pipe.pipeHandlers.body import Body
 from pipe.pipeHandlers.element import Element
-from pipe.pipeHandlers.environment import Department
 from pipe.pipeHandlers.environment import Environment
 
 
@@ -25,14 +20,12 @@ class Cloner:
         environment = Environment()
         self.user = environment.get_user()
 
-    def clone_asset(self, node=None):
-        self.clone_hda(hda=node)
 
     def clone_tool(self, node=None):
         self.project = Project()
         hda_list = self.project.list_hdas()
 
-        self.item_gui = sfl.SelectFromList(l=hda_list, parent=houdini_main_window(), title="Select a tool to clone")
+        self.item_gui = sfl.SelectFromList(l=hda_list, parent=hou.ui.mainQtWindow(), title="Select a tool to clone")
         self.item_gui.submitted.connect(self.tool_results)
 
     def tool_results(self, value):
@@ -69,7 +62,7 @@ class Cloner:
         project = Project()
 
         asset_list = project.list_shots()
-        self.item_gui = sfl.SelectFromList(l=asset_list, parent=houdini_main_window(), title="Select a shot to clone")
+        self.item_gui = sfl.SelectFromList(l=asset_list, parent=hou.ui.mainQtWindow(), title="Select a shot to clone")
         self.item_gui.submitted.connect(self.shot_results)
 
     def shot_results(self, value):
@@ -98,7 +91,7 @@ class Cloner:
             label = publish[0] + " " + publish[1] + " " + publish[2]
             self.sanitized_publish_list.append(label)
 
-        self.item_gui = sfl.SelectFromList(l=self.sanitized_publish_list, parent=houdini_main_window(), title="Select publish to clone")
+        self.item_gui = sfl.SelectFromList(l=self.sanitized_publish_list, parent=hou.ui.mainQtWindow(), title="Select publish to clone")
         self.item_gui.submitted.connect(self.publish_selection_results)
 
     def publish_selection_results(self, value):
@@ -120,13 +113,6 @@ class Cloner:
                 return
             else:
                 hou.hipFile.load(selected_scene_file)
-
-    def clone_hda(self, hda=None):
-        project = Project()
-
-        asset_list = project.list_asset()
-        self.item_gui = sfl.SelectFromList(l=asset_list, parent=hou.ui.mainQtWindow(), title="Select an asset to clone")
-        self.item_gui.submitted.connect(self.asset_results)
 
     def get_department_paths(self, body):
         self.modify_element = body.get_element("modify")
@@ -161,6 +147,13 @@ class Cloner:
 
         return department_paths
 
+    def clone_asset(self):
+        project = Project()
+
+        asset_list = project.list_existing_assets()
+        self.item_gui = sfl.SelectFromList(l=asset_list, parent=hou.ui.mainQtWindow(), title="Select an asset to clone")
+        self.item_gui.submitted.connect(self.asset_results)
+
     def asset_results(self, value):
         print("Selected asset: ", value[0])
         filename = value[0]
@@ -170,7 +163,7 @@ class Cloner:
 
         department_paths = self.get_department_paths(self.body)
 
-        from pipe.tools.houtools.assembler.assembler import Assembler  # we put import here to avoid cross import issue #63 FIXME
+        from pipe.tools.houdiniTools.assembler.assembler import Assembler  # we put import here to avoid cross import issue #63 FIXME
         node, created_instances =  Assembler().create_hda(filename, body=self.body, department_paths=department_paths)
         layout_object_level_nodes()
 

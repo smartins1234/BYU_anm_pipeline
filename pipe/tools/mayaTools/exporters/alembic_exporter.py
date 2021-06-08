@@ -9,7 +9,7 @@ import pymel.core as pm
 import pipe.pipeHandlers.pipeline_io as pio
 from pipe.tools.mayaTools.utilities.utils import *
 from pipe.pipeHandlers.environment import Environment
-from pipe.pipeHandlers.environment import Department
+#from pipe.pipeHandlers.environment import Department
 from pipe.pipeHandlers.body import AssetType
 from pipe.pipeHandlers.project import Project
 from pipe.pipeHandlers import quick_dialogs as qd
@@ -70,7 +70,7 @@ class AlembicExporter:
         self.body.set_frame_range(self.frame_range)
 
         asset_type = self.body.get_type()
-        department_list = get_departments_by_type(asset_type, export=True)
+        """department_list = get_departments_by_type(asset_type, export=True)
 
         if export_all:
             # tag top level nodes
@@ -79,9 +79,9 @@ class AlembicExporter:
             for node in nodes:
                 tag_node_with_flag(node, "DCC_Alembic_Export_Flag")
 
-        self.department_results(department_list)
+        self.department_results(department_list)"""
 
-    def department_results(self, value):
+    """def department_results(self, value):
         department_list = value
 
         selection = None
@@ -116,7 +116,7 @@ class AlembicExporter:
                 body = project.get_body(element.get_parent())
                 element = body.get_element(dept)
 
-            self.export(element, selection=selection, startFrame=startFrame, endFrame=endFrame)
+            self.export(element, selection=selection, startFrame=startFrame, endFrame=endFrame)"""
 
     def export(self, element, selection=None, startFrame=None, endFrame=None):
         project = Project()
@@ -138,7 +138,7 @@ class AlembicExporter:
             endFrame = str(endFrame)
             files = self.exportReferences(abcFilePath, tag='DCC_Alembic_Export_Flag', startFrame=startFrame, endFrame=endFrame)
             if self.cameras:
-                files.extend(self.export_cameras(body, startFrame, endFrame))
+                pass#files.extend(self.export_cameras(body, startFrame, endFrame))
 
         elif body.is_asset():
             if body.get_type() == AssetType.SET:
@@ -293,7 +293,7 @@ class AlembicExporter:
 
         return abcFiles
 
-    def export_cameras(self, shot, startFrame, endFrame):
+    """def export_cameras(self, shot, startFrame, endFrame):
         cam_list = mc.listCameras(p=True)
 
         if u'persp' in cam_list:
@@ -330,13 +330,13 @@ class AlembicExporter:
 
             files.append(destination)
 
-        return files
+        return files"""
 
     def getFilenameForReference(self, ref):
         #TODO Make sure that we test for multiple files
         # When we get the file name we need to make sure that we also get the reference number. This will allow us to have multiple alembics from a duplicated reference.
         # refPath = ref.fileName(False,True,True)
-        refPath = refPath = pm.referenceQuery(unicode(ref), filename=True)
+        refPath = refPath = pm.referenceQuery(str(ref), filename=True)
         start = refPath.find('{')
         end = refPath.find('}')
 

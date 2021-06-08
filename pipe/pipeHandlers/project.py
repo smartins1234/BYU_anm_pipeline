@@ -3,15 +3,14 @@ import shutil
 
 from pipeHandlers.body import Body, Asset, Shot, Tool, CrowdCycle, AssetType
 from pipeHandlers.element import Checkout, Element
-from pipeHandlers.environment import Department, Environment, User
+from pipeHandlers.environment import Environment, User
 from pipeHandlers import pipeline_io
-from pipeHandlers.registry import Registry
 
 
 
 class Project:
 	'''
-	Class describing a dcc project.
+	Class describing a BYU project.
 	'''
 
 	def __init__(self):
@@ -19,48 +18,6 @@ class Project:
 		creates a Project instance for the currently defined project from the environment
 		'''
 		self._env = Environment()
-
-	@staticmethod
-	def default_departments():
-		'''
-		return a list of all departments
-		'''
-		return Department.ALL
-
-	@staticmethod
-	def houdini_default_departments():
-		'''
-		return a list of houdini-specific departments
-		'''
-		return Department.HOUDINI_DEPTS
-
-	@staticmethod
-	def prop_export_departments():
-		'''
-		return a list of departments that props are exported to
-		'''
-		return Department.PROP_EXPORT_DEPARTMENTS
-
-	@staticmethod
-	def char_export_departments():
-		'''
-		return a list of departments that chars are exported to
-		'''
-		return Department.ACTOR_EXPORT_DEPARTMENTS
-
-	@staticmethod
-	def set_export_departments():
-		'''
-		return a list of departments that sets are exported to
-		'''
-		return Department.SET_EXPORT_DEPARTMENTS
-
-	@staticmethod
-	def shot_export_departments():
-		'''
-		return a list of departments that shots are exported to
-		'''
-		return Department.SHOT_EXPORT_DEPARTMENTS
 
 	def get_name(self):
 		'''
@@ -168,11 +125,9 @@ class Project:
 		body = self.get_asset(name)
 		if body is None:
 			body = self.get_tool(name)
-		if body is None:
-			body = self.get_crowd_cycle(name)
 		return body
 
-	def _create_body(self, name, bodyobj):
+	def create_body(self, name, bodyobj):
 		'''
 		If a body with that name already exists, raises EnvironmentError.
 		The bodyobj is the class name for the body that will be created.
@@ -193,18 +148,18 @@ class Project:
 		datadict = bodyobj.create_new_dict(name)
 		pipeline_io.writefile(os.path.join(filepath, bodyobj.PIPELINE_FILENAME), datadict)
 		new_body = bodyobj(filepath)
-		for dept in self.default_departments():
-			pipeline_io.mkdir(os.path.join(filepath, dept))
-			new_body.create_element(dept, Element.DEFAULT_NAME)
+		for department in Asset.ALL:
+			pipeline_io.mkdir(os.path.join(filepath, department))
+			new_body.create_element(department, Element.DEFAULT_NAME)
 
 		return new_body
 
-	def create_asset(self, name, asset_type=AssetType.PROP):
+	def create_asset(self, name, asset_type=AssetType.ASSET):
 		'''
 		creates a new asset with the given name, and returns the resulting asset object.
 		name -- the name of the new asset to create
 		'''
-		asset = self._create_body(name, Asset)
+		asset = self.create_body(name, Asset)
 
 		if asset is None:
 			return None  # asset already exists.
@@ -223,14 +178,14 @@ class Project:
 		creates a new shot with the given name, and returns the resulting shot object.
 		name -- the name of the new shot to create
 		'''
-		return self._create_body(name, Shot)
+		return self.create_body(name, Shot)
 
 	def create_tool(self, name):
 		'''
 		creates a new tool with the given name, and returns the resulting tool object.
 		name -- the name of the new tool to create
 		'''
-		return self._create_body(name, Tool)
+		return self.create_body(name, Tool)
 
 	def _list_bodies_in_dir(self, filepath, filter=None):
 		dirlist = os.listdir(filepath)
@@ -255,6 +210,18 @@ class Project:
 		return bodylist
 
 	def list_assets(self):
+		path = self._env.get_assets_dir() + ".asset_list.txt"
+		assets = []
+		f = open(path, "r")
+		for aName in f:
+			if aName[-1] is "\n":  # remove newline character
+				aName = aName[:-1]
+			assets.append(aName)
+
+		assets.sort(key=str.lower)
+		return assets
+
+	def list_existing_assets(self):
 		list = self._list_bodies_in_dir(self._env.get_assets_dir())
 		assets = []
 
@@ -262,9 +229,7 @@ class Project:
 			asset = self.get_asset(item)
 			if asset.get_type() == AssetType.ASSET:
 				assets.append(str(item))
-
 		assets.sort(key=str.lower)
-
 		return assets
 
 	def list_shots(self, filter=None):
@@ -356,7 +321,7 @@ class Project:
 		'''
 		returns a list of strings containing the names of all bodies (assets and shots)
 		'''
-		return self._list_bodies_in_dir(self._env.get_assets_dir()) + self.list_shots() + self.list_tools() + self.list_crowd_cycles()
+		return self._list_bodies_in_dir(self._env.get_assets_dir()) + self.list_shots() + self.list_tools()
 
 	def list_users(self):
 		'''
@@ -371,23 +336,6 @@ class Project:
 				userlist.append(username)
 		userlist.sort()
 		return userlist
-
-	def list_bodies_by_departments(self, departments=Department.ALL):
-		'''
-		returns a list of tuples containing label and list of body names
-		'''
-		result = {}
-		for department in departments:
-			result[department] = []
-		for body_name in self.list_bodies():
-			for department in Department.ALL:
-				body = self.get_body(body_name)
-				try:
-					if body and body.get_element(department):
-						result[department].append(body.get_name())
-				except Exception as e:
-					pass
-		return result
 
 	def is_checkout_dir(self, path):
 		'''

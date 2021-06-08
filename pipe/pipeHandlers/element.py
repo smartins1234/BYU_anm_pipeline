@@ -14,7 +14,6 @@ class Checkout:
 
     USER = "user"
     BODY = "body_name"
-    DEPARTMENT = "department"
     ELEMENT = "element_name"
     FILES = "filename"
     TIMES = "time"
@@ -27,7 +26,6 @@ class Checkout:
         datadict = {}
         datadict[Checkout.USER] = username
         datadict[Checkout.BODY] = body
-        datadict[Checkout.DEPARTMENT] = department
         datadict[Checkout.ELEMENT] = element
         datadict[Checkout.FILES] = []
         datadict[Checkout.TIMES] = []
@@ -93,38 +91,12 @@ class Element:
 
     NAME = "name"
     PARENT = "parent"
-    DEPARTMENT = "department"
     LATEST_VERSION = "latest_version"
-    ASSIGNED_USER = "assigned_user"
     PUBLISHES = "publishes"
-    START_DATE = "start_date"
-    END_DATE = "end_date"
+    CHECKOUT_USERS = "checkout_users"
     APP_EXT = "app_ext"
     CACHE_EXT = "cache_ext"
     CACHE_FILEPATH = "cache_filepath"
-    CHECKOUT_USERS = "checkout_users"
-    NOTES = "notes"
-
-    # @staticmethod
-    def create_new_dict(self, name, department, parent_name):
-        """
-        populate a dictionary with defaults for all the fields needed to create a new element
-        """
-        datadict = {}
-        datadict[Element.NAME] = name
-        datadict[Element.PARENT] = parent_name
-        datadict[Element.DEPARTMENT] = department
-        datadict[Element.LATEST_VERSION] = -1
-        datadict[Element.ASSIGNED_USER] = ""
-        datadict[Element.PUBLISHES] = []
-        datadict[Element.START_DATE] = ""
-        datadict[Element.END_DATE] = ""
-        datadict[Element.APP_EXT] = self.app_ext
-        datadict[Element.CACHE_EXT] = ""
-        datadict[Element.CACHE_FILEPATH] = ""
-        datadict[Element.CHECKOUT_USERS] = []
-        datadict[Element.NOTES] = []
-        return datadict
 
     def __init__(self, filepath=None):
         """
@@ -143,6 +115,21 @@ class Element:
             self._filepath = None
             self._pipeline_file = None
             self._datadict = None
+
+    def create_new_dict(self, name, department, parent_name):
+        """
+        populate a dictionary with defaults for all the fields needed to create a new element
+        """
+        datadict = {}
+        datadict[Element.NAME] = name
+        datadict[Element.PARENT] = parent_name
+        datadict[Element.LATEST_VERSION] = -1
+        datadict[Element.PUBLISHES] = []
+        datadict[Element.CHECKOUT_USERS] = []
+        datadict[Element.APP_EXT] = self.app_ext
+        datadict[Element.CACHE_EXT] = ""
+        datadict[Element.CACHE_FILEPATH] = ""
+        return datadict
 
     def set_app_ext(self, extension):
         self.app_ext = extension

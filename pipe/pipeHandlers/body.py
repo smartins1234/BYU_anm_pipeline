@@ -1,9 +1,8 @@
 import os
 
 from pipe.pipeHandlers.element import Element
-from pipe.pipeHandlers.environment import Department, Environment
+from pipe.pipeHandlers.environment import Environment
 from pipe.pipeHandlers import pipeline_io
-from pipe.pipeHandlers.registry import Registry
 
 '''
 body module
@@ -30,7 +29,7 @@ class Body(object):
 		datadict[Body.NAME] = name
 		datadict[Body.REFERENCES] = []
 		datadict[Body.DESCRIPTION] = ''
-		datadict[Body.TYPE] = AssetType.PROP
+		datadict[Body.TYPE] = AssetType.ASSET
 		datadict[Body.FRAME_RANGE] = 0
 		return datadict
 
@@ -166,14 +165,28 @@ class Body(object):
 		dept_dir = os.path.join(self._filepath, department)
 		if not os.path.exists(dept_dir):
 			pipeline_io.mkdir(dept_dir)
-		name = pipeline_io.alphanumeric(name)
-		element_dir = os.path.join(dept_dir, name)
-		if not pipeline_io.mkdir(element_dir):
-			raise EnvironmentError('element already exists: ' + element_dir)
-		empty_element = Registry().create_element(department)
+		empty_element = self.set_app_ext(department)
 		datadict = empty_element.create_new_dict(name, department, self.get_name())
-		pipeline_io.writefile(os.path.join(element_dir, empty_element.PIPELINE_FILENAME), datadict)
-		return Registry().create_element(department, element_dir)
+		if os.path.exists(os.path.join(dept_dir, empty_element.PIPELINE_FILENAME)):
+			raise EnvironmentError('element already exists: ' + dept_dir)
+
+		pipeline_io.writefile(os.path.join(dept_dir, empty_element.PIPELINE_FILENAME), datadict)
+		return self.set_app_ext(department, dept_dir)
+
+	def set_app_ext(self, department, filepath=None):
+		'''
+		this function replaces the old registry class and sets the extension for an element.
+		'''
+		element = Element(filepath)
+
+		if department == Asset.GEO or department == Asset.ANIMATION or department == Asset.RIG:
+			element.set_app_ext(".mb")
+			return element
+		elif department == Asset.HDA:
+			element.set_app_ext(".hdanc")
+			return element
+		else:
+			return element
 
 	def list_elements(self, department):
 		'''
@@ -241,14 +254,11 @@ class AssetType:
 	Class describing types of assets.
 	'''
 
-	ACTOR = 'actor'
-	SET = 'set'
-	PROP = 'prop'
 	TOOL = 'tool'
 	SHOT = 'shot'
 	ASSET = 'asset'
-	ALL = [ACTOR, PROP, SET, SHOT, TOOL]
-	MAYA = [ACTOR, PROP, SET, SHOT]
+	ALL = [ASSET, SHOT, TOOL]
+	MAYA = [ASSET, SHOT]
 
 	def __init__(self):
 		pass
@@ -263,6 +273,15 @@ class Asset(Body):
 	'''
 	Class describing an asset body.
 	'''
+	GEO = 'geo'
+	CAMERA = 'camera'
+	ANIMATION = 'animation'
+	RIG = 'rig'
+	HDA = 'hda'
+	TEXTURES = 'textures'
+	MATERIALS = 'materials'
+	LIGHTS = 'lights'
+	ALL = [GEO, CAMERA, ANIMATION, RIG, HDA, TEXTURES, MATERIALS, LIGHTS]
 
 	@staticmethod
 	def create_new_dict(name):
