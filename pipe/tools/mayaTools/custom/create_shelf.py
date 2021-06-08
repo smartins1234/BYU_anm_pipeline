@@ -27,6 +27,7 @@ os.environ["DCC_DEPARTMENT"] = ""
 	follow the instructions at the top of this file.
 '''
 def load_shelf(shelfName, fileName):
+	print("loading ", shelfName)
 	delete_shelf(shelfName)
 	ReloadScripts().go()
 

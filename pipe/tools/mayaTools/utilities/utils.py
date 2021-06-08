@@ -6,13 +6,14 @@ import re
 from PySide2 import QtWidgets
 #from PySide6 import QtWidgets
 
-from pipe.pipeHandlers import *
+#from pipe.pipeHandlers import *
 from pipe.pipeHandlers.environment import Environment
-from pipe.pipeHandlers.environment import Department
+#from pipe.pipeHandlers.environment import Department
 from pipe.pipeHandlers.project import Project
 from pipe.pipeHandlers.element import Element
 from pipe.pipeHandlers.body import Body, AssetType
 import pipe.pipeHandlers.quick_dialogs as qd
+import pipe.pipeHandlers.pipeline_io as pipeline_io
 #from pipe.tools.mayaTools.exporters.exporter import Exporter
 #from pipe.tools.mayaTools.publishers.publisher import MayaPublisher as Publisher
 
@@ -23,8 +24,8 @@ import maya.cmds as mc
     Set Asset and Department Environment Variables
 '''
 def setPublishEnvVar(asset_name, department="model"):
-    os.environ["DCC_ASSET_NAME"] = asset_name;
-    os.environ["DCC_DEPARTMENT"] = department;
+    os.environ["DCC_ASSET_NAME"] = asset_name
+    os.environ["DCC_DEPARTMENT"] = department
 
 '''
     Function used whenever a more complex gui is called within Maya
@@ -38,14 +39,14 @@ def maya_main_window():
 '''
     Prepare the scene for a publish. Called from creator and publisher.
 '''
-def prepare_scene_file(quick_publish=False, department=None, body=None):
+"""def prepare_scene_file(quick_publish=False, department=None, body=None):
     scene_prep(quick_publish, body=body, department=department)
     file_path = Environment().get_user_workspace()
     file_path = os.path.join(file_path, 'untitled.mb')
     file_path = pipeline_io.version_file(file_path)
     mc.file(rename=file_path)
     print("saving file: ", file_path)
-    mc.file(save=True)
+    mc.file(save=True)"""
 
 '''
     Publish the asset. Called from creator and publisher.
@@ -121,11 +122,12 @@ def get_scene_file():
 '''
     Helper function for post_publish()
 '''
-def scene_prep(quick_publish, body=None, department=None):
+"""def scene_prep(quick_publish, body=None, department=None):
     if quick_publish:
         print("skipping check for unsaved changes")
     else:
-        check_unsaved_changes()
+        pass
+        #check_unsaved_changes()
         # save_scene_file()
 
     freeze_and_clear = True
@@ -192,7 +194,7 @@ def scene_prep(quick_publish, body=None, department=None):
     try:
         group_top_level()
     except:
-        qd.warning("Group top level failed.")
+        qd.warning("Group top level failed.")"""
 
 '''
     Helper function for scene_prep()
@@ -252,7 +254,7 @@ def group_top_level():
         if shapes and "group" not in str(node):
             pm.group(top_level_nodes)
 
-def get_departments_by_type(asset_type, export=False):
+'''def get_departments_by_type(asset_type, export=False):
     department_list = []
     project = Project()
 
@@ -268,7 +270,7 @@ def get_departments_by_type(asset_type, export=False):
     elif asset_type == AssetType.SHOT:
         department_list = ["anim"]
 
-    return department_list
+    return department_list'''
 
 '''
     Helper function for scene_prep()
@@ -318,7 +320,7 @@ def ref_path_to_ref_name(path):
     Helper for get_body_from_reference()
 '''
 def extract_reference_data(ref):
-    refPath = pm.referenceQuery(unicode(ref), filename=True)
+    refPath = pm.referenceQuery(str(ref), filename=True)
     refName = ref_path_to_ref_name(refPath)
     start = refPath.find('{')
     end = refPath.find('}')
@@ -408,8 +410,8 @@ def get_body_from_reference(ref):
     Helper for JSONExporter and AlembicExporter
 '''
 def get_root_node_from_reference(ref):
-    refPath = pm.referenceQuery(unicode(ref), filename=True)
-    refNodes = pm.referenceQuery(unicode(refPath), nodes=True )
+    refPath = pm.referenceQuery(str(ref), filename=True)
+    refNodes = pm.referenceQuery(str(refPath), nodes=True )
     rootNode = pm.ls(refNodes[0])[0]
     return rootNode
 
