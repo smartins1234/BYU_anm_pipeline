@@ -3,8 +3,8 @@ python("SHELF_DIR = os.environ.get('MAYA_SHELF_DIR')");
 python("sys.path.append(SHELF_DIR)");
 python("print(SHELF_DIR)");
 python("import create_shelf");
-python("create_shelf.load_shelf(\"Cenote_Modeling\", \"model_shelf.json\")")
-python("create_shelf.load_shelf(\"Cenote_Animation\", \"anim_shelf.json\")")
-python("create_shelf.load_shelf(\"Cenote_Rigging\", \"rig_shelf.json\")")
-python("create_shelf.load_shelf(\"Cenote_Previs\", \"previs_shelf.json\")")
+python("create_shelf.load_shelf(\"Cenote_Modeling\", \"model_shelf.json\")");
+python("create_shelf.load_shelf(\"Cenote_Animation\", \"anim_shelf.json\")");
+python("create_shelf.load_shelf(\"Cenote_Rigging\", \"rig_shelf.json\")");
+python("create_shelf.load_shelf(\"Cenote_Previs\", \"previs_shelf.json\")");
 print "successfully loaded shelves!\n";

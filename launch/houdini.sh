@@ -39,6 +39,7 @@ export HOUDINI_MENU_PATH=${HOUDINI_TOOLS}"/custom/menu;&"
 export HOUDINI_TOOLBAR_PATH=${MEDIA_PROJECT_DIR}"/production/tabs;&"
 export HOUDINI_UI_ICON_PATH=${MEDIA_PROJECT_DIR}"icons/tool-icons;&"
 
+export HSITE = ${HOUDINI_TOOLS}"/custom;&"
 #export HOUDINI_USER_PREF_DIR=${MEDIA_PROJECT_DIR}"/production/users/"${USER}";&"
 export HOUDINI_DESK_PATH=${HOUDINI_DESK_PATH}:${HOUDINI_TOOLS}"/custom/menu;&"
 

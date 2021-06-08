@@ -16,7 +16,7 @@
 			"annotation":"OBJ export test",
 			"label":"OBJ export",
 			"menu":0,
-			"double-click":"print(\"double click\")",
+			"double-click":"",
 			"tool":"mayaTools.exporters.exporter",
 			"function":"Exporter.export()"
 		}
