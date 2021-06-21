@@ -1,5 +1,4 @@
-import hou
-import os
+import hou, os
 import pipe.pipeHandlers.quick_dialogs as qd
 import pipe.pipeHandlers.select_from_list as sfl
 
@@ -158,13 +157,11 @@ class Cloner:
         print("Selected asset: ", value[0])
         filename = value[0]
 
-        project = Project()
-        self.body = project.get_body(filename)
-
+        self.body = project().get_body(filename)
         department_paths = self.get_department_paths(self.body)
 
         from pipe.tools.houdiniTools.assembler.assembler import Assembler  # we put import here to avoid cross import issue #63 FIXME
-        node, created_instances =  Assembler().create_hda(filename, body=self.body, department_paths=department_paths)
+        node =  Assembler().create_hda(filename, body=self.body, department_paths=department_paths)
         layout_object_level_nodes()
 
-        return node, created_instances
+        return node

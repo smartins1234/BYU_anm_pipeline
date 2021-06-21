@@ -7,9 +7,9 @@ import pipe.pipeHandlers.quick_dialogs as qd
 from pipe.tools.mayaTools.utilities.utils import *
 from pipe.tools.mayaTools.exporters.alembic_exporter import AlembicExporter
 from pipe.tools.mayaTools.exporters.obj_exporter import ObjExporter
+import pipe.pipeHandlers.select_from_list as sfl
 # from pipe.tools.mayaTools.exporters.fbx_exporter import FbxExporter
 # from pipe.tools.mayaTools.exporters.json_exporter import JSONExporter
-
 
 class Exporter:
 
@@ -19,15 +19,38 @@ class Exporter:
         self.list = ["alembic", "fbx", "json", "usd", "obj"]
         self.cameras = True'''
 
+    def go(self, alembic=False, usd=False, obj=False):
+        self.alembic = alembic
+        self.usd = usd
+        self.obj = obj
+
+        project = Project()
+        asset_list = project.list_assets()
+
+        self.item_gui = sfl.SelectFromList(l=asset_list, parent=maya_main_window(), title="Select an asset to export to")
+        self.item_gui.submitted.connect(self.asset_results)
+
     def auto_export_all(self):
         '''self.export()'''
 
     def export_one(self, alembic=False, fbx=False, json=False, usd=False, methods=None):
         '''self.export(alembic=alembic, fbx=fbx, json=json, usd=usd, methods=methods)'''
 
-    def export(self, alembic=True, fbx=True, json=True, usd=True, methods=None):
-        #ObjExporter().exportSelected("TEST")
-        ObjExporter().export()
+    def export(self, ):
+        
+        if self.obj:
+            ObjExporter().exportSelected(self.chosen_asset)
+
+        if self.usd:
+            #export as usd
+            pass
+
+        if self.alembic:
+            shot_list = Project().list_shots()
+            print(shot_list)
+            self.item_gui = sfl.SelectFromList(l=shot_list, parent=maya_main_window(), title="What shot is this animation in?")
+            self.item_gui.submitted.connect(self.shot_results)
+
         '''if methods is None:
             methods = self.list
 
@@ -105,3 +128,26 @@ class Exporter:
                     methods.append("usd")
 
         self.export(alembic=alembic, fbx=fbx, json=json, usd=usd, methods=methods)'''
+    
+    def asset_results(self, value):
+        self.chosen_asset = value[0]
+
+        #check if asset already exists
+        #if not, create it
+
+        proj = Project()
+        proj.create_asset(name=self.chosen_asset)
+
+        self.export()
+
+    def shot_results(self, value):
+        chosen_shot = value[0]
+        print(chosen_shot)
+
+        #check if shot already exists
+        #if not, create it
+
+        proj = Project()
+        proj.create_shot(chosen_shot)
+
+        AlembicExporter().exportSelected(self.chosen_asset, chosen_shot)

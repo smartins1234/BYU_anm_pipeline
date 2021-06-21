@@ -232,14 +232,26 @@ class Project:
 		assets.sort(key=str.lower)
 		return assets
 
-	def list_shots(self, filter=None):
+	def list_shots(self):
+		path = self._env.get_shots_dir() + ".shot_list"
+		shots = []
+		f = open(path, "r")
+		for shot in f:
+			if shot[-1] is "\n": #remove newline character
+				shot = shot[:-1]
+			shots.append(shot)
+		
+		shots.sort(key=str.lower)
+		return shots
+
+	def list_existing_shots(self, filter=None):
 		'''
 		returns a list of strings containing the names of all shots in this project
 		filter -- a tuple containing an attribute (string) relation (operator) and value
 				e.g. (Shot.FRAME_RANGE, operator.gt, 100). Only returns shots whose
 				given attribute has the relation to the given desired value. Defaults to None.
 		'''
-		list = self._list_bodies_in_dir(self._env.get_assets_dir())
+		list = self._list_bodies_in_dir(self._env.get_shots_dir())
 
 		shot_list = []
 
