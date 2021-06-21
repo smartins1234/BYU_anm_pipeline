@@ -2,23 +2,13 @@
 	"shelfItems":[
 		{
 			"itemType":"button",
-			"icon":"maya.png",
-			"annotation":"This is a test.",
-			"label":"test",
-			"menu":0,
-			"double-click":"print(\"double click\")",
-			"tool":"mayaTools.tests.test",
-			"function":"junk.print_junk()"
-		},
-		{
-			"itemType":"button",
-			"icon":"maya.png",
-			"annotation":"OBJ export test",
-			"label":"OBJ export",
+			"icon":"publish.svg",
+			"annotation":"Publish for modeling department",
+			"label":"Publish",
 			"menu":0,
 			"double-click":"",
 			"tool":"mayaTools.exporters.exporter",
-			"function":"Exporter.export()"
+			"function":"Exporter.go(usd=True,obj=True)"
 		}
     ]
 }

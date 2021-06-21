@@ -10,6 +10,7 @@ import pymel.core as pm
 import pipe.pipeHandlers.pipeline_io as pio
 from pipe.tools.mayaTools.utilities.utils import *
 from pipe.pipeHandlers.environment import Environment
+from pipeHandlers.body import Asset
 #from pipe.pipeHandlers.environment import Department
 from pipe.pipeHandlers.body import AssetType
 from pipe.pipeHandlers.project import Project
@@ -465,7 +466,7 @@ class ObjExporter:
 
     def getFilePath(self, name):
         env = Environment()
-        path = env.get_assets_dir() + name                              # get directory of the asset
+        path = env.get_assets_dir() + name + "/" + Asset.GEO                      # get directory of the asset
 
         name = name + "_GEO"
 

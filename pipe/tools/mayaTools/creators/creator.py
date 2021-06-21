@@ -11,7 +11,9 @@ from pipe.pipeHandlers import pipeline_io
 #from pipe.tools.houdiniTools.assembler.assembler import Assembler
 #from pipe.tools.houdiniTools.exporter.json_exporter import JSONExporter
 import re
-import hou
+#import hou
+import maya.cmds as mc
+import pymel.core as pm
 from PySide2 import QtWidgets
 
 
