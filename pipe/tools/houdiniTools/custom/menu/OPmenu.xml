@@ -3,11 +3,11 @@
 <!-- menuDocument can only contain 1 menu whose id is implicitly "root_menu" -->
 <menuDocument>
 	<menu>
-		<!-- ============================ Start Tool Cloner Tool =========================== -->
+		<!-- ============================ Start Tool Cloner Tool =========================== >
 		<scriptItem id="opmenu.checkoutTool">
 			<label>Clone Tool</label>
 			<expression>
-from pipe.am.project import Project
+from pipe.pipeHandlers.project import Project
 node = kwargs.get('node', None)
 if node:
 	if node.isLockedHDA():
@@ -23,7 +23,7 @@ return 0
 			</expression>
 			<scriptCode scriptType="python">
 				<![CDATA[
-from pipe.tools.houtools.cloner import cloner
+from pipe.tools.houdiniTools.cloner import cloner
 node = kwargs.get('node', None)
 if node:
 	import hou
@@ -33,13 +33,13 @@ if node:
 				]]>
 			</scriptCode>
 		</scriptItem>
-		<!-- ============================ End Tool Cloner Tool =========================== -->
+		<! ============================ End Tool Cloner Tool =========================== >
 
-		<!-- ============================ Start Tool Publisher Tool =========================== -->
+		<! ============================ Start Tool Publisher Tool =========================== >
 		<scriptItem id="opmenu.publishTool">
 			<label>Publish Tool</label>
 			<expression>
-from pipe.am.project import Project
+from pipe.pipeHandlers.project import Project
 node = kwargs.get('node', None)
 if node:
 	if not node.isLockedHDA():
@@ -54,7 +54,7 @@ return 0
 			</expression>
 			<scriptCode scriptType="python">
 				<![CDATA[
-from pipe.tools.houtools.publisher import publisher
+from pipe.tools.houdiniTools.publisher import publisher
 node = kwargs.get('node', None)
 if node:
 	import hou
@@ -64,13 +64,13 @@ if node:
 				]]>
 			</scriptCode>
 		</scriptItem>
-		<!-- ============================ End Tool Publisher Tool =========================== -->
+		<! ============================ End Tool Publisher Tool =========================== >
 
-		<!-- ============================ Start Tool Rollback Tool =========================== -->
+		<! ============================ Start Tool Rollback Tool =========================== >
 		<scriptItem id="opmenu.rollbackTool">
 			<label>Rollback Tool</label>
 			<expression>
-from pipe.am.project import Project
+from pipe.pipeHandlers.project import Project
 node = kwargs.get('node', None)
 if node:
 	if node.isLockedHDA():
@@ -86,7 +86,7 @@ return 0
 			</expression>
 			<scriptCode scriptType="python">
 				<![CDATA[
-from pipe.tools.houtools.rollback import rollback
+from pipe.tools.houdiniTools.rollback import rollback
 node = kwargs.get('node', None)
 if node:
 	import hou
@@ -96,13 +96,13 @@ if node:
 				]]>
 			</scriptCode>
 		</scriptItem>
-		<!-- ============================ End Tool Rollback Tool =========================== -->
+		<! ============================ End Tool Rollback Tool =========================== >
 
-		<!-- ============================ Start Asset Cloner Tool =========================== -->
+		<! ============================ Start Asset Cloner Tool =========================== >
 		<scriptItem id="opmenu.checkoutAsset">
 			<label>Clone Asset</label>
 			<expression>
-from pipe.am.project import Project
+from pipe.pipeHandlers.project import Project
 node = kwargs.get('node', None)
 if node:
 	if node.type().definition() is not None:
@@ -117,7 +117,7 @@ return 0
 			</expression>
 			<scriptCode scriptType="python">
 				<![CDATA[
-from pipe.tools.houtools.cloner import cloner
+from pipe.tools.houdiniTools.cloner import cloner
 node = kwargs.get('node', None)
 if node:
 	import hou
@@ -127,9 +127,9 @@ if node:
 				]]>
 			</scriptCode>
 		</scriptItem>
-		<!-- ============================ End Asset Cloner Tool =========================== -->
+		<! ============================ End Asset Cloner Tool =========================== >
 
-		<!-- ============================ Start Individual HDA Asset Publisher Tool =========================== -->
+		<! ============================ Start Individual HDA Asset Publisher Tool =========================== >
 		<scriptItem id="opmenu.publishIndividualAsset">
 			<labelExpression>
 node = kwargs.get('node', None)
@@ -139,7 +139,7 @@ if node:
 		return "Publish " + str(node_name) + " to Asset"
 			</labelExpression>
 			<expression>
-from pipe.am.project import Project
+from pipe.pipeHandlers.project import Project
 node = kwargs.get('node', None)
 if node:
 	if node.type().definition() is not None:
@@ -154,7 +154,7 @@ return 0
 			</expression>
 			<scriptCode scriptType="python">
 				<![CDATA[
-from pipe.tools.houtools.publisher import publisher
+from pipe.tools.houdiniTools.publisher import publisher
 node = kwargs.get('node', None).parent()
 if node:
 	import hou
@@ -168,13 +168,13 @@ if node:
 				]]>
 			</scriptCode>
 		</scriptItem>
-		<!-- ============================ End Individual HDA Asset Publisher Tool =========================== -->
+		<! ============================ End Individual HDA Asset Publisher Tool =========================== -->
 
 		<!-- ============================ Start Top Level Asset Publisher Tool =========================== -->
 		<scriptItem id="opmenu.publishAsset">
 			<label>Publish Asset</label>
 			<expression>
-from pipe.am.project import Project
+from pipe.pipeHandlers.project import Project
 node = kwargs.get('node', None)
 if node:
 	if node.type().definition() is not None:
@@ -203,9 +203,9 @@ return 0
 			</expression>
 			<scriptCode scriptType="python">
 				<![CDATA[
-from pipe.am.project import Project
-from pipe.tools.houtools.publisher import publisher
-from pipe.am.body import AssetType
+from pipe.pipeHandlers.project import Project
+from pipe.tools.houdiniTools.publisher import publisher
+from pipe.pipeHandlers.body import AssetType
 node = kwargs.get('node', None)
 if node:
 	import hou
@@ -228,7 +228,7 @@ if node:
 		<scriptItem id="opmenu.rollbackAsset">
 			<label>Rollback Element</label>
 			<expression>
-from pipe.am.project import Project
+from pipe.pipeHandlers.project import Project
 node = kwargs.get('node', None)
 if node:
 	if node.type().definition() is not None:
@@ -245,7 +245,7 @@ return 0
 			</expression>
 			<scriptCode scriptType="python">
 				<![CDATA[
-from pipe.tools.houtools.rollback import rollback
+from pipe.tools.houdiniTools.rollback import rollback
 node = kwargs.get('node', None)
 node_name = node.type().name()
 index = node_name.rfind('_')
@@ -259,9 +259,9 @@ if node:
 				]]>
 			</scriptCode>
 		</scriptItem>
-		<!-- ============================ End Asset Rollback Tool =========================== -->
+		<!-- ============================ End Asset Rollback Tool =========================== >
 
-		<!-- ============================ Start Tool Creator Tool =========================== -->
+		<! ============================ Start Tool Creator Tool =========================== >
 		<scriptItem id="opmenu.createTool">
 			<label>Create DCC Digital Asset</label>
 			<expression>
@@ -272,7 +272,7 @@ return 0
 			</expression>
 			<scriptCode scriptType="python">
 				<![CDATA[
-from pipe.tools.houtools.utils import create_tool_hda
+from pipe.tools.houdiniTools.utils import create_tool_hda
 node = kwargs.get('node', None)
 if node:
 	import hou
@@ -282,7 +282,7 @@ if node:
 				]]>
 			</scriptCode>
 		</scriptItem>
-		<!-- ============================ End Tool Creator Tool =========================== -->
+	 ============================ End Tool Creator Tool =========================== -->
 
 	</menu>
 </menuDocument>

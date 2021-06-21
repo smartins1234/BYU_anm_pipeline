@@ -17,13 +17,13 @@ import pipe.pipeHandlers.select_from_list as sfl
 
 
 class AlembicExporter:
-    def __init__(self, frame_range=1, gui=True, element=None, show_tagger=False):
+    def __init__(self, frame_range=1):
         self.frame_range = frame_range
-        pm.loadPlugin('AbcExport')
-        self.crease = False
-        self.cameras = False
+        pm.loadPlugin("AbcExport")
+        #self.crease = False
+        #self.cameras = False
 
-    def auto_export(self, asset_name, cameras=True):
+    """def auto_export(self, asset_name, cameras=True):
         self.cameras = cameras
         self.get_body_and_export(asset_name, export_all=True)
 
@@ -32,13 +32,14 @@ class AlembicExporter:
         asset_list = project.list_assets()
 
         self.item_gui = sfl.SelectFromList(l=asset_list, parent=maya_main_window(), title="Select an asset to export to")
-        self.item_gui.submitted.connect(self.asset_results)
+        self.item_gui.submitted.connect(self.asset_results)"""
 
     def asset_results(self, value):
         chosen_asset = value[0]
-        self.get_body_and_export(chosen_asset)
+        print(chosen_asset)
+        #self.get_body_and_export(chosen_asset)
 
-    def get_body_and_export(self, chosen_asset, export_all=False):
+    """def get_body_and_export(self, chosen_asset, export_all=False):
         project = Project()
         self.body = project.get_body(chosen_asset)
         try:
@@ -70,7 +71,7 @@ class AlembicExporter:
         self.body.set_frame_range(self.frame_range)
 
         asset_type = self.body.get_type()
-        """department_list = get_departments_by_type(asset_type, export=True)
+        department_list = get_departments_by_type(asset_type, export=True)
 
         if export_all:
             # tag top level nodes
@@ -117,7 +118,7 @@ class AlembicExporter:
                 element = body.get_element(dept)
 
             self.export(element, selection=selection, startFrame=startFrame, endFrame=endFrame)"""
-
+    """
     def export(self, element, selection=None, startFrame=None, endFrame=None):
         project = Project()
         bodyName = element.get_parent()
@@ -165,10 +166,30 @@ class AlembicExporter:
             exported_asset_names += asset_file_name + '\n'
         qd.info("Alembics exported successfully: " + '\n' + exported_asset_names)
 
-        return files
+        return files"""
 
-    def exportSelected(self, selection, destination, tag=None, startFrame=1, endFrame=1, disregardNoTags=False):
-        endFrame = self.frame_range
+    def exportSelected(self, asset_name, shot_name):#selection, destination, tag=None, startFrame=1, endFrame=1, disregardNoTags=False):
+        
+        #get frame range
+        self.frame_range = qd.input("How many frames are in this shot?")
+
+        if self.frame_range is None or self.frame_range == u'':
+            self.frame_range = 1
+
+        self.frame_range = str(self.frame_range)
+        if not self.frame_range.isdigit():
+            qd.error("Invalid frame range input. Setting to 1.")
+
+        print("Frame range: ", self.frame_range)
+
+        #get shot number
+            #get list of shots
+            #get input
+        #determine file path
+        #build the command
+        #execute
+
+        """endFrame = self.frame_range
         abcFiles = []
 
         # for node in selection:
@@ -186,9 +207,9 @@ class AlembicExporter:
         pm.Mel.eval(command)
         abcFiles.append(abcFilePath)
 
-        return abcFiles
+        return abcFiles"""
 
-    def exportAll(self, destination, tag=None, startFrame=1, endFrame=1, element=None):
+    """def exportAll(self, destination, tag=None, startFrame=1, endFrame=1, element=None):
         # selection = pm.ls(assemblies=True)
         #
         # culled_selection = []
@@ -293,7 +314,7 @@ class AlembicExporter:
 
         return abcFiles
 
-    """def export_cameras(self, shot, startFrame, endFrame):
+       def export_cameras(self, shot, startFrame, endFrame):
         cam_list = mc.listCameras(p=True)
 
         if u'persp' in cam_list:
@@ -330,7 +351,7 @@ class AlembicExporter:
 
             files.append(destination)
 
-        return files"""
+        return files
 
     def getFilenameForReference(self, ref):
         #TODO Make sure that we test for multiple files
@@ -432,3 +453,4 @@ class AlembicExporter:
             tagged_children.extend(self.getTaggedNodes(child, tag))
 
         return tagged_children
+"""

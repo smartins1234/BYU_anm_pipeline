@@ -308,6 +308,10 @@ class Shot(Body):
 		datadict = Body.create_new_dict(name)
 		return datadict
 
+	@staticmethod
+	def get_parent_dir():
+		return Environment().get_shots_dir()
+
 	def __str__(self):
 		return super(Shot, self).__str__()
 
