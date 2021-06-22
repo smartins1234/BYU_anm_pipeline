@@ -149,15 +149,31 @@ publisher.publish_shot()
 		</subMenu>
 		<!-- ============================ End Publish subMenu =========================== -->
 
-		<scriptItem id="h.cenote_env">
-			<label>Cenote Env</label>
-			<scriptCode scriptType="python">
+		<subMenu id="utils_menu">
+			<label>Utils</label>
+			<scriptItem id="h.cenote_env">
+				<label>Cenote Env</label>
+				<scriptCode scriptType="python">
 				<![CDATA[
 desktops_dict = dict((d.name(), d) for d in hou.ui.desktops())
 desktops_dict['cenoteDesktop'].setAsCurrent()
 				]]>
-			</scriptCode>
-		</scriptItem>
+				</scriptCode>
+			</scriptItem>
+
+			<scriptItem id="h.reload">
+				<label>Reload</label>
+				<scriptCode scriptType="python">
+				<![CDATA[
+from pipe.tools.houdiniTools.utils import reload_scripts
+import hou
+reload = reload_scripts.ReloadScripts()
+hou.session.reload = reload
+reload.run()
+				]]>
+				</scriptCode>
+			</scriptItem>
+		</subMenu>
 
 	</subMenu>
 	<!-- ============================ End BYU Tools Menu =========================== -->
