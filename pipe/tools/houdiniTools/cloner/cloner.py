@@ -157,11 +157,12 @@ class Cloner:
         print("Selected asset: ", value[0])
         filename = value[0]
 
-        self.body = project().get_body(filename)
-        department_paths = self.get_department_paths(self.body)
+        self.body = Project().get_body(filename)
+        #department_paths = self.get_department_paths(self.body)
 
         from pipe.tools.houdiniTools.assembler.assembler import Assembler  # we put import here to avoid cross import issue #63 FIXME
-        node =  Assembler().create_hda(filename, body=self.body, department_paths=department_paths)
-        layout_object_level_nodes()
+
+        node =  Assembler().create_hda(filename, body=self.body)
+        #layout_object_level_nodes()
 
         return node
