@@ -189,6 +189,12 @@ class Element:
 
         return self._datadict[self.ASSIGNED_USER]
 
+    def get_last_version(self):
+        """
+        returns latest version number
+        """
+        return self._datadict[self.LATEST_VERSION]
+
     def get_last_publish(self):
         """
         return a tuple describing the latest publish: (username, timestamp, comment, filepath)
@@ -371,16 +377,24 @@ class Element:
         self.update_checkout_users(username)
         return checkout_file
 
-    def publish(self, username, src, comment, status=None):
+    def publish(self, username, path, comment, status=None):
         """
-        Replace the applcation file of this element. Create a new version with the new file.
-        Store the result of this operation as a new publish.
+        Update the version number and save publish information in the
+        element file
         username -- the username of the user performing this action
-        src -- a string representing the file to be placed in the new version
+        path -- a string representing the path to the published file
         comment -- description of changes made in this publish
         """
+        new_version = self._datadict[self.LATEST_VERSION] + 1
+        self._datadict[self.LATEST_VERSION] = new_version
 
-        if not os.path.exists(src):
+        timestamp = pipeline_io.timestamp()
+        pipeline_io.set_permissions(path)
+        self._datadict[self.PUBLISHES].append((username, timestamp, comment, path))
+
+        self._update_pipeline_file()
+
+        """if not os.path.exists(src):
             raise EnvironmentError("file does not exist: " + src)
 
         self._datadict[self.APP_EXT] = os.path.splitext(src)[1]
@@ -425,7 +439,7 @@ class Element:
                 message += "\ncomment: "+comment
             self._env.sendmail(dst_addresses, subject, message)
 
-        return dst
+        return dst"""
 
     def update_cache(self, src, reference=False):
         """

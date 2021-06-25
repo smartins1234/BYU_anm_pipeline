@@ -138,7 +138,6 @@ class Project:
 		print("filepath: ", filepath)
 
 		if name in self.list_bodies():
-			# raise EnvironmentError('body already exists: '+filepath)
 			return None  # body already exists
 
 		if not pipeline_io.mkdir(filepath):
@@ -240,7 +239,7 @@ class Project:
 			if shot[-1] is "\n": #remove newline character
 				shot = shot[:-1]
 			shots.append(shot)
-		
+
 		shots.sort(key=str.lower)
 		return shots
 

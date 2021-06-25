@@ -143,7 +143,7 @@ class Body(object):
 		name -- the name of the element to get. Defaults to the name of the
 				element created by default for each department.
 		'''
-		element_dir = os.path.join(self._filepath, department, name)
+		element_dir = os.path.join(self._filepath, department)
 		if not os.path.exists(element_dir):
 			if force_create:
 				try:

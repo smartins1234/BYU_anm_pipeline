@@ -14,7 +14,7 @@ class Assembler:
         @param asset_name: name of the asset to assemble/clone
         @param already_tabbed_in_node: an hda where the new content hdas should be created. Typically None
     '''
-    def create_hda(self, asset_name, body=None):
+    def create_hda(self, asset_name, body=None, selected_nodes=None):
         if body is None:
             body = self.body
 
@@ -27,10 +27,8 @@ class Assembler:
             return None
 
 
-        print "Creating node for {0}".format(body.get_name)
-
         if body.get_type() == AssetType.ASSET:
-            node = self.build_asset (body)
+            node = self.build_asset(body, selected_nodes=selected_nodes)
         elif body.get_type() == AssetType.SHOT:
             return None
         else:
@@ -42,7 +40,7 @@ class Assembler:
     '''
         Build the node network for an Asset in an HDA subnet.
     '''
-    def build_asset(self, body):
+    def build_asset(self, body, selected_nodes=None):
         stage = hou.node("/stage")
         temp_node = stage.createNode("subnet")
         temp_node.deleteItems(temp_node.children())
@@ -65,21 +63,32 @@ class Assembler:
         sop_create.parm("enable_subsetgroups").set(True)
         sop_create.parm("kindschema").set("Nested assembly, groups, and components")
         sop_create.parm("subsetgroups").set("*")
+        sop_create.setDisplayFlag(True)
+        sop_view = sop_create.children()[0].children()[0]
 
-        usd_import = sop_create.children()[0].children()[0].createNode("usdimport")
-        usd_import.parm("input_unpack").set(True)
-        filepath1 = Element(os.path.join(body.get_filepath(), "geo")).get_last_publish()
-        print("\n\nImport filepath:  " + filepath1[3])
-        usd_import.parm("filepath1").set(filepath1[3])
-        wrangle = sop_create.children()[0].children()[0].createNode("attribwrangle")
-        wrangle.setInput(0, usd_import, 0)
-        wrangle.parm("snippet").set("@name = \"/" + asset_name + "\";\n@path = @name;")
-        wrangle.parm("class").set(1)
+        '''create import nodes if no hda exists'''
+        if selected_nodes == None:
+            usd_import = sop_view.createNode("usdimport")
+            usd_import.parm("input_unpack").set(True)
+            usd_import.parm("pathattrib").set("")
+            element = Element(os.path.join(body.get_filepath(), "geo")).get_last_publish()
+            if not element == None:
+                print(element)
+                print("\n\nImport filepath:  " + element[3])
+                usd_import.parm("filepath1").set(element[3])
+            wrangle = sop_view.createNode("attribwrangle")
+            wrangle.setInput(0, usd_import, 0)
+            wrangle.parm("snippet").set("s@path = \"/" + asset_name + "\";")
+            wrangle.parm("class").set(1)
 
-        output = sop_create.children()[0].children()[0].createNode("output")
-        output.setInput(0, wrangle, 0)
-        output.setDisplayFlag(True)
-        output.setRenderFlag(True)
+            output = sop_view.createNode("output")
+            output.setInput(0, wrangle, 0)
+            output.setDisplayFlag(True)
+            output.setRenderFlag(True)
+        else:
+            hou.moveNodesTo(selected_nodes, sop_view)
 
-        childs = sop_create.children()[0].children()[0].children()[0]
-        sop_create.children()[0].children()[0].layoutChildren(childs)
+        #childs = sop_create.children()[0].children()[0]
+        sop_create.children()[0].layoutChildren()
+
+        return HDA
