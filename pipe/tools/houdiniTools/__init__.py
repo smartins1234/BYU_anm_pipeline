@@ -1,1 +1,1 @@
-__all__ = ['cloner', 'creator', 'assembler', 'utils']
+__all__ = ['cloner', 'creator', 'assembler', 'utils', 'publisher']
