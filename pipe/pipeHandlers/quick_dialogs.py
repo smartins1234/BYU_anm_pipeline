@@ -1,30 +1,29 @@
-try:
-    from PySide import QtGui as QtWidgets
-    from PySide import QtGui as QtGui
-    from PySide import QtCore
-except ImportError:
-    from PySide2 import QtWidgets, QtGui, QtCore
-
+# try:
+#from PySide import QtGui as QtWidgets
+#from PySide import QtGui as QtGui
+#from PySide import QtCore
+# except ImportError:
+#from PySide2 import QtWidgets, QtGui, QtCore
+from PySide2 import QtWidgets, QtCore, QtGui
 import os
 from pipe.pipeHandlers.project import Project
 
+'''Reports a critical error'''
+
 
 def error(errMsg, details=None, title='Error'):
-    '''
-    Reports a critical error
-    '''
     message(errMsg, details=details, title=title)
+
+    '''Reports a non-critical warning'''
 
 
 def warning(warnMsg, details=None, title='Warning'):
-    '''
-    Reports a non-critical warning
-    '''
     message(warnMsg, details=details, title=title)
+
+    '''Reports a message'''
 
 
 def message(msg=' ', details=None, title='Message'):
-    '''Reports a message'''
     print(msg)
 
     msgBox = QtWidgets.QMessageBox()
@@ -43,9 +42,10 @@ def message(msg=' ', details=None, title='Message'):
 
     msgBox.exec_()
 
+    '''Reports an informational message'''
+
 
 def info(infoMsg, title='Info'):
-    '''Reports an informational message'''
     message(msg=infoMsg, title=title)
 
 
@@ -151,9 +151,7 @@ class HoudiniInput(QtWidgets.QWidget):
 
         self.values = newText
 
-    '''
-    Get the current state of the loading indicator gif as an icon
-    '''
+    '''Get the current state of the loading indicator gif as an icon'''
 
     def setButtonIcon(self, frame):
         icon = QtGui.QIcon(self.movie.currentPixmap())
@@ -177,6 +175,80 @@ class HoudiniInput(QtWidgets.QWidget):
         self.button.setEnabled(False)
         self.submitted.emit(self.values)
         self.close()
+
+
+try:
+    import hou
+
+    class VersionWindow(QtWidgets.QMainWindow):
+
+        def __init__(self, parent=hou.ui.mainQtWindow()):
+            super(VersionWindow, self).__init__(parent)
+
+            # Function to build the UI
+            # Create main widget
+            main_widget = PySide2.QtWidgets.QWidget(self)
+            self.setCentralWidget(main_widget)
+
+            # Initialize the layout
+            global_layout = PySide2.QtWidgets.QVBoxLayout()
+            layout = PySide2.QtWidgets.QFormLayout()
+            main_widget.setLayout(global_layout)
+
+            # Create Controls - Display Current Version
+            self.current_version_label = PySide2.QtWidgets.QLabel()
+            self.current_version_label.setMinimumWidth(300)
+            # Create Controls - Display Library Path
+            self.current_path_label = PySide2.QtWidgets.QLabel()
+            # Create Controls - Display Divider
+            line = PySide2.QtWidgets.QFrame()
+            line.setFrameStyle(PySide2.QtWidgets.QFrame.HLine |
+                               PySide2.QtWidgets.QFrame.Sunken)
+            # Create Controls - Major version int editor
+            self.major_version = PySide2.QtWidgets.QSpinBox()
+            # Create Controls - Minor version int editor
+            self.minor_version = PySide2.QtWidgets.QSpinBox()
+            # Create Controls - custom spin box that supports a zero padded syntax for integers (001 instead of 1)
+            self.revision_version = PaddedSpinBox()
+            # Create Controls - Create New Version button
+            self.set_version = PySide2.QtWidgets.QPushButton(
+                'Create New Version')
+
+            # Add controls to layout and set label
+            layout.addRow('Current Version:', self.current_version_label)
+            layout.addRow('Library Path:', self.current_path_label)
+            layout.addRow(line)
+            layout.addRow('Major Version:', self.major_version)
+            layout.addRow('Minor Version:', self.minor_version)
+            layout.addRow('Revision Version:', self.revision_version)
+
+            # Global layout setting
+            global_layout.addLayout(layout)
+            global_layout.addWidget(self.set_version)
+
+except:
+    pass
+
+
+
+# PySide2 UI - custom QSpinBox that supports a zero padded syntax
+# Subclass PySide2.QtWidgets.QSpinBox
+class PaddedSpinBox(QtWidgets.QSpinBox):
+    def __init__(self, parent=None):
+        super(PaddedSpinBox, self).__init__(parent)
+
+    # Custom format of the actual value returned from the text
+    def valueFromText(self, text):
+        regExp = PySide2.QtCore.QRegExp(("(\\d+)(\\s*[xx]\\s*\\d+)?"))
+
+        if regExp.exactMatch(text):
+            return regExp.cap(1).toInt()
+        else:
+            return 0
+
+    # Custom format of the text displayed from the value
+    def textFromValue(self, value):
+        return str(value).zfill(3)
 
 
 def large_input(label, title='Input', text=None):

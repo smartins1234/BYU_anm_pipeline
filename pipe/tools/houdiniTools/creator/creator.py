@@ -1,4 +1,4 @@
-import os
+import os, hou
 
 import pipe.pipeHandlers.quick_dialogs as qd
 import pipe.pipeHandlers.select_from_list as sfl
@@ -8,10 +8,7 @@ from pipe.pipeHandlers.body import Body
 from pipe.pipeHandlers.body import AssetType
 #from pipe.tools.houtools.utils.utils import *
 from pipe.pipeHandlers import pipeline_io
-#from pipe.tools.houdiniTools.assembler.assembler import Assembler
-#from pipe.tools.houdiniTools.exporter.json_exporter import JSONExporter
-import re
-import hou
+from pipe.tools.houdiniTools.assembler.assembler import Assembler
 from PySide2 import QtWidgets
 
 
@@ -65,14 +62,25 @@ class Creator:
         if created:
             project = Project()
             body = project.create_asset(name, asset_type=type)
+            selectedNodes = []
+
+            for node in hou.selectedNodes():
+                if node.type().category() == hou.sopNodeTypeCategory():
+                    selectedNodes.append(node)
+                elif node.type().category() == hou.objNodeTypeCategory():
+                    if selectedNodes:
+                        qd.error("Selected nodes for asset must be inside a geo node or a single geo node.")
+                    selectedNodes = node.children()
+                    break
+
             if body == None:
                 qd.error("Asset with name " + name + " already exists in pipeline.")
             elif self.type == AssetType.SHOT:
-                qd.info("Asset created successfully.", "Success")
+                qd.info("Shot created successfully.", "Success")
             else:
-                #assembler = Assembler()
-                #assembler.create_hda(name, body=body)
-
+                assembler = Assembler()
+                HDA = assembler.create_hda(name, body=body, selected_nodes=selectedNodes)
+                HDA.updateFromNode(HDA)
                 qd.info("Asset created successfully.", "Success")
 
         else:
