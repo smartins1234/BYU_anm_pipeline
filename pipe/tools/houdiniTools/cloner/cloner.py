@@ -19,7 +19,6 @@ class Cloner:
         environment = Environment()
         self.user = environment.get_user()
 
-
     def clone_tool(self, node=None):
         self.project = Project()
         hda_list = self.project.list_hdas()

@@ -10,7 +10,7 @@ import pipe.pipeHandlers.pipeline_io as pio
 from pipe.tools.mayaTools.utilities.utils import *
 from pipe.pipeHandlers.environment import Environment
 #from pipe.pipeHandlers.environment import Department
-from pipe.pipeHandlers.body import AssetType
+from pipe.pipeHandlers.body import Asset
 from pipe.pipeHandlers.project import Project
 from pipe.pipeHandlers import quick_dialogs as qd
 import pipe.pipeHandlers.select_from_list as sfl
@@ -168,7 +168,7 @@ class AlembicExporter:
 
         return files"""
 
-    def exportSelected(self, asset_name, shot_name):#selection, destination, tag=None, startFrame=1, endFrame=1, disregardNoTags=False):
+    def exportSelected(self, asset_name, shot_name, camera=False):#selection, destination, tag=None, startFrame=1, endFrame=1, disregardNoTags=False):
         
         #get frame range
         self.frame_range = qd.input("How many frames are in this shot?")
@@ -180,14 +180,15 @@ class AlembicExporter:
         if not self.frame_range.isdigit():
             qd.error("Invalid frame range input. Setting to 1.")
 
-        print("Frame range: ", self.frame_range)
+        if camera:
+            path = ""
+        else:
+            path = self.getFilePath(shot_name, asset_name)
+        command = self.buildAlembicCommand(path)
+        pm.Mel.eval(command)
 
-        #get shot number
-            #get list of shots
-            #get input
-        #determine file path
-        #build the command
-        #execute
+        publish_info = [self.element, path]
+        return publish_info
 
         """endFrame = self.frame_range
         abcFiles = []
@@ -208,6 +209,51 @@ class AlembicExporter:
         abcFiles.append(abcFilePath)
 
         return abcFiles"""
+
+    def buildAlembicCommand(self, path):
+        #get selected nodes
+        selected = mc.ls(sl=True,long=True)
+        nodes = ""
+        for node in selected:
+            nodes += node
+            nodes += " "
+
+        options = "-frameRange 1 " + self.frame_range + " -uvWrite -worldSpace -writeUVSets -dataFormat ogawa -root " + nodes + "-file " + path
+        command = "AbcExport -verbose -j \"" + options +"\""
+        print(command)
+        return command
+
+    def getFilePath(self, shot_name, asset_name):
+        shot = Project().get_shot(shot_name)
+        if shot is None:
+            return None
+        path = shot.get_filepath()
+        path = os.path.join(path, Asset.ANIMATION)
+
+        self.element = Element(path)
+
+        path = os.path.join(path, asset_name)
+        last_version = self.element.get_last_version()
+        current_version = last_version + 1
+        path = path + "_v" + str(current_version).zfill(3) + ".abc"
+        print(path)
+        return path
+
+    def getCameraPath(self, shot_name):
+        shot = Project().get_shot(shot_name)
+        if shot is None:
+            return None
+        path = shot.get_filepath()
+        path = os.path.join(path, Asset.CAMERA)
+
+        self.element = Element(path)
+
+        path = os.path.join(path, asset_name)
+        last_version = self.element.get_last_version()
+        current_version = last_version + 1
+        path = path + "_v" + str(current_version).zfill(3) + ".abc"
+        print(path)
+        return path
 
     """def exportAll(self, destination, tag=None, startFrame=1, endFrame=1, element=None):
         # selection = pm.ls(assemblies=True)

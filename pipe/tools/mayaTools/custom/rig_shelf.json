@@ -2,14 +2,13 @@
 	"shelfItems":[
 		{
 			"itemType":"button",
-			"icon":"maya.png",
-			"annotation":"This is a test.",
-			"label":"test",
+			"icon":"publish.svg",
+			"annotation":"Publish for rigging department",
+			"label":"Publish",
 			"menu":0,
-			"menu_items":{"Prop":"create_prop()", "Actor":"create_actor()", "Set":"create_set()", "Shot":"create_shot()"},
-			"double-click":"print(\"double click\")",
-			"tool":"mayaTools.tests.test",
-			"function":"junk.print_junk()"
+			"double-click":"",
+			"tool":"mayaTools.exporters.exporter",
+			"function":"Exporter.go(mb=True)"
         }
     ]
 }

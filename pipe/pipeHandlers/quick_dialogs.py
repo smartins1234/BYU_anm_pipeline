@@ -116,9 +116,13 @@ class HoudiniInput(QtWidgets.QWidget):
         self.initializeVBox()
         self.setLayout(self.vbox)
         self.show()
+        print('trying to raise.')
+        # self.raise_()
+        # self.setActiveWindow()    #these were supposed to raise the window to the top of things, but they don't seem to be doing anything.
 
     def initializeVBox(self):
         self.vbox = QtWidgets.QVBoxLayout()
+        #QApplication.setActiveWindow()
         self.initializeTextBar()
         self.initializeSubmitButton()
 
@@ -163,7 +167,7 @@ class HoudiniInput(QtWidgets.QWidget):
     '''
 
     def submit(self):
-        print(self.values)
+        print('comment input: '+ self.values)
         self.button.setText("Loading...")
         icon_path = os.path.join(Project().get_project_dir(
         ), "pipe", "tools", "_resources", "loading_indicator_transparent.gif")
@@ -187,31 +191,31 @@ try:
 
             # Function to build the UI
             # Create main widget
-            main_widget = PySide2.QtWidgets.QWidget(self)
+            main_widget = QtWidgets.QWidget(self)
             self.setCentralWidget(main_widget)
 
             # Initialize the layout
-            global_layout = PySide2.QtWidgets.QVBoxLayout()
-            layout = PySide2.QtWidgets.QFormLayout()
+            global_layout = QtWidgets.QVBoxLayout()
+            layout = QtWidgets.QFormLayout()
             main_widget.setLayout(global_layout)
 
             # Create Controls - Display Current Version
-            self.current_version_label = PySide2.QtWidgets.QLabel()
+            self.current_version_label = QtWidgets.QLabel()
             self.current_version_label.setMinimumWidth(300)
             # Create Controls - Display Library Path
-            self.current_path_label = PySide2.QtWidgets.QLabel()
+            self.current_path_label = QtWidgets.QLabel()
             # Create Controls - Display Divider
-            line = PySide2.QtWidgets.QFrame()
-            line.setFrameStyle(PySide2.QtWidgets.QFrame.HLine |
-                               PySide2.QtWidgets.QFrame.Sunken)
+            line = QtWidgets.QFrame()
+            line.setFrameStyle(QtWidgets.QFrame.HLine |
+                               QtWidgets.QFrame.Sunken)
             # Create Controls - Major version int editor
-            self.major_version = PySide2.QtWidgets.QSpinBox()
+            self.major_version = QtWidgets.QSpinBox()
             # Create Controls - Minor version int editor
-            self.minor_version = PySide2.QtWidgets.QSpinBox()
+            self.minor_version = QtWidgets.QSpinBox()
             # Create Controls - custom spin box that supports a zero padded syntax for integers (001 instead of 1)
             self.revision_version = PaddedSpinBox()
             # Create Controls - Create New Version button
-            self.set_version = PySide2.QtWidgets.QPushButton(
+            self.set_version = QtWidgets.QPushButton(
                 'Create New Version')
 
             # Add controls to layout and set label
@@ -239,7 +243,7 @@ class PaddedSpinBox(QtWidgets.QSpinBox):
 
     # Custom format of the actual value returned from the text
     def valueFromText(self, text):
-        regExp = PySide2.QtCore.QRegExp(("(\\d+)(\\s*[xx]\\s*\\d+)?"))
+        regExp = QtCore.QRegExp(("(\\d+)(\\s*[xx]\\s*\\d+)?"))
 
         if regExp.exactMatch(text):
             return regExp.cap(1).toInt()
