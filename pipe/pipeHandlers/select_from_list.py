@@ -4,6 +4,7 @@ try:
     from PySide import QtCore
 except ImportError:
     from PySide2 import QtWidgets, QtGui, QtCore
+    #from PySide2 import QApplication
 
 from pipe.pipeHandlers.project import Project
 import os
@@ -58,6 +59,8 @@ class SelectFromList(QtWidgets.QDialog):
 
     def initializeVBox(self):
         self.vbox = QtWidgets.QVBoxLayout()
+        #QtWidgets.raise()
+        #QApplication.setActiveWindow()
         self.initializeSearchBar()
         self.initializeListWidget()
         self.initializeSubmitButton()

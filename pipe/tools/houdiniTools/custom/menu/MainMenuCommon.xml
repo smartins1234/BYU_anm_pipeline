@@ -25,7 +25,7 @@ creator.run(type="asset")
 					]]>
 				</scriptCode>
 			</scriptItem>
-			<!-- ============================ End Create Actor Tool =========================== -->
+			<!-- ============================ End Create Asset Tool =========================== -->
 
 			<!-- ============================ Start Create Shot Tool =========================== -->
 			<scriptItem id="h.createShot">
@@ -47,7 +47,7 @@ creator.run(type="shot")
 		<!-- ============================ Start cloner subMenu =========================== -->
 		<subMenu id="cloner_menu">
 			<label>Clone</label>
-			<!-- ============================ Start ASSETS_DIR cloner Tool =========================== -->
+			<!-- ============================ Start Asset cloner Tool =========================== -->
 			<scriptItem id="h.checkout_asset">
 				<label>Asset</label>
 				<scriptCode scriptType="python">

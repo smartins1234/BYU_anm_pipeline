@@ -26,7 +26,8 @@ class Creator:
     This will bring up the create new body UI
     '''
     def create_body(self):
-        self.input = qd.HoudiniInput(parent=hou.ui.mainQtWindow(), title="What is the name of this asset?")
+        titlestring = "What is the name of this " + self.type + "?"
+        self.input = qd.HoudiniInput(parent=hou.ui.mainQtWindow(), title=titlestring)
         self.input.submitted.connect(self.name_results)
 
     def name_results(self, value):

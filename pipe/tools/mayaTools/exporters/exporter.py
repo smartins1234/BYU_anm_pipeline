@@ -7,6 +7,7 @@ import pipe.pipeHandlers.quick_dialogs as qd
 from pipe.tools.mayaTools.utilities.utils import *
 from pipe.tools.mayaTools.exporters.alembic_exporter import AlembicExporter
 from pipe.tools.mayaTools.exporters.obj_exporter import ObjExporter
+from pipe.tools.mayaTools.exporters.mb_exporter import MbExporter
 import pipe.pipeHandlers.select_from_list as sfl
 # from pipe.tools.mayaTools.exporters.fbx_exporter import FbxExporter
 # from pipe.tools.mayaTools.exporters.json_exporter import JSONExporter
@@ -19,10 +20,12 @@ class Exporter:
         self.list = ["alembic", "fbx", "json", "usd", "obj"]
         self.cameras = True'''
 
-    def go(self, alembic=False, usd=False, obj=False):
+    def go(self, alembic=False, usd=False, obj=False, mb=False, camera=False):
         self.alembic = alembic
         self.usd = usd
         self.obj = obj
+        self.mb = mb
+        self.camera = camera
 
         project = Project()
         asset_list = project.list_assets()
@@ -36,10 +39,11 @@ class Exporter:
     def export_one(self, alembic=False, fbx=False, json=False, usd=False, methods=None):
         '''self.export(alembic=alembic, fbx=fbx, json=json, usd=usd, methods=methods)'''
 
-    def export(self, ):
+    def export(self):
         
         if self.obj:
-            ObjExporter().exportSelected(self.chosen_asset)
+            publish_info = ObjExporter().exportSelected(self.chosen_asset)
+            self.publish(publish_info)
 
         if self.usd:
             #export as usd
@@ -50,6 +54,10 @@ class Exporter:
             print(shot_list)
             self.item_gui = sfl.SelectFromList(l=shot_list, parent=maya_main_window(), title="What shot is this animation in?")
             self.item_gui.submitted.connect(self.shot_results)
+
+        if self.mb:
+            publish_info = MbExporter().export(self.chosen_asset)
+            self.publish(publish_info)
 
         '''if methods is None:
             methods = self.list
@@ -150,4 +158,22 @@ class Exporter:
         proj = Project()
         proj.create_shot(chosen_shot)
 
-        AlembicExporter().exportSelected(self.chosen_asset, chosen_shot)
+        publish_info = AlembicExporter().exportSelected(self.chosen_asset, chosen_shot)
+        self.publish(publish_info)
+
+    def publish(self, publish_info):
+        element = publish_info[0]
+        path = publish_info[1]
+
+        self.publishes = element.list_publishes()
+        publishes_string_list = ""
+        for publish in self.publishes:
+            label = publish[0] + " " + publish[1] + " " + publish[2] + "\n"
+            publishes_string_list += label
+
+        # get comment and update element file with publish info
+        comment = qd.input(title="Comment for publish", label=publishes_string_list)
+        if comment is None:
+            comment = "No comment."
+        username = Environment().get_user().get_username()
+        element.publish(username, path, comment)
