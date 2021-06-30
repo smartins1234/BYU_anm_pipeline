@@ -102,7 +102,7 @@ class Project:
 		returns the shot object associated with the given name.
 		name -- the name of the shot
 		'''
-		filepath = os.path.join(self._env.get_assets_dir(), name)
+		filepath = os.path.join(self._env.get_shots_dir(), name)
 		if not os.path.exists(filepath):
 			return None
 		return Shot(filepath)
@@ -117,14 +117,18 @@ class Project:
 			return None
 		return Tool(filepath)
 
-	def get_body(self, name):
+	def get_body(self, name):		#this needs to work. Why isn't it?
 		'''
 		returns the body object associated with the given name.
 		name -- the name of the body
 		'''
+		print('getting name of body.')
 		body = self.get_asset(name)
 		if body is None:
 			body = self.get_tool(name)
+		if body is None:
+			print('in project.py now using get_shot.')
+			body = self.get_shot(name)
 		return body
 
 	def create_body(self, name, bodyobj):
@@ -138,6 +142,7 @@ class Project:
 		print("filepath: ", filepath)
 
 		if name in self.list_bodies():
+			print(name, " already exists, exiting...")
 			return None  # body already exists
 
 		if not pipeline_io.mkdir(filepath):
@@ -177,6 +182,11 @@ class Project:
 		creates a new shot with the given name, and returns the resulting shot object.
 		name -- the name of the new shot to create
 		'''
+		shot = self.create_body(name, Shot)
+
+		if shot is None:
+			return None # shot already exists
+
 		return self.create_body(name, Shot)
 
 	def create_tool(self, name):
@@ -255,8 +265,8 @@ class Project:
 		shot_list = []
 
 		for item in list:
-			asset = self.get_asset(item)
-			if asset.get_type() == AssetType.SHOT:
+			shot = self.get_shot(item)
+			if shot.get_type() == AssetType.SHOT:
 				shot_list.append(str(item))
 
 		shot_list.sort(key=str.lower)
@@ -332,7 +342,7 @@ class Project:
 		'''
 		returns a list of strings containing the names of all bodies (assets and shots)
 		'''
-		return self._list_bodies_in_dir(self._env.get_assets_dir()) + self.list_shots() + self.list_tools()
+		return self._list_bodies_in_dir(self._env.get_assets_dir()) + self.list_existing_shots() + self.list_tools()
 
 	def list_users(self):
 		'''

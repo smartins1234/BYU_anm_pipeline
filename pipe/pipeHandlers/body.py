@@ -305,7 +305,12 @@ class Shot(Body):
 
 	@staticmethod
 	def create_new_dict(name):
-		datadict = Body.create_new_dict(name)
+		datadict = {}
+		datadict[Body.NAME] = name
+		datadict[Body.REFERENCES] = []
+		datadict[Body.DESCRIPTION] = ''
+		datadict[Body.TYPE] = AssetType.SHOT
+		datadict[Body.FRAME_RANGE] = 0
 		return datadict
 
 	@staticmethod
