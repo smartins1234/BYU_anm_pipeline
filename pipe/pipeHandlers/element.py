@@ -134,6 +134,10 @@ class Element:
     def set_app_ext(self, extension):
         self.app_ext = extension
 
+    def update_app_ext(self, extension):
+        self._datadict[Element.APP_EXT] = extension
+        self._update_pipeline_file()
+
     def load_pipeline_file(self, filepath):
         """
         load the pipeline file that describes this element
@@ -377,22 +381,57 @@ class Element:
         self.update_checkout_users(username)
         return checkout_file
 
-    def publish(self, username, path, comment, status=None):
+    def publish(self, username, path, comment, asset_name):
         """
-        Update the version number and save publish information in the
-        element file
+        Update the version number and save publish information in the 
+        element file. Save the file at path in a version
+        folder as well as in the main element folder. If the given path
+        isn't the same as the version folder or main element folder, the
+        file at path will be deleted.
+        
         username -- the username of the user performing this action
         path -- a string representing the path to the published file
         comment -- description of changes made in this publish
+        asset_name -- name of the asset being published
         """
+        #get the new version number
         new_version = self._datadict[self.LATEST_VERSION] + 1
         self._datadict[self.LATEST_VERSION] = new_version
 
-        timestamp = pipeline_io.timestamp()
-        pipeline_io.set_permissions(path)
-        self._datadict[self.PUBLISHES].append((username, timestamp, comment, path))
+        #path to the file that will be saved in the same folder as the .element file
+        main_path = asset_name + "_" + self.get_name() + self.get_app_ext()
+        main_path = os.path.join(self._filepath, main_path)
+        print(main_path)
 
+        #path to the file that will be saved in the version folder
+        version_path = self.get_version_dir(new_version)
+        pipeline_io.mkdir(version_path)
+        version_path = os.path.join(version_path, asset_name + self.get_app_ext())
+        print(version_path)
+
+        if path != main_path and path != version_path:
+            #copy the file then delete the original
+            shutil.copy(path, main_path)
+            shutil.copy(path, version_path)
+
+            pipeline_io.set_permissions(main_path)
+            pipeline_io.set_permissions(version_path)
+
+            os.remove(path)
+
+        elif path is main_path:
+            shutil.copy(path, version_path)
+            pipeline_io.set_permissions(version_path)
+
+        elif path is version_path:
+            shutil.copy(path, main_path)
+            pipeline_io.set_permissions(main_path)
+
+        #save publish data to the .element file
+        timestamp = pipeline_io.timestamp()
+        self._datadict[self.PUBLISHES].append((username, timestamp, comment, main_path))
         self._update_pipeline_file()
+
 
         """if not os.path.exists(src):
             raise EnvironmentError("file does not exist: " + src)

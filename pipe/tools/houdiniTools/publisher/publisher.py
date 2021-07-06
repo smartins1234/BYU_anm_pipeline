@@ -141,21 +141,19 @@ class Publisher:
         print('file name is ' + scene)
 
         project = Project()     # get project and its shots
-        asset_list = project.list_shots()
+        asset_list = project.list_existing_shots()
 
-        self.item_gui = sfl.SelectFromList(l=asset_list, parent=hou.ui.mainQtWindow(), title="Select a shot to publish to, my friend.")
+        self.item_gui = sfl.SelectFromList(l=asset_list, parent=hou.qt.mainWindow(), title="Select a shot to publish to, my friend.")
         self.item_gui.submitted.connect(self.shot_results)
 
+
     def shot_results(self, value):
-        test_window = hou.ui.mainQtWindow
-        print('reached shot results.')
         self.chosen_shot = value[0]        # chosen shot is the only asset in the list
 
-        self.comment = qd.HoudiniInput(parent=hou.ui.mainQtWindow(), title="Please comment on the changes made to the shot, hombre.")
+        self.comment = qd.HoudiniInput(parent=hou.qt.mainWindow(), title="Please comment on the changes made to the shot, hombre.")
         self.comment.submitted.connect(self.shot_comment)
 
     def shot_comment(self, value):
-        print('reached comments.')
         hou.hipFile.setName('newName_v01')  #this will change the name of the file: can be versioned. So that's nice.
         comment = value
         if comment is None:
@@ -163,10 +161,9 @@ class Publisher:
         #FIXME: make variable more specific to shot?
         chosen_shot = self.chosen_shot
         project = Project()
-        print(type(project))
-        print('searching for shot:')
-        print(chosen_shot)
-        print(os.path.abspath(inspect.getfile(project.get_body)))
+        print('searching for shot: '+chosen_shot)
+        path = os.path.abspath(inspect.getfile(project.get_body(chosen_shot)))
+        print("path " + path + "\n")
 
         project.get_body(chosen_shot)
         self.body = project.get_body(chosen_shot)  #Get Body JSON for the stuff

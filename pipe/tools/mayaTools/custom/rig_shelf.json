@@ -9,6 +9,16 @@
 			"double-click":"",
 			"tool":"mayaTools.exporters.exporter",
 			"function":"Exporter.go(mb=True)"
+		},
+		{
+			"itemType":"button",
+			"icon":"rollback.svg",
+			"annotation":"Remove namespaces tool",
+			"label":"",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.utilities.rm_namespaces",
+			"function":"RemoveNamespaces.go()"
         }
     ]
 }

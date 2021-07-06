@@ -6,6 +6,7 @@ from pipe.tools.mayaTools.utilities.utils import *
 #from pipe.tools.mayaTools.publishers.publisher import MayaPublisher as Publisher
 from pipe.pipeHandlers.project import Project
 from pipe.pipeHandlers.body import Body
+from pipe.pipeHandlers.body import Asset
 from pipe.pipeHandlers.element import Element
 
 from PySide2 import QtWidgets
@@ -16,8 +17,9 @@ import os
 
 class MayaCloner:
 	def __init__(self):
-		self.maya_checkout_dialog = None
-		self.quick = False
+		#self.maya_checkout_dialog = None
+		#self.quick = False
+		pass
 
 	def rollback(self):
 		print("Rollin' Rollin' Rollin' (Back)")
@@ -43,7 +45,40 @@ class MayaCloner:
 		else:
 			print('File does not exist: '+assetName)
 
-	def clone_prop(self):
+	def clone_geo(self, quick=True):
+		self.quick = quick
+		self.project = Project()
+		self.type = Asset.GEO
+		asset_list = self.project.list_existing_assets()
+		self.item_gui = sfl.SelectFromList(l=asset_list, parent=maya_main_window(), title="Select a model to clone")
+		self.item_gui.submitted.connect(self.results)
+
+	def clone_rig(self, quick=True):
+		self.quick = quick
+		self.project = Project()
+		self.type = Asset.RIG
+		asset_list = self.project.list_existing_assets()
+		self.item_gui = sfl.SelectFromList(l=asset_list, parent=maya_main_window(), title="Select a rig to clone")
+		self.item_gui.submitted.connect(self.results)
+
+	def clone_anim(self, quick=True):
+		self.quick = quick
+		self.project = Project()
+		self.type = Asset.ANIMATION
+		asset_list = self.project.list_existing_assets()
+		self.item_gui = sfl.SelectFromList(l=asset_list, parent=maya_main_window(), title="Select an asset to clone")
+		self.item_gui.submitted.connect(self.results)
+
+	def clone_camera(self, quick=True):
+		self.quick = quick
+		self.project = Project()
+		self.type = Asset.CAMERA
+		#pull up the shot list instead
+		'''asset_list = self.project.list_existing_assets()
+		self.item_gui = sfl.SelectFromList(l=asset_list, parent=maya_main_window(), title="Select an asset to clone")
+		self.item_gui.submitted.connect(self.results)'''
+
+	'''def clone_prop(self):
 		self.quick = True
 		project = Project()
 		asset_list = project.list_props()
@@ -69,7 +104,7 @@ class MayaCloner:
 		project = Project()
 		asset_list = project.list_shots()
 		self.item_gui = sfl.SelectFromList(l=asset_list, parent=maya_main_window(), title="Select a shot to clone")
-		self.item_gui.submitted.connect(self.results)
+		self.item_gui.submitted.connect(self.results)'''
 
 	def go(self):
 		project = Project()
@@ -118,11 +153,15 @@ class MayaCloner:
 		print("Final value: ", value[0])
 		filename = value[0]
 
-		project = Project()
-		body = project.get_body(filename)
+		body = self.project.get_body(filename)
 		self.body = body
-		type = body.get_type()
-		element = self.get_element_option(type, body)
+		#type = body.get_type()
+		#element = self.get_element_option(type, body)
+		element = body.get_element(self.type)
+
+		if element is None:
+			qd.warning("Nothing was cloned.")
+			return
 
 		if self.quick:
 			latest = element.get_last_publish()
@@ -134,15 +173,11 @@ class MayaCloner:
 				self.open_scene_file(selected_scene_file)
 				return
 
-		if element is None:
-			qd.warning("Nothing was cloned.")
-			return
-
 		self.publishes = element.list_publishes()
 		print("publishes: ", self.publishes)
 
 		if not self.publishes:
-			qd.error("There have been no publishes in this department. Maybe you meant model?")
+			qd.error("There have been no publishes in this department.")
 			return
 
 		# make the list a list of strings, not tuples
@@ -176,21 +211,32 @@ class MayaCloner:
 
 	def open_scene_file(self, selected_scene_file):
 		if selected_scene_file is not None:
-			check_unsaved_changes()
-			setPublishEnvVar(self.body.get_name(), self.department)
+			#check_unsaved_changes()
+			#setPublishEnvVar(self.body.get_name(), self.department)
 
 			if not os.path.exists(selected_scene_file):
-				try:
+				qd.error("That publish is missing. It may have been deleted to clear up space.")
+				return False
+				'''try:
 					mc.file(new=True, force=True)
 					mc.file(rename=selected_scene_file)
 					mc.file(save=True, force=True)
 					print("New file: " + selected_scene_file)
 				except Exception as e:
 					qd.error("That publish is missing. It may have been deleted to clear up space.", details=str(e))
-					return False
+					return False'''
 			else:
-				mc.file(selected_scene_file, open=True, force=True, ignoreVersion=True)
-				print("File opened: " + selected_scene_file)
+				if self.type == Asset.RIG:
+					#reference in the rig
+					'''mc.file(selected_scene_file, open=True, force=True, ignoreVersion=True)
+					print("File opened: " + selected_scene_file)'''
+					pass
+				elif self.type == Asset.GEO:
+					#import the obj file
+					pass
+				elif self.type == Asset.ANIMATION or self.type == Asset.ANIMATION:
+					#reference the abc file
+					pass
 
 			return True
 		else:

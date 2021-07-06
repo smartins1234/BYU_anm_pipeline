@@ -169,27 +169,26 @@ class AlembicExporter:
         return files"""
 
     def exportSelected(self, asset_name, shot_name, camera=False):#selection, destination, tag=None, startFrame=1, endFrame=1, disregardNoTags=False):
-        
-        #get frame range
-        self.frame_range = qd.input("How many frames are in this shot?")
 
-        if self.frame_range is None or self.frame_range == u'':
-            self.frame_range = 1
+        self.shot_name = shot_name
+        self.shot = Project().get_shot(shot_name)
 
-        self.frame_range = str(self.frame_range)
-        if not self.frame_range.isdigit():
-            qd.error("Invalid frame range input. Setting to 1.")
+        if self.shot is None:
+            return None
 
         if camera:
-            path = ""
+            path = self.getCameraPath(asset_name)
+            command = self.buildAlembicCommand(path, uv=False)
+                
         else:
-            path = self.getFilePath(shot_name, asset_name)
-        command = self.buildAlembicCommand(path)
+            path = self.getFilePath(asset_name)
+            command = self.buildAlembicCommand(path)
+
         pm.Mel.eval(command)
 
         publish_info = [self.element, path]
         return publish_info
-
+        
         """endFrame = self.frame_range
         abcFiles = []
 
@@ -210,7 +209,7 @@ class AlembicExporter:
 
         return abcFiles"""
 
-    def buildAlembicCommand(self, path):
+    def buildAlembicCommand(self, path, uv=True):
         #get selected nodes
         selected = mc.ls(sl=True,long=True)
         nodes = ""
@@ -218,19 +217,29 @@ class AlembicExporter:
             nodes += node
             nodes += " "
 
-        options = "-frameRange 1 " + self.frame_range + " -uvWrite -worldSpace -writeUVSets -dataFormat ogawa -root " + nodes + "-file " + path
+        frame_range = str(self.shot.get_frame_range())
+
+        options = "-frameRange 1 " + frame_range
+        if uv:
+            options += " -uvWrite -writeUVSets"
+        options += " -worldSpace -dataFormat ogawa -root " + nodes + "-file " + path
+
         command = "AbcExport -verbose -j \"" + options +"\""
         print(command)
         return command
 
-    def getFilePath(self, shot_name, asset_name):
-        shot = Project().get_shot(shot_name)
-        if shot is None:
-            return None
-        path = shot.get_filepath()
-        path = os.path.join(path, Asset.ANIMATION)
+    def getFilePath(self, asset_name):
+        path = self.shot.get_filepath()
+        dept = os.path.join(Asset.ANIMATION, asset_name) #this is to make it so we can keep track of the versions of animations for each asset
+        path = os.path.join(path, dept)
 
-        self.element = Element(path)
+        #try to create the element if it doesn't exist
+        self.element = self.shot.create_element(dept, Element.DEFAULT_NAME)
+        #retrieve it if it does already
+        if self.element is None:
+            self.element = self.shot.get_element(dept)
+            
+        self.element.update_app_ext(".abc")
 
         path = os.path.join(path, asset_name)
         last_version = self.element.get_last_version()
@@ -239,16 +248,18 @@ class AlembicExporter:
         print(path)
         return path
 
-    def getCameraPath(self, shot_name):
-        shot = Project().get_shot(shot_name)
-        if shot is None:
-            return None
-        path = shot.get_filepath()
-        path = os.path.join(path, Asset.CAMERA)
+    def getCameraPath(self, camera_name):
+        path = self.shot.get_filepath()
+        dept = os.path.join(Asset.CAMERA, camera_name) #this is to make it so we can keep track of the versions of animations for each camera
+        path = os.path.join(path, dept)
 
-        self.element = Element(path)
+        #try to create the element if it doesn't exist
+        self.element = self.shot.create_element(dept, Element.DEFAULT_NAME)
+        #retrieve it if it does already
+        if self.element is None:
+            self.element = self.shot.get_element(dept)
 
-        path = os.path.join(path, asset_name)
+        path = os.path.join(path, camera_name)
         last_version = self.element.get_last_version()
         current_version = last_version + 1
         path = path + "_v" + str(current_version).zfill(3) + ".abc"
