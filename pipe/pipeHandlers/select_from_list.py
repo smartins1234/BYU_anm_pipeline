@@ -4,7 +4,6 @@ try:
     from PySide import QtCore
 except ImportError:
     from PySide2 import QtWidgets, QtGui, QtCore
-    #from PySide2 import QApplication
 
 from pipe.pipeHandlers.project import Project
 import os

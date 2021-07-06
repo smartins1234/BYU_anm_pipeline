@@ -19,6 +19,7 @@ class Body(object):
 	DESCRIPTION = 'description'
 	TYPE = 'type'
 	FRAME_RANGE = 'frame_range'
+	CAMERA_NUMBER = 'camera_number'
 
 	@staticmethod
 	def create_new_dict(name):
@@ -107,10 +108,18 @@ class Body(object):
 
 	def set_frame_range(self, frame_range):
 		self._datadict[Body.FRAME_RANGE] = frame_range
+		pipeline_io.writefile(self._pipeline_file, self._datadict)
 
 	def update_frame_range(self, frame_range):
 
 		self._datadict[Body.FRAME_RANGE] = frame_range
+		pipeline_io.writefile(self._pipeline_file, self._datadict)
+
+	def get_camera_number(self):
+		return self._datadict[Body.CAMERA_NUMBER]
+
+	def set_camera_number(self, num):
+		self._datadict[Body.CAMERA_NUMBER] = num
 		pipeline_io.writefile(self._pipeline_file, self._datadict)
 
 	def version_prop_json(self, prop, filepath):
@@ -153,7 +162,7 @@ class Body(object):
 			else:
 				raise EnvironmentError('no such element: ' + element_dir + ' does not exist')
 
-		return Registry().create_element(department, element_dir)
+		return Element(element_dir)
 
 	def create_element(self, department, name):
 		'''
@@ -168,7 +177,9 @@ class Body(object):
 		empty_element = self.set_app_ext(department)
 		datadict = empty_element.create_new_dict(name, department, self.get_name())
 		if os.path.exists(os.path.join(dept_dir, empty_element.PIPELINE_FILENAME)):
-			raise EnvironmentError('element already exists: ' + dept_dir)
+			#raise EnvironmentError('element already exists: ' + dept_dir)
+			print("element already exists: " + dept_dir)
+			return None
 
 		pipeline_io.writefile(os.path.join(dept_dir, empty_element.PIPELINE_FILENAME), datadict)
 		return self.set_app_ext(department, dept_dir)
@@ -178,12 +189,21 @@ class Body(object):
 		this function replaces the old registry class and sets the extension for an element.
 		'''
 		element = Element(filepath)
-
+		'''
 		if department == Asset.GEO or department == Asset.ANIMATION or department == Asset.RIG:
 			element.set_app_ext(".mb")
 			return element
 		elif department == Asset.HDA:
 			element.set_app_ext(".hdanc")
+			return element'''
+		if department == Asset.GEO:
+			element.set_app_ext(".obj")
+			return element
+		elif department == Asset.ANIMATION or department == Asset.CAMERA:
+			element.set_app_ext(".abc")
+			return element
+		elif department == Asset.RIG:
+			element.set_app_ext(".mb")
 			return element
 		else:
 			return element

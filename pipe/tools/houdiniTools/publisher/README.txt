@@ -28,6 +28,33 @@ Asset:
 
 
 Tool:
+
+    Publish creates / versions HDAs.
+    Clone will clone an HDA. (tab menu support tbd)
+
+    on publish:
+        check that 1+ nodes are selected.
+        check that selected nodes are in the object level
+
+        If one node Selected:
+            If node(s) is/are not HDA:
+                -if nodes are not subnet:
+                    collapse nodes into subnet
+                -create HDA with subnet
+
+        Now, there is an HDA to work with.
+        Ask user if they want to create a new HDA, or version an existing HDA
+            -if versioning current HDA:
+                pull up menu of existing HDAs
+                user selects HDA to version
+                program *versions up HDA*
+            -else:
+                prompt for HDA name
+                rename HDA with new name
+                save HDA
+
+
+    (OLD){
     TLDR: saves versioned tool .hda with notes
 
     selected: hda
@@ -37,6 +64,7 @@ Tool:
     adds note in HDA metadata
     Saves versioned (hda tools stored where?)
     export USD file of tool? Probably not.
+    }
 
 Shot:
     TLDR: saves versioned shot .hip with notes

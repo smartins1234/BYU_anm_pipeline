@@ -27,11 +27,20 @@ class Exporter:
         self.mb = mb
         self.camera = camera
 
-        project = Project()
-        asset_list = project.list_assets()
+        self.project = Project()
+        self.chosen_asset = None
 
-        self.item_gui = sfl.SelectFromList(l=asset_list, parent=maya_main_window(), title="Select an asset to export to")
-        self.item_gui.submitted.connect(self.asset_results)
+        if self.camera and self.alembic:    #previs publish case
+            shot_list = self.project.list_shots()
+
+            self.item_gui = sfl.SelectFromList(l=shot_list, parent=maya_main_window(), title="What shot is this camera in?")
+            self.item_gui.submitted.connect(self.shot_results)
+
+        else:
+            asset_list = self.project.list_assets()
+
+            self.item_gui = sfl.SelectFromList(l=asset_list, parent=maya_main_window(), title="Select an asset to export to")
+            self.item_gui.submitted.connect(self.asset_results)
 
     def auto_export_all(self):
         '''self.export()'''
@@ -41,21 +50,21 @@ class Exporter:
 
     def export(self):
         
-        if self.obj:
+        if self.obj:    #modeling publish case
             publish_info = ObjExporter().exportSelected(self.chosen_asset)
             self.publish(publish_info)
 
-        if self.usd:
+        if self.usd:    #modeling publish case
             #export as usd
             pass
 
-        if self.alembic:
-            shot_list = Project().list_shots()
-            print(shot_list)
+        if self.alembic:#animation publish case
+            shot_list = self.project.list_shots()
+
             self.item_gui = sfl.SelectFromList(l=shot_list, parent=maya_main_window(), title="What shot is this animation in?")
             self.item_gui.submitted.connect(self.shot_results)
 
-        if self.mb:
+        if self.mb:     #rigging publish case
             publish_info = MbExporter().export(self.chosen_asset)
             self.publish(publish_info)
 
@@ -142,23 +151,58 @@ class Exporter:
 
         #check if asset already exists
         #if not, create it
-
-        proj = Project()
-        proj.create_asset(name=self.chosen_asset)
+        self.project.create_asset(name=self.chosen_asset)
 
         self.export()
 
     def shot_results(self, value):
-        chosen_shot = value[0]
-        print(chosen_shot)
+        self.chosen_shot = value[0]
+        print(self.chosen_shot)
 
-        #check if shot already exists
-        #if not, create it
+        shot = self.project.create_shot(self.chosen_shot)
 
-        proj = Project()
-        proj.create_shot(chosen_shot)
+        #if the shot didn't exist already, set the frame range
+        if shot is not None:    
+            qd.warning("You are creating this shot in the pipe. Check with your team lead that the following information you enter is correct.")
+            frame_range = qd.input("How many frames are in this shot?")
 
-        publish_info = AlembicExporter().exportSelected(self.chosen_asset, chosen_shot)
+            if frame_range is None or frame_range == u'':
+                frame_range = 1
+
+            frame_range = str(frame_range)
+            if not frame_range.isdigit():
+                qd.error("Invalid frame range input. Setting to 1.")
+
+            shot.set_frame_range(int(frame_range))
+            print(str(shot.get_frame_range()))
+
+        else:
+            shot = self.project.get_shot(self.chosen_shot)
+
+        #pre-vis publish
+        if self.camera:     
+            camera_num = int(shot.get_camera_number())
+            if camera_num == 1:     #only one camera in the shot
+                self.chosen_asset = "camera1"
+                publish_info = AlembicExporter().exportSelected(asset_name=self.chosen_asset, shot_name=self.chosen_shot, camera=self.camera)
+                self.publish(publish_info)
+            else:                   #pick which camera to publish
+                cam_list = []
+                for number in range(1, camera_num+1):
+                    camera_name = "camera" + str(number)
+                    cam_list.append(camera_name)
+
+                self.item_gui = sfl.SelectFromList(l=cam_list, parent=maya_main_window(), title="Which camera are you publishing?")
+                self.item_gui.submitted.connect(self.camera_results)
+
+        #animation publish
+        else:
+            publish_info = AlembicExporter().exportSelected(asset_name=self.chosen_asset, shot_name=self.chosen_shot, camera=self.camera)
+            self.publish(publish_info)
+
+    def camera_results(self, value):
+        self.chosen_asset = value[0]
+        publish_info = AlembicExporter().exportSelected(asset_name=self.chosen_asset, shot_name=self.chosen_shot, camera=self.camera)
         self.publish(publish_info)
 
     def publish(self, publish_info):
@@ -176,4 +220,4 @@ class Exporter:
         if comment is None:
             comment = "No comment."
         username = Environment().get_user().get_username()
-        element.publish(username, path, comment)
+        element.publish(username, path, comment, self.chosen_asset)

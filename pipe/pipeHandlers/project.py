@@ -41,7 +41,7 @@ class Project:
 		'''
 		return the absolute filepath to the shots directory of this project
 		'''
-		return self._env.get_assets_dir()
+		return self._env.get_shots_dir()
 
 	def get_rendered_shots_dir(self):
 		rendered_shots = Environment().get_shots_dir()
@@ -122,12 +122,10 @@ class Project:
 		returns the body object associated with the given name.
 		name -- the name of the body
 		'''
-		print('getting name of body.')
 		body = self.get_asset(name)
 		if body is None:
 			body = self.get_tool(name)
 		if body is None:
-			print('in project.py now using get_shot.')
 			body = self.get_shot(name)
 		return body
 
@@ -187,7 +185,10 @@ class Project:
 		if shot is None:
 			return None # shot already exists
 
-		return self.create_body(name, Shot)
+		shot._datadict[Body.CAMERA_NUMBER] = 1
+		pipeline_io.writefile(shot._pipeline_file, shot._datadict)
+
+		return shot
 
 	def create_tool(self, name):
 		'''
@@ -205,7 +206,7 @@ class Project:
 			if os.path.exists(os.path.join(abspath, Body.PIPELINE_FILENAME)):
 				bodylist.append(bodydir)
 			else:
-				print("path doesn't exist?")
+				print("path doesn't exist for ", bodydir)
 		bodylist.sort()
 
 		if filter is not None and len(filter)==3:
@@ -252,6 +253,17 @@ class Project:
 
 		shots.sort(key=str.lower)
 		return shots
+
+	def list_existing_shots(self):
+		list = self._list_bodies_in_dir(self._env.get_shots_dir())
+		shots = []
+
+		for item in list:
+			shot = self.get_shot(item)
+			if asset.get_type() == AssetType.ASSET:
+				assets.append(str(item))
+		assets.sort(key=str.lower)
+		return assets
 
 	def list_existing_shots(self, filter=None):
 		'''
