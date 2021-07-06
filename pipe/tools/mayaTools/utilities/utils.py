@@ -76,36 +76,36 @@ def maya_main_window():
 '''
     check if user has unsaved changes before performing action, and if so, save as new publish
 '''
-# def check_unsaved_changes():
-#     unsaved_changes = mc.file(q=True, modified=True)
-#
-#     if unsaved_changes:
-#         response = qd.yes_or_no("Would you like to publish the current asset before you proceed?", title="Unsaved changes detected", details="(Press No if you just created a new scene or opened Maya.)")
-#         if response is True:
-#             # instead of saving, publish.
-#             scene = mc.file(q=True, sceneName=True)
-#             dir_path = scene.split("assets/")
-#             try:
-#                 asset_path = dir_path[1].split("/")
-#             except:
-#                 # scene path is stored in the user directory instead of assets. We can't get the asset name, so they must publish manually.
-#                 qd.error("Publish failed. Please publish manually before cloning the new asset.")
-#                 return
-#             asset_name = asset_path[0]
-#             try:
-#                 department = asset_path[1].split("/")[0]
-#                 print("department " + department)
-#             except:
-#                 department = None
-#
-#             if department:
-#                 print("department found")
-#             else:
-#                 qd.warning("Skipping changes to " + str(asset_name))
-#                 return
-#
-#             publisher = Publisher(quick_publish=True, export=False)
-#             publisher.non_gui_publish(asset_name, department)
+def check_unsaved_changes():
+    unsaved_changes = mc.file(q=True, modified=True)
+
+    if unsaved_changes:
+        response = qd.yes_or_no("Would you like to publish the current asset before you proceed?", title="Unsaved changes detected", details="(Press No if you just created a new scene or opened Maya.)")
+        if response is True:
+            # instead of saving, publish.
+            scene = mc.file(q=True, sceneName=True)
+            dir_path = scene.split("assets/")
+            try:
+                asset_path = dir_path[1].split("/")
+            except:
+                # scene path is stored in the user directory instead of assets. We can't get the asset name, so they must publish manually.
+                qd.error("Publish failed. Please publish manually before cloning the new asset.")
+                return
+            asset_name = asset_path[0]
+            try:
+                department = asset_path[1].split("/")[0]
+                print("department " + department)
+            except:
+                department = None
+
+            if department:
+                print("department found")
+            else:
+                qd.warning("Skipping changes to " + str(asset_name))
+                return
+
+            publisher = Publisher(quick_publish=True, export=False)
+            publisher.non_gui_publish(asset_name, department)
 
 '''
     Helper function for post_publish()

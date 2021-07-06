@@ -6,7 +6,6 @@ from pipe.pipeHandlers.project import Project
 from pipe.pipeHandlers.environment import Environment
 from pipe.pipeHandlers.body import Body
 from pipe.pipeHandlers.body import AssetType
-#from pipe.tools.houtools.utils.utils import *
 from pipe.pipeHandlers import pipeline_io
 from pipe.tools.houdiniTools.assembler.assembler import Assembler
 from PySide2 import QtWidgets
@@ -27,7 +26,7 @@ class Creator:
     '''
     def create_body(self):
         titlestring = "What is the name of this " + self.type + "?"
-        self.input = qd.HoudiniInput(parent=hou.ui.mainQtWindow(), title=titlestring)
+        self.input = qd.HoudiniInput(parent=hou.qt.mainWindow(), title=titlestring)
         self.input.submitted.connect(self.name_results)
 
     def name_results(self, value):
@@ -47,7 +46,7 @@ class Creator:
             self.results([self.type])
             return
 
-        self.item_gui = sfl.SelectFromList(l=asset_type_list, parent=hou.ui.mainQtWindow(), title="What are you creating?", width=250, height=160)
+        self.item_gui = sfl.SelectFromList(l=asset_type_list, parent=hou.qt.mainWindow(), title="What are you creating?", width=250, height=160)
         self.item_gui.submitted.connect(self.results)
 
     def results(self, value):

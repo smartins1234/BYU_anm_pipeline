@@ -1,11 +1,5 @@
-# try:
-#from PySide import QtGui as QtWidgets
-#from PySide import QtGui as QtGui
-#from PySide import QtCore
-# except ImportError:
-#from PySide2 import QtWidgets, QtGui, QtCore
 from PySide2 import QtWidgets, QtCore, QtGui
-import os
+import os #, hou        we can't have import hou here because it makes it break on the maya side
 from pipe.pipeHandlers.project import Project
 
 '''Reports a critical error'''
@@ -98,7 +92,7 @@ def input(label, title='Input', text=None):
 '''
 
 
-class HoudiniInput(QtWidgets.QWidget):
+class HoudiniInput(QtWidgets.QDialog):
     '''
     submitted is a class variable that must be instantiated outside of __init__
     in order for the Signal to be created correctly.
@@ -106,19 +100,16 @@ class HoudiniInput(QtWidgets.QWidget):
     submitted = QtCore.Signal(list)
 
     def __init__(self, parent=None, title="Enter info", width=350, height=75):
-        super(HoudiniInput, self).__init__()
+        super(HoudiniInput, self).__init__(parent)
+
         if parent:
             self.parent = parent
-
         self.setWindowTitle(title)
         self.setObjectName('HoudiniInput')
         self.resize(width, height)
         self.initializeVBox()
         self.setLayout(self.vbox)
         self.show()
-        print('trying to raise.')
-        # self.raise_()
-        # self.setActiveWindow()    #these were supposed to raise the window to the top of things, but they don't seem to be doing anything.
 
     def initializeVBox(self):
         self.vbox = QtWidgets.QVBoxLayout()
@@ -167,7 +158,7 @@ class HoudiniInput(QtWidgets.QWidget):
     '''
 
     def submit(self):
-        print('comment input: '+ self.values)
+        print('comment input: '+ self.values +'\n')
         self.button.setText("Loading...")
         icon_path = os.path.join(Project().get_project_dir(
         ), "pipe", "tools", "_resources", "loading_indicator_transparent.gif")
@@ -181,57 +172,53 @@ class HoudiniInput(QtWidgets.QWidget):
         self.close()
 
 
-try:
-    import hou
 
-    class VersionWindow(QtWidgets.QMainWindow):
+class VersionWindow(QtWidgets.QMainWindow):
 
-        def __init__(self, parent=hou.ui.mainQtWindow()):
-            super(VersionWindow, self).__init__(parent)
+    def __init__(self, parent):#=hou.qt.mainWindow()):  # you're going to have to set the parent explicitly when you call this function
+        super(VersionWindow, self).__init__(parent)     # because importing hou raises an error when this runs in maya
 
-            # Function to build the UI
-            # Create main widget
-            main_widget = QtWidgets.QWidget(self)
-            self.setCentralWidget(main_widget)
+        # Function to build the UI
+        # Create main widget
+        main_widget = QtWidgets.QWidget(self)
+        self.setCentralWidget(main_widget)
 
-            # Initialize the layout
-            global_layout = QtWidgets.QVBoxLayout()
-            layout = QtWidgets.QFormLayout()
-            main_widget.setLayout(global_layout)
+        # Initialize the layout
+        global_layout = QtWidgets.QVBoxLayout()
+        layout = QtWidgets.QFormLayout()
+        main_widget.setLayout(global_layout)
 
-            # Create Controls - Display Current Version
-            self.current_version_label = QtWidgets.QLabel()
-            self.current_version_label.setMinimumWidth(300)
-            # Create Controls - Display Library Path
-            self.current_path_label = QtWidgets.QLabel()
-            # Create Controls - Display Divider
-            line = QtWidgets.QFrame()
-            line.setFrameStyle(QtWidgets.QFrame.HLine |
-                               QtWidgets.QFrame.Sunken)
-            # Create Controls - Major version int editor
-            self.major_version = QtWidgets.QSpinBox()
-            # Create Controls - Minor version int editor
-            self.minor_version = QtWidgets.QSpinBox()
-            # Create Controls - custom spin box that supports a zero padded syntax for integers (001 instead of 1)
-            self.revision_version = PaddedSpinBox()
-            # Create Controls - Create New Version button
-            self.set_version = QtWidgets.QPushButton(
-                'Create New Version')
+        # Create Controls - Display Current Version
+        self.current_version_label = QtWidgets.QLabel()
+        self.current_version_label.setMinimumWidth(300)
+        # Create Controls - Display Library Path
+        self.current_path_label = QtWidgets.QLabel()
+        # Create Controls - Display Divider
+        line = QtWidgets.QFrame()
+        line.setFrameStyle(QtWidgets.QFrame.HLine |
+                           QtWidgets.QFrame.Sunken)
+        # Create Controls - Major version int editor
+        self.major_version = QtWidgets.QSpinBox()
+        # Create Controls - Minor version int editor
+        self.minor_version = QtWidgets.QSpinBox()
+        # Create Controls - custom spin box that supports a zero padded syntax for integers (001 instead of 1)
+        self.revision_version = PaddedSpinBox()
+        # Create Controls - Create New Version button
+        self.set_version = QtWidgets.QPushButton(
+            'Create New Version')
 
-            # Add controls to layout and set label
-            layout.addRow('Current Version:', self.current_version_label)
-            layout.addRow('Library Path:', self.current_path_label)
-            layout.addRow(line)
-            layout.addRow('Major Version:', self.major_version)
-            layout.addRow('Minor Version:', self.minor_version)
-            layout.addRow('Revision Version:', self.revision_version)
+        # Add controls to layout and set label
+        layout.addRow('Current Version:', self.current_version_label)
+        layout.addRow('Library Path:', self.current_path_label)
+        layout.addRow(line)
+        layout.addRow('Major Version:', self.major_version)
+        layout.addRow('Minor Version:', self.minor_version)
+        layout.addRow('Revision Version:', self.revision_version)
 
-            # Global layout setting
-            global_layout.addLayout(layout)
-            global_layout.addWidget(self.set_version)
+        # Global layout setting
+        global_layout.addLayout(layout)
+        global_layout.addWidget(self.set_version)
 
-except:
-    pass
 
 
 

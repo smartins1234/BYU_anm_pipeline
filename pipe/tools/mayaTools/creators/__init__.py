@@ -1,1 +1,1 @@
-__all__ = ['creator']
+__all__ = ['creator', 'camera_creator']
