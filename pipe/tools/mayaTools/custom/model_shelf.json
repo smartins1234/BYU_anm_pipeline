@@ -9,6 +9,16 @@
 			"double-click":"",
 			"tool":"mayaTools.exporters.exporter",
 			"function":"Exporter.go(usd=True,obj=True)"
+		},
+		{
+			"itemType":"button",
+			"icon":"clone.svg",
+			"annotation":"Clone in an asset",
+			"label":"Clone",
+			"menu":0,
+			"double-click":"clone(quick=False)",
+			"tool":"mayaTools.cloners.cloner",
+			"function":"Cloner.clone()"
 		}
     ]
 }

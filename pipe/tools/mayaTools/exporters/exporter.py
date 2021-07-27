@@ -217,7 +217,7 @@ class Exporter:
 
         # get comment and update element file with publish info
         comment = qd.input(title="Comment for publish", label=publishes_string_list)
-        if comment is None:
+        if comment is None or comment == "":
             comment = "No comment."
         username = Environment().get_user().get_username()
         element.publish(username, path, comment, self.chosen_asset)

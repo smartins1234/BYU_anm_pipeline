@@ -19,6 +19,16 @@
 			"double-click":"",
 			"tool":"mayaTools.creators.camera_creator",
 			"function":"CameraCreator.go()"
+		},
+		{
+			"itemType":"button",
+			"icon":"clone.svg",
+			"annotation":"Clone in an asset",
+			"label":"Clone",
+			"menu":0,
+			"double-click":"clone(quick=False)",
+			"tool":"mayaTools.cloners.cloner",
+			"function":"Cloner.clone()"
 		}
     ]
 }

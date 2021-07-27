@@ -3,7 +3,7 @@
 import pipe.pipeHandlers.select_from_list as sfl
 import pipe.pipeHandlers.quick_dialogs as qd
 from pipe.tools.mayaTools.utilities.utils import *
-#from pipe.tools.mayaTools.publishers.publisher import MayaPublisher as Publisher
+# from pipe.tools.mayaTools.publishers.publisher import MayaPublisher as Publisher
 from pipe.pipeHandlers.project import Project
 from pipe.pipeHandlers.body import Body
 from pipe.pipeHandlers.body import Asset
@@ -15,10 +15,10 @@ import maya.OpenMayaUI as omu
 import os
 
 
-class MayaCloner:
+class Cloner:
 	def __init__(self):
-		#self.maya_checkout_dialog = None
-		#self.quick = False
+		# self.maya_checkout_dialog = None
+		# self.quick = False
 		pass
 
 	def rollback(self):
@@ -28,12 +28,33 @@ class MayaCloner:
 		self.quick = True
 		self.go()
 
-	def clone(self, gui=True, file_path=None, asset_name='Temp'):
-		if gui:
-			self.go()
+	def clone(self, quick=True):
+		self.quick = quick
+		self.project = Project()
+
+		type_list = ["Model", "Rig", "Animation", "Camera", "Layout"]
+		self.item_gui = sfl.SelectFromList(
+		    l=type_list, parent=maya_main_window(), title="Select a type of asset to clone")
+		self.item_gui.submitted.connect(self.type_results)
+
+		# pick which type of asset your cloning
+		# then go to the specific type of function needed
+
+	def type_results(self, value):
+		self.type = value[0]
+		print(self.type)
+
+		if self.type == "Model":
+			self.clone_geo()
+		elif self.type == "Rig":
+			self.clone_rig()
+		elif self.type == "Animation":
+			self.clone_anim()
+		elif self.type == "Camera":
+			self.clone_camera()
 		else:
-			# TODO: make this method work
-			self.non_gui_open(file_path, asset_name)
+			qd.error("Stephanie did something wrong, go complain to her :)")
+			return
 
 	def non_gui_open(self, filePath=None, assetName='Temp'):
 		if filePath == None:
@@ -45,74 +66,130 @@ class MayaCloner:
 		else:
 			print('File does not exist: '+assetName)
 
-	def clone_geo(self, quick=True):
-		self.quick = quick
-		self.project = Project()
+	def clone_geo(self):
+
 		self.type = Asset.GEO
+
 		asset_list = self.project.list_existing_assets()
-		self.item_gui = sfl.SelectFromList(l=asset_list, parent=maya_main_window(), title="Select a model to clone")
+		self.item_gui = sfl.SelectFromList(
+		    l=asset_list, parent=maya_main_window(), title="Select a model to clone")
 		self.item_gui.submitted.connect(self.results)
 
-	def clone_rig(self, quick=True):
-		self.quick = quick
-		self.project = Project()
+	def clone_rig(self):
+
 		self.type = Asset.RIG
+
 		asset_list = self.project.list_existing_assets()
-		self.item_gui = sfl.SelectFromList(l=asset_list, parent=maya_main_window(), title="Select a rig to clone")
+		self.item_gui = sfl.SelectFromList(
+		    l=asset_list, parent=maya_main_window(), title="Select a rig to clone")
 		self.item_gui.submitted.connect(self.results)
 
-	def clone_anim(self, quick=True):
-		self.quick = quick
-		self.project = Project()
+	def clone_anim(self):
+
 		self.type = Asset.ANIMATION
-		asset_list = self.project.list_existing_assets()
-		self.item_gui = sfl.SelectFromList(l=asset_list, parent=maya_main_window(), title="Select an asset to clone")
-		self.item_gui.submitted.connect(self.results)
 
-	def clone_camera(self, quick=True):
-		self.quick = quick
-		self.project = Project()
+		shot_list = self.project.list_existing_shots()
+		self.item_gui = sfl.SelectFromList(
+		    l=shot_list, parent=maya_main_window(), title="Select a shot to clone")
+		self.item_gui.submitted.connect(self.shot_results)
+
+	def clone_camera(self):
+
 		self.type = Asset.CAMERA
-		#pull up the shot list instead
-		'''asset_list = self.project.list_existing_assets()
-		self.item_gui = sfl.SelectFromList(l=asset_list, parent=maya_main_window(), title="Select an asset to clone")
-		self.item_gui.submitted.connect(self.results)'''
+
+		shot_list = self.project.list_existing_shots()
+		self.item_gui = sfl.SelectFromList(
+		    l=shot_list, parent=maya_main_window(), title="Select a shot to clone")
+		self.item_gui.submitted.connect(self.shot_results)
+
+	def shot_results(self, value):
+		shot_name = value[0]
+		print(shot_name)
+		self.shot = self.project.get_body(shot_name)
+
+		if self.type == Asset.CAMERA:
+			self.element = self.shot.get_element(Asset.CAMERA)
+			#cam_list = os.listdir(self.element._filepath)
+			cam_list = next(os.walk(self.element._filepath))[1]
+			for name in cam_list:
+				if not name.startswith(Asset.CAMERA):
+					cam_list.remove(name)
+
+			cam_list.sort(key=str.lower)
+			print(cam_list)
+			self.item_gui = sfl.SelectFromList(
+			    l=cam_list, parent=maya_main_window(), title="Select a camera to clone")
+			self.item_gui.submitted.connect(self.results)
+
+		elif self.type == Asset.ANIMATION:
+			self.element = self.shot.get_element(Asset.ANIMATION)
+			#asset_list = os.listdir(self.element._filepath)
+			asset_list = next(os.walk(self.element._filepath))[1]
+			for name in asset_list:
+				if name == "cache":
+					asset_list.remove(name)
+
+			asset_list.sort(key=str.lower)
+			print(asset_list)
+			self.item_gui = sfl.SelectFromList(l=asset_list, parent=maya_main_window(), title="Select an asset to clone")
+			self.item_gui.submitted.connect(self.results)
+
+	def asset_results(self, value):
+		asset_name = value[0]
+		print(asset_name)
+
+		self.type = os.path.join(self.type, asset_name)
 
 	'''def clone_prop(self):
 		self.quick = True
 		project = Project()
 		asset_list = project.list_props()
-		self.item_gui = sfl.SelectFromList(l=asset_list, parent=maya_main_window(), title="Select a prop to clone")
+		self.item_gui = sfl.SelectFromList(
+		    l=asset_list, parent=maya_main_window(), title="Select a prop to clone")
 		self.item_gui.submitted.connect(self.results)
 
 	def clone_actor(self):
 		self.quick = True
 		project = Project()
 		asset_list = project.list_actors()
-		self.item_gui = sfl.SelectFromList(l=asset_list, parent=maya_main_window(), title="Select an actor to clone")
+		self.item_gui = sfl.SelectFromList(
+		    l=asset_list, parent=maya_main_window(), title="Select an actor to clone")
 		self.item_gui.submitted.connect(self.results)
 
 	def clone_set(self):
 		self.quick = True
 		project = Project()
 		asset_list = project.list_sets()
-		self.item_gui = sfl.SelectFromList(l=asset_list, parent=maya_main_window(), title="Select a set to clone")
+		self.item_gui = sfl.SelectFromList(
+		    l=asset_list, parent=maya_main_window(), title="Select a set to clone")
 		self.item_gui.submitted.connect(self.results)
 
 	def clone_shot(self):
 		self.quick = True
 		project = Project()
 		asset_list = project.list_shots()
-		self.item_gui = sfl.SelectFromList(l=asset_list, parent=maya_main_window(), title="Select a shot to clone")
+		self.item_gui = sfl.SelectFromList(
+		    l=asset_list, parent=maya_main_window(), title="Select a shot to clone")
 		self.item_gui.submitted.connect(self.results)'''
+
+	def get_asset(self, value):
+		asset_name = value[0]
+		print(asset_name)
+		self.type = os.path.join(self.type, asset_name)
+
+		shot_list = self.project.list_existing_shots()
+		self.item_gui = sfl.SelectFromList(
+		    l=shot_list, parent=maya_main_window(), title="Select the shot to clone")
+		self.item_gui.submitted.connect(self.results)
 
 	def go(self):
 		project = Project()
 		asset_list = project.list_assets()
-		self.item_gui = sfl.SelectFromList(l=asset_list, parent=maya_main_window(), title="Select an asset to clone")
+		self.item_gui = sfl.SelectFromList(
+		    l=asset_list, parent=maya_main_window(), title="Select an asset to clone")
 		self.item_gui.submitted.connect(self.results)
 
-	def get_element_option(self, type, body):  # FIXME: this would go better in Body()
+	'''def get_element_option(self, type, body):  # FIXME: this would go better in Body()
 		element = None
 
 		if type == AssetType.PROP:
@@ -120,7 +197,8 @@ class MayaCloner:
 			self.department = "model"
 
 		elif type == AssetType.ACTOR:
-			response = qd.binary_option("Which department for " + str(body.get_name()) + "?", "model", "rig")
+			response = qd.binary_option(
+			    "Which department for " + str(body.get_name()) + "?", "model", "rig")
 			if response:
 				element = body.get_element("model")
 				self.department = "model"
@@ -135,7 +213,8 @@ class MayaCloner:
 			self.department = "model"
 
 		elif type == AssetType.SHOT:
-			response = qd.binary_option("Which department for " + str(body.get_name()) + "?", "model", "anim")
+			response = qd.binary_option(
+			    "Which department for " + str(body.get_name()) + "?", "model", "anim")
 			if response:
 				element = body.get_element("model")
 				self.department = "model"
@@ -147,17 +226,20 @@ class MayaCloner:
 
 		print("element: ", element)
 
-		return element
+		return element'''
 
 	def results(self, value):
 		print("Final value: ", value[0])
 		filename = value[0]
+		self.namespace = filename
 
-		body = self.project.get_body(filename)
-		self.body = body
-		#type = body.get_type()
-		#element = self.get_element_option(type, body)
-		element = body.get_element(self.type)
+		if self.type == Asset.GEO or self.type == Asset.RIG:
+			body = self.project.get_body(filename)
+			self.body = body
+			element = self.body.get_element(self.type)
+		else:
+			self.body = self.shot
+			element = self.body.get_element(os.path.join(self.type, filename))
 
 		if element is None:
 			qd.warning("Nothing was cloned.")
@@ -169,7 +251,7 @@ class MayaCloner:
 				qd.error("There have been no publishes in this department.")
 				return
 			else:
-				selected_scene_file = latest[3]
+				selected_scene_file=latest[3]
 				self.open_scene_file(selected_scene_file)
 				return
 
@@ -181,62 +263,62 @@ class MayaCloner:
 			return
 
 		# make the list a list of strings, not tuples
-		self.sanitized_publish_list = []
+		self.sanitized_publish_list=[]
 		for publish in self.publishes:
-			path = publish[3]
+			'''path = publish[3]
 			file_ext = path.split('.')[-1]
 			if not file_ext == "mb":
-				continue
-			label = publish[0] + " " + publish[1] + " " + publish[2]
+				continue'''
+			label=publish[0] + " " + publish[1] + " " + publish[2]
 			self.sanitized_publish_list.append(label)
 
-		self.item_gui = sfl.SelectFromList(l=self.sanitized_publish_list, parent=maya_main_window(), title="Select publish to clone")
+		self.item_gui = sfl.SelectFromList(
+		    l=self.sanitized_publish_list, parent=maya_main_window(), title="Select publish to clone")
 		self.item_gui.submitted.connect(self.publish_selection_results)
 
 	def publish_selection_results(self, value):
 
-		selected_publish = None
+		selected_publish=None
 		for item in self.sanitized_publish_list:
 			if value[0] == item:
-				selected_publish = item
+				selected_publish=item
 
-		selected_scene_file = None
+		selected_scene_file=None
 		for publish in self.publishes:
-			label = publish[0] + " " + publish[1] + " " + publish[2]
+			label=publish[0] + " " + publish[1] + " " + publish[2]
 			if label == selected_publish:
-				selected_scene_file = publish[3]
+				selected_scene_file=publish[3]
 
 		# selected_scene_file is the one that contains the scene file for the selected commit
 		self.open_scene_file(selected_scene_file)
 
 	def open_scene_file(self, selected_scene_file):
 		if selected_scene_file is not None:
-			#check_unsaved_changes()
-			#setPublishEnvVar(self.body.get_name(), self.department)
 
 			if not os.path.exists(selected_scene_file):
 				qd.error("That publish is missing. It may have been deleted to clear up space.")
 				return False
-				'''try:
-					mc.file(new=True, force=True)
-					mc.file(rename=selected_scene_file)
-					mc.file(save=True, force=True)
-					print("New file: " + selected_scene_file)
-				except Exception as e:
-					qd.error("That publish is missing. It may have been deleted to clear up space.", details=str(e))
-					return False'''
+
 			else:
-				if self.type == Asset.RIG:
-					#reference in the rig
-					'''mc.file(selected_scene_file, open=True, force=True, ignoreVersion=True)
-					print("File opened: " + selected_scene_file)'''
-					pass
+				if self.type == Asset.RIG or self.type == Asset.ANIMATION or self.type == Asset.CAMERA:
+					# reference in the file
+					mc.file(selected_scene_file, r=True, ignoreVersion=True, mnc=False, gl=True, ns=":")
+					print("File referenced: " + selected_scene_file)
 				elif self.type == Asset.GEO:
-					#import the obj file
-					pass
-				elif self.type == Asset.ANIMATION or self.type == Asset.ANIMATION:
-					#reference the abc file
-					pass
+					# check for import vs reference
+					im = qd.binary_option("Do you want to import or reference this asset?", "Import", "Reference")
+					if im:
+						# import the geometry
+						mc.file(selected_scene_file, i=True, ignoreVersion=True, mnc=False, gl=True, ns=":")
+						print("File imported: " + selected_scene_file)
+					else:
+						# reference the geometry
+						mc.file(selected_scene_file, r=True, ignoreVersion=True, mnc=False, gl=True, ns=":")
+						print("File referenced: " + selected_scene_file)
+				else:
+					# reference the file
+					mc.file(selected_scene_file, r=True, ignoreVersion=True, mnc=False, gl=True, ns=":")
+					print("File referenced: " + selected_scene_file)
 
 			return True
 		else:
