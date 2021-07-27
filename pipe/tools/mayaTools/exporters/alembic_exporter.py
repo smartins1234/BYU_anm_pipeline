@@ -259,6 +259,8 @@ class AlembicExporter:
         if self.element is None:
             self.element = self.shot.get_element(dept)
 
+        self.element.update_app_ext(".abc")
+
         path = os.path.join(path, camera_name)
         last_version = self.element.get_last_version()
         current_version = last_version + 1
