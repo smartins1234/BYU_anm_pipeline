@@ -3,7 +3,7 @@ import pipe.pipeHandlers.quick_dialogs as qd
 import pipe.pipeHandlers.select_from_list as sfl
 
 from pipe.pipeHandlers.project import Project
-from pipe.pipeHandlers.body import Body
+from pipe.pipeHandlers.body import Body, Asset
 from pipe.pipeHandlers.element import Element
 from pipe.pipeHandlers.environment import Environment
 
@@ -153,15 +153,32 @@ class Cloner:
         self.item_gui.submitted.connect(self.asset_results)
 
     def asset_results(self, value):
-        print("Selected asset: ", value[0])
+        print("Selected asset: " + value[0])
         filename = value[0]
 
         self.body = Project().get_body(filename)
+        self.element = self.body.get_element(Asset.HDA)
+        filepath = self.element.get_last_publish()[3]
+        nodeType = "byu::" + filename
+
+        hou.hda.installFile(filepath)
+        node = hou.node("/obj").createNode(nodeType)
+        node.setName(filename, unique_name=True)
+        node.setDisplayFlag(True)
+        node.setColor(hou.Color((0.2,0.0,0.8)))
         #department_paths = self.get_department_paths(self.body)
 
-        from pipe.tools.houdiniTools.assembler.assembler import Assembler  # we put import here to avoid cross import issue #63 FIXME
+        '''from pipe.tools.houdiniTools.assembler.assembler import Assembler  # we put import here to avoid cross import issue #63 FIXME
 
-        node =  Assembler().create_hda(filename, body=self.body)
+        node =  Assembler().create_hda(filename, body=self.body)'''
         #layout_object_level_nodes()
 
         return node
+
+    def clone_layout(self):
+        original = qd.binary_option("Do you want the original layout, or one pertaining to a specific shot?", "Original", "Shot specific")
+
+        # if original, ask for which layout and get it from the layout
+        # if shot, ask for which shot and get it from there
+
+        # when you go to open it, ask if they want it in obj or the stage

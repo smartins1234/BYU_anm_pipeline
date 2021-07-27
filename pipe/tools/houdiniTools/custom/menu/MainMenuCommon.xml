@@ -91,6 +91,21 @@ cloner.clone_shot()
 				</scriptCode>
 			</scriptItem>
 			<!-- ============================ End Shot cloner Tool =========================== -->
+
+						<!-- ============================ Start Layout cloner Tool =========================== -->
+			<scriptItem id="h.cloner_layout">
+				<label>Layout</label>
+				<scriptCode scriptType="python">
+					<![CDATA[
+from pipe.tools.houdiniTools.unpacker import unpacker
+import hou
+unpacker = unpacker.Unpacker()
+hou.session.unpacker = unpacker
+unpacker.unpack_usd()
+]]>
+				</scriptCode>
+			</scriptItem>
+			<!-- ============================ End Layout cloner Tool =========================== -->
 		</subMenu>
 		<!-- ============================ End cloner subMenu =========================== -->
 
@@ -146,6 +161,22 @@ publisher.publish_shot()
 				</scriptCode>
 			</scriptItem>
 			<!-- ============================ End Shot Publish Tool =========================== -->
+
+			<!-- ============================ Start Layout Publish Tool =========================== -->
+			<scriptItem id="h.publish_layout">
+				<label>Layout</label>
+				<scriptCode scriptType="python">
+					<![CDATA[
+from pipe.tools.houdiniTools.publisher import publisher
+import hou
+publisher = publisher.Publisher()
+hou.session.publisher = publisher
+publisher.publish_layout()
+					]]>
+				</scriptCode>
+			</scriptItem>
+			<!-- ============================ End Layout Publish Tool =========================== -->
+
 		</subMenu>
 		<!-- ============================ End Publish subMenu =========================== -->
 
