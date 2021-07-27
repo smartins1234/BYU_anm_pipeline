@@ -74,6 +74,12 @@ class Environment:
         '''
         return os.path.join(self._project_dir, pipeline_io.get_project_info(self._project_dir, "tools_dir"))
 
+    def get_layouts_dir(self):
+        '''
+        return the absolute filepath to the sets directory of th ecurrent project
+        '''
+        return os.path.join(self._project_dir, pipeline_io.get_project_info(self._project_dir, "layouts_dir"))
+
     def get_otl_dir(self):
         '''
         return the absolute filepath to the assembly directory of the current project

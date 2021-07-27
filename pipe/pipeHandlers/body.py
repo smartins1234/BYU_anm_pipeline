@@ -152,6 +152,8 @@ class Body(object):
 		name -- the name of the element to get. Defaults to the name of the
 				element created by default for each department.
 		'''
+		print('looking for element', name)
+
 		element_dir = os.path.join(self._filepath, department)
 		if not os.path.exists(element_dir):
 			if force_create:
@@ -174,7 +176,8 @@ class Body(object):
 		dept_dir = os.path.join(self._filepath, department)
 		if not os.path.exists(dept_dir):
 			pipeline_io.mkdir(dept_dir)
-		empty_element = self.set_app_ext(department)
+		#empty_element = self.set_app_ext(department)
+		empty_element = Element()
 		datadict = empty_element.create_new_dict(name, department, self.get_name())
 		if os.path.exists(os.path.join(dept_dir, empty_element.PIPELINE_FILENAME)):
 			#raise EnvironmentError('element already exists: ' + dept_dir)
@@ -197,13 +200,13 @@ class Body(object):
 			element.set_app_ext(".hdanc")
 			return element'''
 		if department == Asset.GEO:
-			element.set_app_ext(".obj")
+			element.update_app_ext(".obj")
 			return element
 		elif department == Asset.ANIMATION or department == Asset.CAMERA:
-			element.set_app_ext(".abc")
+			element.update_app_ext(".abc")
 			return element
 		elif department == Asset.RIG:
-			element.set_app_ext(".mb")
+			element.update_app_ext(".mb")
 			return element
 		else:
 			return element
@@ -277,8 +280,9 @@ class AssetType:
 	TOOL = 'tool'
 	SHOT = 'shot'
 	ASSET = 'asset'
-	ALL = [ASSET, SHOT, TOOL]
-	MAYA = [ASSET, SHOT]
+	SET = 'set'
+	ALL = [ASSET, SHOT, TOOL, SET]
+	MAYA = [ASSET, SHOT, SET]
 
 	def __init__(self):
 		pass
@@ -301,7 +305,9 @@ class Asset(Body):
 	TEXTURES = 'textures'
 	MATERIALS = 'materials'
 	LIGHTS = 'lights'
-	ALL = [GEO, CAMERA, ANIMATION, RIG, HDA, TEXTURES, MATERIALS, LIGHTS]
+	HIP = 'hip'
+	LAYOUT = 'layout'
+	ALL = [GEO, CAMERA, ANIMATION, RIG, HDA, TEXTURES, MATERIALS, LIGHTS, HIP, LAYOUT]
 
 	@staticmethod
 	def create_new_dict(name):
@@ -339,6 +345,31 @@ class Shot(Body):
 
 	def __str__(self):
 		return super(Shot, self).__str__()
+
+	def is_tool(self):
+		return False
+
+	def is_crowd_cycle(self):
+		return False
+
+class Layout(Body):
+
+	@staticmethod
+	def create_new_dict(name):
+		datadict = {}
+		datadict[Body.NAME] = name
+		datadict[Body.REFERENCES] = []
+		datadict[Body.DESCRIPTION] = ''
+		datadict[Body.TYPE] = AssetType.SHOT
+		datadict[Body.FRAME_RANGE] = 0
+		return datadict
+
+	@staticmethod
+	def get_parent_dir():
+		return Environment().get_layouts_dir()
+
+	def __str__(self):
+		return super(Layout, self).__str__()
 
 	def is_tool(self):
 		return False
