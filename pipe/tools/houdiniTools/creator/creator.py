@@ -80,7 +80,8 @@ class Creator:
             else:
                 assembler = Assembler()
                 HDA = assembler.create_hda(name, body=body, selected_nodes=selectedNodes)
-                HDA.updateFromNode(HDA)
+                HDA.type().definition().updateFromNode(HDA)
+                #HDA.updateFromNode(HDA)
                 qd.info("Asset created successfully.", "Success")
 
         else:

@@ -67,7 +67,7 @@ Tool:
     }
 
 Shot:
-    TLDR: saves versioned shot .hip with notes
+    TLDR: saves versioned shot .hip with notes. Will save in project folder, regardless of where the actual file is stored. With correct name too.
 
     selected: nothing
 
