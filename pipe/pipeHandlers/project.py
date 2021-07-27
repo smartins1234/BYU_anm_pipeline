@@ -1,7 +1,7 @@
 import os
 import shutil
 
-from pipeHandlers.body import Body, Asset, Shot, Tool, CrowdCycle, AssetType
+from pipeHandlers.body import Body, Asset, Shot, Tool, CrowdCycle, AssetType, Layout
 from pipeHandlers.element import Checkout, Element
 from pipeHandlers.environment import Environment, User
 from pipeHandlers import pipeline_io
@@ -42,6 +42,12 @@ class Project:
 		return the absolute filepath to the shots directory of this project
 		'''
 		return self._env.get_shots_dir()
+	
+	def get_layouts_dir(self):
+		'''
+		return the absolute filepath to the layouts directory of this project
+		'''
+		return self._env.get_layouts_dir()
 
 	def get_rendered_shots_dir(self):
 		rendered_shots = Environment().get_shots_dir()
@@ -116,6 +122,16 @@ class Project:
 		if not os.path.exists(filepath):
 			return None
 		return Tool(filepath)
+	
+	def get_layout(self, name):
+		'''
+		returns the layout object associated with the given name.
+		name -- the name of the layout
+		'''
+		filepath = os.path.join(self._env.get_layouts_dir(), name)
+		if not os.path.exists(filepath):
+			return None
+		return Layout(filepath)
 
 	def get_body(self, name):		#this needs to work. Why isn't it?
 		'''
@@ -127,6 +143,8 @@ class Project:
 			body = self.get_tool(name)
 		if body is None:
 			body = self.get_shot(name)
+		if body is None:
+			body = self.get_layout(name)
 		return body
 
 	def create_body(self, name, bodyobj):
@@ -190,6 +208,14 @@ class Project:
 
 		return shot
 
+	def create_layout(self, name):
+		layout = self.create_body(name, Layout)
+
+		if layout is None:
+			return None # set already exists
+
+		return layout
+
 	def create_tool(self, name):
 		'''
 		creates a new tool with the given name, and returns the resulting tool object.
@@ -224,7 +250,7 @@ class Project:
 		assets = []
 		f = open(path, "r")
 		for aName in f:
-			if aName[-1] is "\n":  # remove newline character
+			if aName[-1] == "\n":  # remove newline character
 				aName = aName[:-1]
 			assets.append(aName)
 
@@ -247,14 +273,14 @@ class Project:
 		shots = []
 		f = open(path, "r")
 		for shot in f:
-			if shot[-1] is "\n": #remove newline character
+			if shot[-1] == "\n": #remove newline character
 				shot = shot[:-1]
 			shots.append(shot)
 
 		shots.sort(key=str.lower)
 		return shots
 
-	def list_existing_shots(self):
+	'''def list_existing_shots(self):
 		list = self._list_bodies_in_dir(self._env.get_shots_dir())
 		shots = []
 
@@ -263,7 +289,19 @@ class Project:
 			if asset.get_type() == AssetType.ASSET:
 				assets.append(str(item))
 		assets.sort(key=str.lower)
-		return assets
+		return assets'''
+
+	def list_layouts(self):
+		path = self._env.get_layouts_dir() + ".layout_list"
+		layouts = []
+		f = open(path, "r")
+		for layout in f:
+			if layout[-1] == "\n": #remove newline character
+				layout = layout[:-1]
+			layouts.append(layout)
+
+		layouts.sort(key=str.lower)
+		return layouts
 
 	def list_existing_shots(self, filter=None):
 		'''
@@ -284,6 +322,11 @@ class Project:
 		shot_list.sort(key=str.lower)
 
 		return shot_list
+
+	def list_existing_layouts(self):
+		layouts = self._list_bodies_in_dir(self._env.get_layouts_dir())
+		layouts.sort(key=str.lower)
+		return layouts
 
 	def list_tools(self):
 		'''
@@ -354,7 +397,7 @@ class Project:
 		'''
 		returns a list of strings containing the names of all bodies (assets and shots)
 		'''
-		return self._list_bodies_in_dir(self._env.get_assets_dir()) + self.list_existing_shots() + self.list_tools()
+		return self.list_existing_assets() + self.list_existing_shots() + self.list_tools() + self.list_existing_layouts()
 
 	def list_users(self):
 		'''
@@ -410,7 +453,7 @@ class Project:
 		delete the given asset
 		'''
 		if asset in self._list_bodies_in_dir(self._env.get_assets_dir()):
-			shutil.rmtree(os.path.join(self.get_asset_dir(), asset))
+			shutil.rmtree(os.path.join(self.get_assets_dir(), asset))
 
 	def delete_tool(self, tool):
 		'''
