@@ -131,9 +131,6 @@ class Element:
         datadict[Element.CACHE_FILEPATH] = ""
         return datadict
 
-    def set_app_ext(self, extension):
-        self.app_ext = extension
-
     def update_app_ext(self, extension):
         self._datadict[Element.APP_EXT] = extension
         self._update_pipeline_file()
@@ -383,12 +380,12 @@ class Element:
 
     def publish(self, username, path, comment, asset_name):
         """
-        Update the version number and save publish information in the 
+        Update the version number and save publish information in the
         element file. Save the file at path in a version
         folder as well as in the main element folder. If the given path
         isn't the same as the version folder or main element folder, the
         file at path will be deleted.
-        
+
         username -- the username of the user performing this action
         path -- a string representing the path to the published file
         comment -- description of changes made in this publish
@@ -419,11 +416,11 @@ class Element:
 
             os.remove(path)
 
-        elif path is main_path:
+        elif path == main_path:
             shutil.copy(path, version_path)
             pipeline_io.set_permissions(version_path)
 
-        elif path is version_path:
+        elif path == version_path:
             shutil.copy(path, main_path)
             pipeline_io.set_permissions(main_path)
 
