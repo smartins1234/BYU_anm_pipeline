@@ -9,6 +9,26 @@
 			"double-click":"",
 			"tool":"mayaTools.exporters.exporter",
 			"function":"Exporter.go(alembic=True)"
-        }
+		},
+		{
+			"itemType":"button",
+			"icon":"clone.svg",
+			"annotation":"Clone in an asset",
+			"label":"Clone",
+			"menu":0,
+			"double-click":"clone(quick=False)",
+			"tool":"mayaTools.cloners.cloner",
+			"function":"Cloner.clone()"
+		},
+		{
+			"itemType":"button",
+			"icon":"usd.png",
+			"annotation":"Reference in a USD layout",
+			"label":"USD",
+			"menu":0,
+			"double-click":"go(quick=False)",
+			"tool":"mayaTools.usd_io.readUsd",
+			"function":"UsdReader.go()"
+		}
     ]
 }
