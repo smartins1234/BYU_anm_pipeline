@@ -1,11 +1,14 @@
 import hou, os
 import pipe.pipeHandlers.quick_dialogs as qd
 import pipe.pipeHandlers.select_from_list as sfl
+import shutil
 
+#from unpacker import Unpacker
 from pipe.pipeHandlers.project import Project
 from pipe.pipeHandlers.body import Body, Asset
 from pipe.pipeHandlers.element import Element
 from pipe.pipeHandlers.environment import Environment
+import pipe.pipeHandlers.pipeline_io as pio
 
 
 class Cloner:
@@ -68,16 +71,16 @@ class Cloner:
         project = Project()
 
         body = project.get_body(shot_name)
-        element = body.get_element("lighting")
+        element = body.get_element("hip")
 
-        self.publishes = element.list_publishes();
+        self.publishes = element.list_publishes()
         print("publishes: ", self.publishes)
 
-        if not self.publishes:
+        '''if not self.publishes:
             # has not been imported. Import it first.
             importer = Importer()
             importer.import_shot([shot_name])
-            return
+            return'''
 
         # make the list a list of strings, not tuples
         self.sanitized_publish_list = []
@@ -145,12 +148,15 @@ class Cloner:
 
         return department_paths
 
-    def clone_asset(self):
+    def clone_asset(self, solaris):
         project = Project()
 
         asset_list = project.list_existing_assets()
         self.item_gui = sfl.SelectFromList(l=asset_list, parent=hou.ui.mainQtWindow(), title="Select an asset to clone")
-        self.item_gui.submitted.connect(self.asset_results)
+        if solaris:
+            self.item_gui.submitted.connect(self.solaris_asset_results)
+        else:
+            self.item_gui.submitted.connect(self.asset_results)
 
     def asset_results(self, value):
         print("Selected asset: " + value[0])
@@ -175,10 +181,72 @@ class Cloner:
 
         return node
 
+    def solaris_asset_results(self, value):
+        print("Selected asset: " + value[0])
+        filename = value[0]
+
+        self.body = Project().get_body(filename)
+        self.element = self.body.get_element(Asset.GEO)
+        if self.element:
+            #just reference in the asset, make sure we're referencing the usda geo
+            path = self.element.get_last_publish()[3]
+            parts = path.split(".")
+            path = parts[0] + ".usda"
+
+            ref = hou.node("/stage").createNode("reference")
+            ref.setName(filename, 1)
+            ref.parm("filepath1").set(path)
+        else:
+            pass
+
     def clone_layout(self):
-        original = qd.binary_option("Do you want the original layout, or one pertaining to a specific shot?", "Original", "Shot specific")
+        # assume layout from specific shot
+        self.project = Project()
+        
+        shot_list = self.project.list_shots()
+        self.item_gui = sfl.SelectFromList(l=shot_list, parent=hou.ui.mainQtWindow(), title="Select a shot to clone from")
+        self.item_gui.submitted.connect(self.layout_results)
 
-        # if original, ask for which layout and get it from the layout
-        # if shot, ask for which shot and get it from there
+    def layout_results(self, value):
+        self.shot_name = value[0]
+        self.shot = self.project.get_shot(self.shot_name)
+        if not self.shot:
+            self.shot = self.project.create_shot(self.shot_name)
+        if not self.shot:
+            qd.error("Something's wrong here. Talk to Stephanie")
+        self.layout_element = self.shot.get_element(Asset.LAYOUT)
+        path = os.path.join(self.layout_element._filepath, self.shot_name + ".usda")
+        if not os.path.exists(path):
+            # no layout is associated with this shot yet
+            layouts = self.project.list_existing_layouts()
 
-        # when you go to open it, ask if they want it in obj or the stage
+            self.item_gui = sfl.SelectFromList(l=layouts, parent=hou.ui.mainQtWindow(), title="Select a layout for this shot")
+            self.item_gui.submitted.connect(self.layouts_results)
+            return
+
+        self.create_ref(path)
+
+    def layouts_results(self, value):
+        layout_name = value[0]
+
+        # copy ref file into the shot
+        layout_body = self.project.get_layout(layout_name)
+        element = layout_body.get_element(Asset.LAYOUT)
+        src = os.path.join(element._filepath, layout_name + "_ref.usda")
+        dst = os.path.join(self.layout_element._filepath, self.shot_name + ".usda")
+        shutil.copy(src, dst)
+        pio.set_permissions(dst)
+        self.create_ref(dst)
+
+    def unpack_usd(self, file):
+        print(file)
+        #Unpacker().unpack_usd2(file)
+
+    def create_ref(self, file):
+        layout_name = file.split("/")[-1][:-5]
+        
+        ref = hou.node("/stage").createNode("reference")
+        ref.setName(layout_name + "_ref")
+        ref.parm("filepath1").set(file)
+        ref.parm("primpath").set("/shot/layout")
+        ref.setDisplayFlag(True)

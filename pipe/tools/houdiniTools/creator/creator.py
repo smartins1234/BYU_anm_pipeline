@@ -86,3 +86,85 @@ class Creator:
 
         else:
             qd.error("Asset creation failed.")
+
+    def create_asset(self):
+        project = Project()
+
+        asset_list = project.list_existing_assets()
+        self.item_gui = sfl.SelectFromList(l=asset_list, parent=hou.ui.mainQtWindow(), title="Select an asset to create")
+        self.item_gui.submitted.connect(self.asset_results)
+
+    def asset_results(self, value):
+        asset_name = value[0]
+
+        stage = hou.node("/stage")
+        primpath = "/" + asset_name
+
+        prim = stage.createNode("primitive")
+        prim.setName("base_prim", 1)
+        prim.parm("primpath").set(primpath)
+
+        config = stage.createNode("configurelayer")
+        config.setName("set_default_prim", 1)
+        config.setInput(0, prim)
+        config.parm("defaultprim").set(primpath)
+        config.parm("setdefaultprim").set(1)
+
+        ref1 = stage.createNode("reference")
+        ref1.setName("blank_reference_1", 1)
+        ref1.parm("primpath").set(primpath)
+        lib1 = stage.createNode("materiallibrary")
+        lib1.setInput(0, ref1)
+        mat_asgn = stage.createNode("assignmaterial")
+        mat_asgn.setInput(0, lib1)
+        label = stage.createNode("null")
+        label.setName(asset_name, 1)
+        label.setInput(0, mat_asgn)
+
+        graft = stage.createNode("graftstages")
+        graft.parm("primpath").set(primpath)
+        graft.parm("destpath").set("/")
+        graft.setInput(0, config)
+        graft.setInput(1, label)
+
+        add_var = stage.createNode("addvariant")
+        add_var.parm("primpath").set(primpath)
+        add_var.setInput(1, graft)
+        
+        set_var = stage.createNode("setvariant")
+        set_var.parm("variantset1").set("model")
+        set_var.setInput(0, add_var)
+        out_label = stage.createNode("null")
+        out_label.setName(asset_name+"_OUT", 1)
+        out_label.setInput(0, set_var)
+        out_label.setDisplayFlag(True)
+
+        stage.layoutChildren()
+
+    def create_layout(self):
+        stage = hou.node("/stage")
+
+        ref1 = stage.createNode("reference")
+        ref1.setName("empty_ref", 1)
+        set_var1 = stage.createNode("setvariant")
+        set_var1.setInput(0, ref1)
+        edit1 = stage.createNode("edit")
+        edit1.setInput(0, set_var1)
+
+        ref2 = stage.createNode("reference")
+        ref2.setName("empty_ref", 1)
+        set_var2 = stage.createNode("setvariant")
+        set_var2.setInput(0, ref2)
+        edit2 = stage.createNode("edit")
+        edit2.setInput(0, set_var2)
+
+        merge = stage.createNode("merge")
+        merge.setInput(0, edit1)
+        merge.setInput(1, edit2)
+
+        label = stage.createNode("null")
+        label.setName("layout_OUT", 1)
+        label.setInput(0, merge)
+        label.setDisplayFlag(True)
+
+        stage.layoutChildren()
