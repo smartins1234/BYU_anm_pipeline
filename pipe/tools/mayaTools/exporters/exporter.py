@@ -8,6 +8,7 @@ from pipe.tools.mayaTools.utilities.utils import *
 from pipe.tools.mayaTools.exporters.alembic_exporter import AlembicExporter
 from pipe.tools.mayaTools.exporters.obj_exporter import ObjExporter
 from pipe.tools.mayaTools.exporters.mb_exporter import MbExporter
+from pipe.tools.mayaTools.exporters.usd_exporter import USDExporter
 import pipe.pipeHandlers.select_from_list as sfl
 # from pipe.tools.mayaTools.exporters.fbx_exporter import FbxExporter
 # from pipe.tools.mayaTools.exporters.json_exporter import JSONExporter
@@ -49,14 +50,14 @@ class Exporter:
         '''self.export(alembic=alembic, fbx=fbx, json=json, usd=usd, methods=methods)'''
 
     def export(self):
-        
+        publish_info = []
         if self.obj:    #modeling publish case
-            publish_info = ObjExporter().exportSelected(self.chosen_asset)
-            self.publish(publish_info)
+            publish_info.append(ObjExporter().exportSelected(self.chosen_asset))
+            #self.publish(publish_info)
 
-        if self.usd:    #modeling publish case
-            #export as usd
-            pass
+            if self.usd:    #modeling publish case
+                publish_info.append(USDExporter().exportSelected(self.chosen_asset))
+                self.publish(publish_info)
 
         if self.alembic:#animation publish case
             shot_list = self.project.list_shots()
@@ -65,7 +66,7 @@ class Exporter:
             self.item_gui.submitted.connect(self.shot_results)
 
         if self.mb:     #rigging publish case
-            publish_info = MbExporter().export(self.chosen_asset)
+            publish_info.append(MbExporter().export(self.chosen_asset))
             self.publish(publish_info)
 
         '''if methods is None:
@@ -180,11 +181,12 @@ class Exporter:
             shot = self.project.get_shot(self.chosen_shot)
 
         #pre-vis publish
+        publish_info = []
         if self.camera:     
             camera_num = int(shot.get_camera_number())
             if camera_num == 1:     #only one camera in the shot
                 self.chosen_asset = "camera1"
-                publish_info = AlembicExporter().exportSelected(asset_name=self.chosen_asset, shot_name=self.chosen_shot, camera=self.camera)
+                publish_info.append(AlembicExporter().exportSelected(asset_name=self.chosen_asset, shot_name=self.chosen_shot, camera=self.camera))
                 self.publish(publish_info)
             else:                   #pick which camera to publish
                 cam_list = []
@@ -197,15 +199,18 @@ class Exporter:
 
         #animation publish
         else:
-            publish_info = AlembicExporter().exportSelected(asset_name=self.chosen_asset, shot_name=self.chosen_shot, camera=self.camera)
+            publish_info.append(AlembicExporter().exportSelected(asset_name=self.chosen_asset, shot_name=self.chosen_shot, camera=self.camera))
             self.publish(publish_info)
 
     def camera_results(self, value):
+        publish_info = []
         self.chosen_asset = value[0]
-        publish_info = AlembicExporter().exportSelected(asset_name=self.chosen_asset, shot_name=self.chosen_shot, camera=self.camera)
+        publish_info.append(AlembicExporter().exportSelected(asset_name=self.chosen_asset, shot_name=self.chosen_shot, camera=self.camera))
         self.publish(publish_info)
 
-    def publish(self, publish_info):
+    def publish(self, publishes):
+        publish_info = publishes[0]
+
         element = publish_info[0]
         path = publish_info[1]
 
@@ -220,4 +225,8 @@ class Exporter:
         if comment is None or comment == "":
             comment = "No comment."
         username = Environment().get_user().get_username()
-        element.publish(username, path, comment, self.chosen_asset)
+
+        for pub_info in publishes:
+            element = pub_info[0]
+            path = pub_info[1]
+            element.publish(username, path, comment, self.chosen_asset)

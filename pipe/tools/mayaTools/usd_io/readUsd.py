@@ -35,8 +35,12 @@ class UsdReader:
         self.item_gui.submitted.connect(self.shot_results)
 
     def shot_results(self, value):
-        shot_name = value[0]
-        self.shot = self.project.get_shot(shot_name)
+        self.shot_name = value[0]
+        self.shot = self.project.get_shot(self.shot_name)
+        if not self.shot:
+            self.shot = self.project.create_shot(self.shot_name)
+        if not self.shot:
+            qd.error("This is real :'( (but the shot you picked isn't. talk to stephanie)")
 
         self.element = self.shot.get_element(Asset.LAYOUT)
 
@@ -115,7 +119,7 @@ class UsdReader:
         layout = self.project.get_layout(layout_name)
         layout_element = layout.get_element(Asset.LAYOUT)
         src = os.path.join(layout_element._filepath, layout_name + "_ref.usda")
-        dst = os.path.join(self.element._filepath, layout_name + ".usda")
+        dst = os.path.join(self.element._filepath, self.shot_name + ".usda")
 
         shutil.copy(src, dst)
         pio.set_permissions(dst)

@@ -89,6 +89,7 @@ class ObjExporter:
         path = os.path.join(path, Asset.GEO)
 
         self.element = Element(path)
+        self.element.update_app_ext(".obj")
 
         path = os.path.join(path, name)
         last_version = self.element.get_last_version()
