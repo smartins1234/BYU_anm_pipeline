@@ -11,6 +11,7 @@ from pipe.pipeHandlers.element import Element
 
 from PySide2 import QtWidgets
 import maya.cmds as mc
+import pymel.core as pm
 import maya.OpenMayaUI as omu
 import os
 
@@ -32,7 +33,7 @@ class Cloner:
 		self.quick = quick
 		self.project = Project()
 
-		type_list = ["Model", "Rig", "Animation", "Camera", "Layout"]
+		type_list = ["Model", "Rig", "Animation", "Camera"]
 		self.item_gui = sfl.SelectFromList(
 		    l=type_list, parent=maya_main_window(), title="Select a type of asset to clone")
 		self.item_gui.submitted.connect(self.type_results)
@@ -67,7 +68,7 @@ class Cloner:
 			print('File does not exist: '+assetName)
 
 	def clone_geo(self):
-
+		pm.loadPlugin("objImport")
 		self.type = Asset.GEO
 
 		asset_list = self.project.list_existing_assets()
@@ -85,7 +86,7 @@ class Cloner:
 		self.item_gui.submitted.connect(self.results)
 
 	def clone_anim(self):
-
+		pm.loadPlugin("AbcImport")
 		self.type = Asset.ANIMATION
 
 		shot_list = self.project.list_existing_shots()
@@ -94,7 +95,7 @@ class Cloner:
 		self.item_gui.submitted.connect(self.shot_results)
 
 	def clone_camera(self):
-
+		pm.loadPlugin("AbcImport")
 		self.type = Asset.CAMERA
 
 		shot_list = self.project.list_existing_shots()
@@ -252,6 +253,12 @@ class Cloner:
 				return
 			else:
 				selected_scene_file=latest[3]
+
+				#if we're cloning a model, lets make sure we're getting the obj instead of the usda
+				if self.type == Asset.GEO:
+					path = selected_scene_file.split(".")
+					selected_scene_file = path[0] + ".obj"
+
 				self.open_scene_file(selected_scene_file)
 				return
 
