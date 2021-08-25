@@ -6,6 +6,8 @@ export CURRENT_PROGRAM='maya'
 export MAYA_SHELF_DIR=${MEDIA_PROJECT_DIR}'/pipe/tools/mayaTools/custom/'
 export MAYA_ICONS_DIR=${MEDIA_PROJECT_DIR}'/icons/'
 export PYTHONPATH=${PYTHONPATH}:${MEDIA_PROJECT_DIR}'/production/tools'
+export MAYAUSD_EXPORT_MAP1_AS_PRIMARY_UV_SET=1
+export MAYAUSD_IMPORT_PRIMARY_UV_SET_AS_MAP1=1
 
 # env vars for USD
 # USD_INSTALL_ROOT='/usr/local/USD/build/USD'

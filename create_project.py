@@ -12,7 +12,8 @@ project_dict = {
      "assets_dir": "production/assets/",
      "users_dir": "production/users/",
      "tools_dir": "production/tools/",
-     "shots_dir": "production/shots/"
+     "shots_dir": "production/shots/",
+     "sets_dir": "production/sets/"
      }
 
 '''
