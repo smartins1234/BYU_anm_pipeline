@@ -268,6 +268,18 @@ class Project:
 		assets.sort(key=str.lower)
 		return assets
 
+	def list_assets_short(self):
+		path = self._env.get_assets_dir() + ".short_asset_list"
+		assets = []
+		f = open(path, "r")
+		for aName in f:
+			if aName[-1] == "\n":
+				aName = aName[:-1]
+			assets.append(aName)
+
+		assets.sort(key=str.lower)
+		return assets
+
 	def list_shots(self):
 		path = self._env.get_shots_dir() + ".shot_list"
 		shots = []
@@ -325,8 +337,14 @@ class Project:
 
 	def list_existing_layouts(self):
 		layouts = self._list_bodies_in_dir(self._env.get_layouts_dir())
-		layouts.sort(key=str.lower)
-		return layouts
+
+		layouts_list = []
+
+		for item in layouts:
+			layouts_list.append(str(item))
+
+		layouts_list.sort(key=str.lower)
+		return layouts_list
 
 	def list_tools(self):
 		'''

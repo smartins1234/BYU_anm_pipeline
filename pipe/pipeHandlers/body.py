@@ -307,7 +307,8 @@ class Asset(Body):
 	LIGHTS = 'lights'
 	HIP = 'hip'
 	LAYOUT = 'layout'
-	ALL = [GEO, CAMERA, ANIMATION, RIG, HDA, TEXTURES, MATERIALS, LIGHTS, HIP, LAYOUT]
+	USD = 'usd'
+	ALL = [GEO, CAMERA, ANIMATION, RIG, HDA, TEXTURES, MATERIALS, LIGHTS, HIP, LAYOUT, USD]
 
 	@staticmethod
 	def create_new_dict(name):
