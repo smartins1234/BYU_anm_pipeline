@@ -2,6 +2,9 @@
 # https://github.com/kennethreitz/samplemod/blob/master/.gitignore
 
 pipe/tools/houtools/_custom/otls/backup/
+pipe/tools/houdiniTools/custom/config
+pipe/tools/houdiniTools/custom/otls
+pipe/pipeHandlers/shotgun.py
 studiolibrary-2.6.3/
 
 # Project file ignores
