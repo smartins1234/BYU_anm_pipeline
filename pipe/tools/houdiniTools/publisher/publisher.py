@@ -1,4 +1,5 @@
 import hou
+from pxr import Sdf, Usd
 from functools import partial
 from distutils.version import StrictVersion
 import pipe.pipeHandlers.quick_dialogs as qd
@@ -65,19 +66,51 @@ class Publisher:
             node.changeNodeType(all_definitions[-1].nodeTypeName())
             # Close version window
 
-    def publish_asset(self):
+    def publish_asset(self, solaris):
         '''
         this is what's called when the button is pushed.
         '''
-        # copied from cloner
         project = Project()
 
         asset_list = project.list_assets()
         self.item_gui = sfl.SelectFromList(
             l=asset_list, parent=hou.ui.mainQtWindow(), title="Select an asset to publish")
         # call asset results function here to be used once selected
-        self.item_gui.submitted.connect(self.asset_results)
-        # end copy
+        if solaris:
+            self.item_gui.submitted.connect(self.solaris_asset_results)
+        else:
+            self.item_gui.submitted.connect(self.asset_results)
+    
+    def solaris_asset_results(self, value):
+        self.asset_name = value[0]
+
+        body = Project().get_asset(self.asset_name)
+        if not body:
+            body = Project().create_asset(self.asset_name)
+        if not body:
+            qd.error("Something broke :'(")
+            return
+        self.element = body.get_element(Asset.USD)
+        self.path = os.path.join(self.element._filepath, "temp.usda")
+
+        selection = hou.selectedNodes()
+        if len(selection) != 1:
+            qd.error("Please select the last node in the network and try again.")
+            return
+        
+        out = selection[0]
+
+        rop = hou.node("/stage").createNode("usd_rop")
+        rop.setInput(0, out)
+        rop.parm("lopoutput").set(self.path)
+        rop.parm("enableoutputprocessor_simplerelativepaths").set(0)
+        rop.parm("execute").pressButton()
+
+    def asset_comment(self, value):
+        comment = value[0]
+        username = Environment().get_user().get_username()
+        self.element.publish(username, self.path, comment, self.asset_name)
+        
 
     def asset_results(self, value):
         self.fileName = value[0]
@@ -93,6 +126,7 @@ class Publisher:
                 'Please select a single Houdini Digital Asset node to save and update version on.')
             return
 
+        #add code to force node name/node type name
         hda_node = selection[0]
         definition = hda_node.type().definition()
         libraryFilePath = definition.libraryFilePath()
@@ -220,7 +254,7 @@ class Publisher:
         # # hou.hipFile.saveAndIncrementFileName()      #this actually works! Dunno if I want to use it though.
         #
         # #Publish
-        user = Environment().get_user().get_username()
+        user = Environment().get_user()
         pipeline_io.set_permissions(src)
         # try that asset name is body name.
         dst = self.publish_element(shot_element, user, filepath, comment)
@@ -274,11 +308,55 @@ class Publisher:
         rop.parm("enableoutputprocessor_simplerelativepaths").set(0)
         # save to disk
         rop.parm("execute").pressButton()
-
+        #add attributes to stage reqired for proper unpacking later
+        self.create_attributes(out)
         # publish :)
         self.comment = qd.HoudiniInput(
             parent=hou.qt.mainWindow(), title="Comment for publish?")
         self.comment.submitted.connect(self.layout_comment)
+
+    def create_attributes(self, node):
+        stage = Usd.Stage.Open(self.savePath)
+
+        node_list = []
+        node_list = self.listInputs(node, node_list)
+
+        for n in node_list:
+            #create a ref_path attribute for each reference in the stage
+            '''if n.type().name() == "reference":
+                prim = stage.GetPrimAtPath(n.parm("primpath").eval())
+                if prim.IsValid():
+                    path = prim.CreateAttribute("ref_path", Sdf.ValueTypeNames.String)
+                    path.Set(n.parm("filepath1").eval())
+                else:
+                    print("uh oh")'''
+
+            #create a hda_path attribute for each material in the stage
+            if n.type().name() == "materiallibrary":
+                mats = n.children()
+                for mat in mats:
+                    if mat.type().definition():
+                        print(mat.type().definition().libraryFilePath())
+                        prim = stage.GetPrimAtPath(n.parm("matpathprefix").eval() + mat.name())
+                        if prim.IsValid():
+                            path = prim.CreateAttribute("hda_path", Sdf.ValueTypeNames.String)
+                            path.Set(mat.type().definition().libraryFilePath())
+                        else:
+                            print("hmmmmmmmqow;ugh")
+                    else:
+                        #send error message
+                        qd.error("Material " + mat.name() + " is not an HDA and won't load properly in the scene.")
+
+        stage.Save()
+
+    def listInputs(self, n, list):
+        list.append(n)
+        inputs = n.inputs()
+        for input in inputs:
+            if input is not None:
+                blank = []
+                list.extend(self.listInputs(input, blank))
+        return list
 
     def layout_comment(self, value):
         comment = value[0]
