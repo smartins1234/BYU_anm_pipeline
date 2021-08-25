@@ -184,6 +184,12 @@ class AlembicExporter:
             path = self.getFilePath(asset_name)
             command = self.buildAlembicCommand(path)
 
+        frame_range = str(self.shot.get_frame_range())
+        cont = qd.yes_or_no("This asset is about to be saved with " + frame_range + " frames. Is that correct?")
+        if not cont:
+            qd.error("Nothing was published.")
+            return
+
         pm.Mel.eval(command)
 
         publish_info = [self.element, path]
