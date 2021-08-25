@@ -12,7 +12,7 @@
 		<subMenu id="creator_menu">
 			<label>Create</label>
 
-			<!-- ============================ Start Create Asset Tool =========================== -->
+			<!-- ============================ Start Create Asset Tool =========================== 
 			<scriptItem id="h.createAsset">
 				<label>Asset</label>
 				<scriptCode scriptType="python">
@@ -21,11 +21,26 @@ from pipe.tools.houdiniTools.creator import creator
 import hou
 creator = creator.Creator()
 hou.session.creator = creator
-creator.run(type="asset")
+creator.create_asset()
 					]]>
 				</scriptCode>
 			</scriptItem>
-			<!-- ============================ End Create Asset Tool =========================== -->
+			 ============================ End Create Asset Tool =========================== -->
+
+			<!-- ============================ Start Create Layout Tool =========================== -->
+			<scriptItem id="h.createLayout">
+				<label>Layout</label>
+				<scriptCode scriptType="python">
+					<![CDATA[
+from pipe.tools.houdiniTools.creator import creator
+import hou
+creator = creator.Creator()
+hou.session.creator = creator
+creator.create_layout()
+					]]>
+				</scriptCode>
+			</scriptItem>
+			<!-- ============================ End Create Layout Tool =========================== -->
 
 			<!-- ============================ Start Create Shot Tool =========================== -->
 			<scriptItem id="h.createShot">
@@ -47,20 +62,49 @@ creator.run(type="shot")
 		<!-- ============================ Start cloner subMenu =========================== -->
 		<subMenu id="cloner_menu">
 			<label>Clone</label>
+			<!-- ============================ Start Geo cloner Tool =========================== -->
+			<scriptItem id="h.cloner_geo">
+				<label>Geo</label>
+				<scriptCode scriptType="python">
+					<![CDATA[
+from pipe.tools.houdiniTools.cloner import geo_cloner
+import hou
+cloner = geo_cloner.GeoCloner()
+hou.session.cloner = cloner
+cloner.clone()
+					]]>
+				</scriptCode>
+			</scriptItem>
+			<!-- ============================ End Geo cloner Tool =========================== -->
 			<!-- ============================ Start Asset cloner Tool =========================== -->
-			<scriptItem id="h.checkout_asset">
+			<scriptItem id="h.cloner_asset">
 				<label>Asset</label>
 				<scriptCode scriptType="python">
 					<![CDATA[
-from pipe.tools.houdiniTools.cloner import cloner
+from pipe.tools.houdiniTools.cloner import asset_cloner
 import hou
-cloner = cloner.Cloner()
+cloner = asset_cloner.AssetCloner()
 hou.session.cloner = cloner
-cloner.clone_asset()
+cloner.clone()
 					]]>
 				</scriptCode>
 			</scriptItem>
 			<!-- ============================ End Asset cloner Tool =========================== -->
+
+			<!-- ============================ Start Material cloner Tool =========================== -->
+			<scriptItem id="h.cloner_material">
+				<label>Material</label>
+				<scriptCode scriptType="python">
+					<![CDATA[
+from pipe.tools.houdiniTools.cloner import mat_cloner
+import hou
+cloner = mat_cloner.MaterialCloner()
+hou.session.cloner = cloner
+cloner.clone()
+					]]>
+				</scriptCode>
+			</scriptItem>
+			<!-- ============================ End Material cloner Tool =========================== -->
 
 			<!-- ============================ Start Tool cloner Tool =========================== -->
 			<scriptItem id="h.cloner_tool">
@@ -82,26 +126,26 @@ cloner.clone_tool()
 				<label>Shot</label>
 				<scriptCode scriptType="python">
 					<![CDATA[
-from pipe.tools.houdiniTools.cloner import cloner
+from pipe.tools.houdiniTools.cloner import shot_cloner
 import hou
-cloner = cloner.Cloner()
+cloner = shot_cloner.ShotCloner()
 hou.session.cloner = cloner
-cloner.clone_shot()
+cloner.clone()
 ]]>
 				</scriptCode>
 			</scriptItem>
 			<!-- ============================ End Shot cloner Tool =========================== -->
 
-						<!-- ============================ Start Layout cloner Tool =========================== -->
+			<!-- ============================ Start Layout cloner Tool =========================== -->
 			<scriptItem id="h.cloner_layout">
 				<label>Layout</label>
 				<scriptCode scriptType="python">
 					<![CDATA[
-from pipe.tools.houdiniTools.unpacker import unpacker
+from pipe.tools.houdiniTools.cloner import layout_cloner
 import hou
-unpacker = unpacker.Unpacker()
-hou.session.unpacker = unpacker
-unpacker.unpack_usd()
+cloner = layout_cloner.LayoutCloner()
+hou.session.cloner = cloner
+cloner.clone()
 ]]>
 				</scriptCode>
 			</scriptItem>
@@ -117,15 +161,30 @@ unpacker.unpack_usd()
 				<label>Asset</label>
 				<scriptCode scriptType="python">
 					<![CDATA[
-from pipe.tools.houdiniTools.publisher import publisher
+from pipe.tools.houdiniTools.publisher import asset_publisher
 import hou
-publisher = publisher.Publisher()
+publisher = asset_publisher.AssetPublisher()
 hou.session.publisher = publisher
-publisher.publish_asset()
+publisher.publish()
 					]]>
 				</scriptCode>
 			</scriptItem>
 			<!-- ============================ End Asset Publish Tool =========================== -->
+
+			<!-- ============================ Start Material Publish Tool =========================== -->
+			<scriptItem id="h.publishMaterial">
+				<label>Material</label>
+				<scriptCode scriptType="python">
+					<![CDATA[
+from pipe.tools.houdiniTools.publisher import mat_publisher
+import hou
+publisher = mat_publisher.MaterialPublisher()
+hou.session.publisher = publisher
+publisher.publish()
+					]]>
+				</scriptCode>
+			</scriptItem>
+			<!-- ============================ End Material Publish Tool =========================== -->
 
 			<!-- ============================ Start Tool Publish Tool =========================== -->
 			<scriptItem id="h.publish_tool">
@@ -152,11 +211,11 @@ publisher.publish_tool()
 				<label>Shot</label>
 				<scriptCode scriptType="python">
 					<![CDATA[
-from pipe.tools.houdiniTools.publisher import publisher
+from pipe.tools.houdiniTools.publisher import shot_publisher
 import hou
-publisher = publisher.Publisher()
+publisher = shot_publisher.ShotPublisher()
 hou.session.publisher = publisher
-publisher.publish_shot()
+publisher.publish()
 					]]>
 				</scriptCode>
 			</scriptItem>
@@ -167,11 +226,11 @@ publisher.publish_shot()
 				<label>Layout</label>
 				<scriptCode scriptType="python">
 					<![CDATA[
-from pipe.tools.houdiniTools.publisher import publisher
+from pipe.tools.houdiniTools.publisher import layout_publisher
 import hou
-publisher = publisher.Publisher()
+publisher = layout_publisher.LayoutPublisher()
 hou.session.publisher = publisher
-publisher.publish_layout()
+publisher.publish()
 					]]>
 				</scriptCode>
 			</scriptItem>
@@ -182,6 +241,20 @@ publisher.publish_layout()
 
 		<subMenu id="utils_menu">
 			<label>Utils</label>
+
+			<scriptItem id="h.assets_update">
+				<label>Update Assets</label>
+				<scriptCode scriptType="python">
+					<![CDATA[
+from pipe.tools.houdiniTools.updater import update_assets
+import hou
+updater = update_assets.UpdateAssets()
+hou.session.updater = updater
+updater.update_assets()
+					]]>
+				</scriptCode>
+			</scriptItem>
+
 			<scriptItem id="h.cenote_env">
 				<label>Cenote Env</label>
 				<scriptCode scriptType="python">
@@ -208,5 +281,5 @@ reload.run()
 
 	</subMenu>
 	<!-- ============================ End BYU Tools Menu =========================== -->
-  </menuBar>
+  	</menuBar>
 </mainMenu>
