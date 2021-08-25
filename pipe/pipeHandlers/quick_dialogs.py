@@ -99,9 +99,10 @@ class HoudiniInput(QtWidgets.QDialog):
     '''
     submitted = QtCore.Signal(list)
 
-    def __init__(self, parent=None, title="Enter info", width=350, height=75):
+    def __init__(self, parent=None, title="Enter info", info="", width=350, height=75):
         super(HoudiniInput, self).__init__(parent)
 
+        self.info = info
         if parent:
             self.parent = parent
         self.setWindowTitle(title)
@@ -114,8 +115,14 @@ class HoudiniInput(QtWidgets.QDialog):
     def initializeVBox(self):
         self.vbox = QtWidgets.QVBoxLayout()
         #QApplication.setActiveWindow()
+        self.initializeInfoText()
         self.initializeTextBar()
         self.initializeSubmitButton()
+
+    def initializeInfoText(self):
+        info_text = QtWidgets.QLabel()
+        info_text.setText(self.info)
+        self.vbox.addWidget(info_text)
 
     def initializeTextBar(self):
         hbox = QtWidgets.QHBoxLayout()

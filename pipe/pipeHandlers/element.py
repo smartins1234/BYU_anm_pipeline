@@ -408,8 +408,8 @@ class Element:
 
         if path != main_path and path != version_path:
             #copy the file then delete the original
-            shutil.copy(path, main_path)
-            shutil.copy(path, version_path)
+            shutil.copyfile(path, main_path)
+            shutil.copyfile(path, version_path)
 
             pipeline_io.set_permissions(main_path)
             pipeline_io.set_permissions(version_path)
@@ -417,11 +417,11 @@ class Element:
             os.remove(path)
 
         elif path == main_path:
-            shutil.copy(path, version_path)
+            shutil.copyfile(path, version_path)
             pipeline_io.set_permissions(version_path)
 
         elif path == version_path:
-            shutil.copy(path, main_path)
+            shutil.copyfile(path, main_path)
             pipeline_io.set_permissions(main_path)
 
         #save publish data to the .element file
