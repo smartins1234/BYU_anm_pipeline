@@ -1,14 +1,12 @@
-"""
-This file should be identical to shotgun.py but without the SERVER_PATH, SCRIPT_NAME, SCRIPT_KEY, and PROJECT_ID
-variables for security reasons, as we don't want these values to be public on github.
-"""
-
 import shotgun_api3
 import pprint
 
 SERVER_PATH = ""
-SCRIPT_NAME = ''
-SCRIPT_KEY = ''
+ASSET_SCRIPT_NAME = ''
+ASSET_SCRIPT_KEY = ''
+
+SHOT_SCRIPT_NAME = ''
+SHOT_SCRIPT_KEY = ''
 
 PROJECT_ID = -1
 
@@ -18,7 +16,7 @@ class ShotgunReader:
 
     def getAssetLists(self):
 
-        sg = shotgun_api3.Shotgun(SERVER_PATH, SCRIPT_NAME, SCRIPT_KEY)
+        sg = shotgun_api3.Shotgun(SERVER_PATH, ASSET_SCRIPT_NAME, ASSET_SCRIPT_KEY)
 
         #pprint.pprint([symbol for symbol in sorted(dir(sg)) if not symbol.startswith('_')])
 
@@ -76,3 +74,24 @@ class ShotgunReader:
         #pprint.pprint(short_list)
         #pprint.pprint(name_list)
         return [name_list, short_list]
+
+    def getShotList(self):
+
+        sg = shotgun_api3.Shotgun(SERVER_PATH, SHOT_SCRIPT_NAME, SHOT_SCRIPT_KEY)
+
+        fields = ['code']
+        filters = [
+            ["project", "is", {"type": "Project", "id": PROJECT_ID}]
+        ]
+
+        result = sg.find("Shot", filters=filters, fields=fields)
+        #pprint.pprint(result)
+        #print(len(result))
+
+        shot_list = []
+
+        for shot in result:
+            name = shot["code"]
+            shot_list.append(name)
+
+        return shot_list
