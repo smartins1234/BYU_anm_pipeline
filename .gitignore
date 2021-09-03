@@ -4,6 +4,7 @@
 pipe/tools/houtools/_custom/otls/backup/
 pipe/tools/houdiniTools/custom/config
 pipe/tools/houdiniTools/custom/otls
+# So that our Shotgrid project info doesn't become public :)
 pipe/pipeHandlers/shotgun.py
 studiolibrary-2.6.3/
 
