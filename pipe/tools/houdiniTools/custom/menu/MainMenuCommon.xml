@@ -42,20 +42,6 @@ creator.create_layout()
 			</scriptItem>
 			<!-- ============================ End Create Layout Tool =========================== -->
 
-			<!-- ============================ Start Create Shot Tool =========================== -->
-			<scriptItem id="h.createShot">
-				<label>Shot</label>
-				<scriptCode scriptType="python">
-					<![CDATA[
-from pipe.tools.houdiniTools.creator import creator
-import hou
-creator = creator.Creator()
-hou.session.creator = creator
-creator.run(type="shot")
-					]]>
-				</scriptCode>
-			</scriptItem>
-			<!-- ============================ End Create Shot Tool =========================== -->
 		</subMenu>
 		<!-- ============================ End creator subMenu =========================== -->
 
@@ -106,7 +92,7 @@ cloner.clone()
 			</scriptItem>
 			<!-- ============================ End Material cloner Tool =========================== -->
 
-			<!-- ============================ Start Tool cloner Tool =========================== -->
+			<!-- ============================ Start Tool cloner Tool =========================== 
 			<scriptItem id="h.cloner_tool">
 				<label>Tool</label>
 				<scriptCode scriptType="python">
@@ -119,9 +105,9 @@ cloner.clone_tool()
 					]]>
 				</scriptCode>
 			</scriptItem>
-			<!-- ============================ End Tool cloner Tool =========================== -->
+			 ============================ End Tool cloner Tool =========================== -->
 
-			<!-- ============================ Start Shot cloner Tool =========================== -->
+			<!-- ============================ Start Shot cloner Tool ===========================
 			<scriptItem id="h.cloner_shot">
 				<label>Shot</label>
 				<scriptCode scriptType="python">
@@ -134,7 +120,7 @@ cloner.clone()
 ]]>
 				</scriptCode>
 			</scriptItem>
-			<!-- ============================ End Shot cloner Tool =========================== -->
+			 ============================ End Shot cloner Tool =========================== -->
 
 			<!-- ============================ Start Layout cloner Tool =========================== -->
 			<scriptItem id="h.cloner_layout">
@@ -150,6 +136,37 @@ cloner.clone()
 				</scriptCode>
 			</scriptItem>
 			<!-- ============================ End Layout cloner Tool =========================== -->
+
+			<!-- ============================ Start Animation cloner Tool =========================== -->
+			<scriptItem id="h.cloner_anim">
+				<label>Animation</label>
+				<scriptCode scriptType="python">
+					<![CDATA[
+from pipe.tools.houdiniTools.cloner import anim_cloner
+import hou
+cloner = anim_cloner.AnimCloner()
+hou.session.cloner = cloner
+cloner.clone()
+]]>
+				</scriptCode>
+			</scriptItem>
+			<!-- ============================ End Animation cloner Tool =========================== -->
+
+			<!-- ============================ Start Camera cloner Tool =========================== -->
+			<scriptItem id="h.cloner_camera">
+				<label>Camera</label>
+				<scriptCode scriptType="python">
+					<![CDATA[
+from pipe.tools.houdiniTools.cloner import camera_cloner
+import hou
+cloner = camera_cloner.CameraCloner()
+hou.session.cloner = cloner
+cloner.clone()
+]]>
+				</scriptCode>
+			</scriptItem>
+			<!-- ============================ End Camera cloner Tool =========================== -->
+
 		</subMenu>
 		<!-- ============================ End cloner subMenu =========================== -->
 
@@ -186,7 +203,7 @@ publisher.publish()
 			</scriptItem>
 			<!-- ============================ End Material Publish Tool =========================== -->
 
-			<!-- ============================ Start Tool Publish Tool =========================== -->
+			<!-- ============================ Start Tool Publish Tool =========================== 
 			<scriptItem id="h.publish_tool">
 				<label>Tool</label>
 				<expression>
@@ -204,9 +221,9 @@ publisher.publish_tool()
 					]]>
 				</scriptCode>
 			</scriptItem>
-			<!-- ============================ End Tool Publish Tool =========================== -->
+			 ============================ End Tool Publish Tool =========================== -->
 
-			<!-- ============================ Start Shot Publish Tool =========================== -->
+			<!-- ============================ Start Shot Publish Tool ===========================
 			<scriptItem id="h.publish_shot">
 				<label>Shot</label>
 				<scriptCode scriptType="python">
@@ -219,7 +236,7 @@ publisher.publish()
 					]]>
 				</scriptCode>
 			</scriptItem>
-			<!-- ============================ End Shot Publish Tool =========================== -->
+			 ============================ End Shot Publish Tool =========================== -->
 
 			<!-- ============================ Start Layout Publish Tool =========================== -->
 			<scriptItem id="h.publish_layout">
@@ -239,6 +256,44 @@ publisher.publish()
 		</subMenu>
 		<!-- ============================ End Publish subMenu =========================== -->
 
+		<!-- ============================ Start Shot subMenu =========================== -->
+		<subMenu id="shot_menu">
+			<label>Shot</label>
+
+			<!-- ============================ Start Shot Checkout Tool =========================== -->
+			<scriptItem id="h.shotCheckout">
+				<label>Checkout</label>
+				<scriptCode scriptType="python">
+					<![CDATA[
+from pipe.tools.houdiniTools.cloner import shot_cloner
+import hou
+cloner = shot_cloner.ShotCloner()
+hou.session.cloner = cloner
+cloner.clone()
+					]]>
+				</scriptCode>
+			</scriptItem>
+			<!-- ============================ End Shot Checkout Tool =========================== -->
+
+			<!-- ============================ Start Shot Return Tool =========================== -->
+			<scriptItem id="h.shotReturn">
+				<label>Return</label>
+				<scriptCode scriptType="python">
+					<![CDATA[
+from pipe.tools.houdiniTools.publisher import shot_publisher
+import hou
+publisher = shot_publisher.ShotPublisher()
+hou.session.publisher = publisher
+publisher.publish()
+					]]>
+				</scriptCode>
+			</scriptItem>
+			<!-- ============================ End Shot Return Tool =========================== -->
+
+		</subMenu>
+		<!-- ============================ End Shot subMenu =========================== -->
+
+
 		<subMenu id="utils_menu">
 			<label>Utils</label>
 
@@ -251,6 +306,19 @@ import hou
 updater = update_assets.UpdateAssets()
 hou.session.updater = updater
 updater.update_assets()
+					]]>
+				</scriptCode>
+			</scriptItem>
+
+			<scriptItem id="h.shots_update">
+				<label>Update Shots</label>
+				<scriptCode scriptType="python">
+					<![CDATA[
+from pipe.tools.houdiniTools.updater import update_shots
+import hou
+updater = update_shots.UpdateShots()
+hou.session.updater = updater
+updater.update_shots()
 					]]>
 				</scriptCode>
 			</scriptItem>

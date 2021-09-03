@@ -26,12 +26,16 @@ class ShotPublisher:
         self.shot_name = value[0]
 
         shot = self.project.get_shot(self.shot_name)
+        if not shot:
+            shot = self.project.create_shot(self.shot_name)
+        if not shot:
+            qd.error("Get Stephanie, because something broke bad.")
         self.element = shot.get_element(Asset.HIP)
 
-        self.path = os.path.join(self.element._filepath, "temp.hip")
+        self.path = os.path.join(self.element._filepath, "temp.hipnc")
 
         hou.hipFile.setName(self.shot_name)
-        hou.hipFile.save(self.path, False)
+        hou.hipFile.save(file_name=self.path, save_to_recent_files=False)
 
         publishes = self.element.list_publishes()
         publishes_string_list = ""
@@ -48,5 +52,6 @@ class ShotPublisher:
         username = Environment().get_user().get_username()
         name = self.shot_name
 
-        self.element.update_app_ext(".hip")
+        self.element.update_app_ext(".hipnc")
         self.element.publish(username, self.path, comment, name)
+        self.element.update_assigned_user("")

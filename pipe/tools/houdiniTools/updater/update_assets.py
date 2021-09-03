@@ -47,6 +47,8 @@ class UpdateAssets:
 
         list_file.close()
 
+        qd.message("Assets updated successfully.")
+
         '''finished = []
 
         for asset in asset_list:
@@ -227,5 +229,7 @@ class UpdateAssets:
 
             mat_lib.destroy()
             rop.destroy()
+
+            pio.set_permissions(dst)
 
             return dst

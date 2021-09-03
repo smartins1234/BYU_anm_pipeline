@@ -37,15 +37,22 @@ class MaterialPublisher:
 
         selection = hou.selectedNodes()
         if len(selection) != 1:
-            qd.error("Please select only the material library node and try again.")
+            qd.error("Please select only the material node and try again.")
             return
-        lib = selection[0]
+        shader = selection[0]
+        if shader.type().name == "materiallibrary":
+            qd.error("Changes have been made to this publishing tool. Now you must select the material node itself, NOT the material library, to publish it. Please try again.")
+            return
+        lib = shader.parent()
+        if len(lib.children()) > 1:
+            qd.error("Only one material can be in the material library node. Move extra nodes to another material library and try again.")
+            return
         if lib.type().name() != "materiallibrary":
-            qd.error("Please select only the material library node and try again.")
+            qd.error("Please put your material in a material library node before publishing and try again.")
             return
 
         lib.setInput(0, None)
-        shader = lib.children()[0]
+        lib.parm("matpath1").set(value[0])
         shader.setName(value[0])
 
         rop = hou.node("/stage").createNode("usd_rop")
