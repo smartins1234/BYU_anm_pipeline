@@ -164,7 +164,7 @@ class Exporter:
 
         #if the shot didn't exist already, set the frame range
         if shot is not None:    
-            qd.warning("You are creating this shot in the pipe. Check with your team lead that the following information you enter is correct.")
+            '''qd.warning("You are creating this shot in the pipe. Check with your team lead that the following information you enter is correct.")
             frame_range = qd.input("How many frames are in this shot?")
 
             if frame_range is None or frame_range == u'':
@@ -175,7 +175,7 @@ class Exporter:
                 qd.error("Invalid frame range input. Setting to 1.")
 
             shot.set_frame_range(int(frame_range))
-            print(str(shot.get_frame_range()))
+            print(str(shot.get_frame_range()))'''
 
         else:
             shot = self.project.get_shot(self.chosen_shot)
