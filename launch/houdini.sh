@@ -43,10 +43,10 @@ export HSITE = ${HOUDINI_TOOLS}"/custom;&"
 #export HOUDINI_USER_PREF_DIR=${MEDIA_PROJECT_DIR}"/production/users/"${USER}";&"
 export HOUDINI_DESK_PATH=${HOUDINI_DESK_PATH}:${HOUDINI_TOOLS}"/custom/menu;&"
 
-export RMANTREE="/opt/pixar/RenderManProServer-23.5"
-export RFHTREE="/opt/pixar/RenderManForHoudini-23.5"
-export RMAN_PROCEDURALPATH=$RFHTREE/18.5.351/openvdb:&
-export HOUDINI_PATH=${HOUDINI_PATH}:$RFHTREE"/18.5.351:&"
+export RMANTREE="/opt/pixar/RenderManProServer-24.1"
+export RFHTREE="/opt/pixar/RenderManForHoudini-24.1"
+export RMAN_PROCEDURALPATH=$RFHTREE/18.5.596/openvdb:&
+export HOUDINI_PATH=${HOUDINI_PATH}:$RFHTREE"/18.5.596:&"
 
 echo "Starting Houdini..."
 cd ~/

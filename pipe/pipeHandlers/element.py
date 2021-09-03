@@ -97,6 +97,7 @@ class Element:
     APP_EXT = "app_ext"
     CACHE_EXT = "cache_ext"
     CACHE_FILEPATH = "cache_filepath"
+    ASSIGNED_USER = "assigned_user"
 
     def __init__(self, filepath=None):
         """
@@ -129,6 +130,7 @@ class Element:
         datadict[Element.APP_EXT] = self.app_ext
         datadict[Element.CACHE_EXT] = ""
         datadict[Element.CACHE_FILEPATH] = ""
+        datadict[Element.ASSIGNED_USER] = ""
         return datadict
 
     def update_app_ext(self, extension):
@@ -187,6 +189,9 @@ class Element:
         """
         returns the username (string) of the assigned user
         """
+        if not self._datadict.has_key(self.ASSIGNED_USER):
+            self._datadict[self.ASSIGNED_USER] = ""
+            self._update_pipeline_file()
 
         return self._datadict[self.ASSIGNED_USER]
 
@@ -284,19 +289,35 @@ class Element:
         """
         return a list of the usernames of all users who have checked out this element
         """
-        return self._datadict[self.CHECKOUT_USERS]
+        return self._datadict[self.CHECKOUT_USER]
+
+    def is_assigned(self):
+        if not self._datadict.has_key(self.ASSIGNED_USER):
+            self._datadict[self.ASSIGNED_USER] = ""
+            self._update_pipeline_file()
+            return False
+            
+        user = self._datadict[self.ASSIGNED_USER]
+        if user == "":
+            return False
+        else:
+            return True
 
     def update_assigned_user(self, username):
         """
         Update the user assigned to this element.
         username -- the username (string) of the new user to be assigned
         """
+        if not self._datadict.has_key(self.ASSIGNED_USER):
+            self._datadict[self.ASSIGNED_USER] = username
+            self._update_pipeline_file()
+            return
         old_username = self._datadict[self.ASSIGNED_USER]
         if(old_username==username):
             return
         self._datadict[self.ASSIGNED_USER] = username
         self._update_pipeline_file()
-        if old_username:
+        '''if old_username:
             old_user = self._env.get_user(old_username)
             if old_user and old_user.has_email():
                 subject = self.get_long_name()+" reassigned to "+username
@@ -316,7 +337,7 @@ class Element:
             note = self.get_last_note()
             if note:
                 message = message + " note: "+note
-            self._env.sendmail([new_user.get_email()], subject, message)
+            self._env.sendmail([new_user.get_email()], subject, message)'''
 
     def update_start_date(self, date):
         """
