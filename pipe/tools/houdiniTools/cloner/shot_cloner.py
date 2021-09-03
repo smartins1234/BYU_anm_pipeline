@@ -4,6 +4,7 @@ import pipe.pipeHandlers.select_from_list as sfl
 from pipe.pipeHandlers.project import Project
 from pipe.pipeHandlers.body import Body, Asset
 from pipe.pipeHandlers.element import Element
+from pipe.pipeHandlers.environment import Environment
 
 class ShotCloner:
 
@@ -22,7 +23,18 @@ class ShotCloner:
 
         self.body = Project().get_body(shot_name)
         self.element = self.body.get_element(Asset.HIP)
-        if self.element:
+        if self.element.get_last_version() >= 0:
+            #check if checked out
+            if self.element.is_assigned():
+                assigned_user = self.element.get_assigned_user()
+                username = Environment().get_user().get_username()
+                if not assigned_user == username:
+                    qd.error("This shot is currently checked out by " + assigned_user)
+                    return
+            else:
+                username = Environment().get_user().get_username()
+                self.element.update_assigned_user(username)
+
             path = self.element.get_last_publish()[3]
             if path:
                 hou.hipFile.load(path)
