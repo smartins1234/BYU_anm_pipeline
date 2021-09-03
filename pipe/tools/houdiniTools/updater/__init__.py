@@ -1,1 +1,1 @@
-__all__ = ['update_assets']
+__all__ = ['update_assets', 'update_shots']
