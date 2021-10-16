@@ -92,21 +92,6 @@ cloner.clone()
 			</scriptItem>
 			<!-- ============================ End Material cloner Tool =========================== -->
 
-			<!-- ============================ Start Tool cloner Tool =========================== 
-			<scriptItem id="h.cloner_tool">
-				<label>Tool</label>
-				<scriptCode scriptType="python">
-					<![CDATA[
-from pipe.tools.houdiniTools.cloner import cloner
-import hou
-cloner = cloner.Cloner()
-hou.session.cloner = cloner
-cloner.clone_tool()
-					]]>
-				</scriptCode>
-			</scriptItem>
-			 ============================ End Tool cloner Tool =========================== -->
-
 			<!-- ============================ Start Shot cloner Tool ===========================
 			<scriptItem id="h.cloner_shot">
 				<label>Shot</label>
@@ -167,6 +152,36 @@ cloner.clone()
 			</scriptItem>
 			<!-- ============================ End Camera cloner Tool =========================== -->
 
+			<!-- ============================ Start Lights cloner Tool =========================== -->
+			<scriptItem id="h.cloner_light">
+				<label>Lights</label>
+				<scriptCode scriptType="python">
+					<![CDATA[
+from pipe.tools.houdiniTools.cloner import light_cloner
+import hou
+cloner = light_cloner.LightCloner()
+hou.session.cloner = cloner
+cloner.clone()
+]]>
+				</scriptCode>
+			</scriptItem>
+			<!-- ============================ End Lights cloner Tool =========================== -->
+
+			<!-- ============================ Start Tool cloner Tool =========================== -->
+			<scriptItem id="h.cloner_tool">
+				<label>Tool</label>
+				<scriptCode scriptType="python">
+					<![CDATA[
+from pipe.tools.houdiniTools.cloner import tool_cloner
+import hou
+cloner = tool_cloner.ToolCloner()
+hou.session.cloner = cloner
+cloner.clone()
+					]]>
+				</scriptCode>
+			</scriptItem>
+			<!-- ============================ End Tool cloner Tool =========================== -->
+
 		</subMenu>
 		<!-- ============================ End cloner subMenu =========================== -->
 
@@ -203,26 +218,6 @@ publisher.publish()
 			</scriptItem>
 			<!-- ============================ End Material Publish Tool =========================== -->
 
-			<!-- ============================ Start Tool Publish Tool =========================== 
-			<scriptItem id="h.publish_tool">
-				<label>Tool</label>
-				<expression>
-import hou
-good = len(hou.selectedNodes())==0
-return good
-				</expression>
-				<scriptCode scriptType="python">
-					<![CDATA[
-from pipe.tools.houdiniTools.publisher import publisher
-import hou
-publisher = publisher.Publisher()
-hou.session.publisher = publisher
-publisher.publish_tool()
-					]]>
-				</scriptCode>
-			</scriptItem>
-			 ============================ End Tool Publish Tool =========================== -->
-
 			<!-- ============================ Start Shot Publish Tool ===========================
 			<scriptItem id="h.publish_shot">
 				<label>Shot</label>
@@ -238,6 +233,21 @@ publisher.publish()
 			</scriptItem>
 			 ============================ End Shot Publish Tool =========================== -->
 
+			<!-- ============================ Start Lights Publish Tool =========================== -->
+			<scriptItem id="h.publish_lights">
+				<label>Lights</label>
+				<scriptCode scriptType="python">
+					<![CDATA[
+from pipe.tools.houdiniTools.publisher import light_publisher
+import hou
+publisher = light_publisher.LightPublisher()
+hou.session.publisher = publisher
+publisher.publish()
+					]]>
+				</scriptCode>
+			</scriptItem>
+			<!-- ============================ End Lights Publish Tool =========================== -->
+
 			<!-- ============================ Start Layout Publish Tool =========================== -->
 			<scriptItem id="h.publish_layout">
 				<label>Layout</label>
@@ -252,6 +262,26 @@ publisher.publish()
 				</scriptCode>
 			</scriptItem>
 			<!-- ============================ End Layout Publish Tool =========================== -->
+
+			<!-- ============================ Start Tool Publish Tool =========================== -->
+			<scriptItem id="h.publish_tool">
+				<label>Tool</label>
+				<!--expression>
+import hou
+good = len(hou.selectedNodes())==0
+return good
+				</expression-->
+				<scriptCode scriptType="python">
+					<![CDATA[
+from pipe.tools.houdiniTools.publisher import tool_publisher
+import hou
+publisher = tool_publisher.ToolPublisher()
+hou.session.publisher = publisher
+publisher.publish()
+					]]>
+				</scriptCode>
+			</scriptItem>
+			<!-- ============================ End Tool Publish Tool =========================== -->
 
 		</subMenu>
 		<!-- ============================ End Publish subMenu =========================== -->

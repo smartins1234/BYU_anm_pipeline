@@ -44,12 +44,12 @@ class MaterialPublisher:
             qd.error("Changes have been made to this publishing tool. Now you must select the material node itself, NOT the material library, to publish it. Please try again.")
             return
         lib = shader.parent()
-        if len(lib.children()) > 1:
+        """if len(lib.children()) > 1:
             qd.error("Only one material can be in the material library node. Move extra nodes to another material library and try again.")
             return
         if lib.type().name() != "materiallibrary":
             qd.error("Please put your material in a material library node before publishing and try again.")
-            return
+            return"""
 
         lib.setInput(0, None)
         lib.parm("matpath1").set(value[0])
