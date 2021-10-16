@@ -43,6 +43,11 @@ export HSITE = ${HOUDINI_TOOLS}"/custom;&"
 #export HOUDINI_USER_PREF_DIR=${MEDIA_PROJECT_DIR}"/production/users/"${USER}";&"
 export HOUDINI_DESK_PATH=${HOUDINI_DESK_PATH}:${HOUDINI_TOOLS}"/custom/menu;&"
 
+#set the colorspace by default
+export OCIO="/opt/hfs18.5.596/houdini/ocio/config.ocio"
+export OCIO_ACTIVE_DISPLAYS="rec709"
+export OCIO_ACTIVE_VIEWS="rec709"
+
 export RMANTREE="/opt/pixar/RenderManProServer-24.1"
 export RFHTREE="/opt/pixar/RenderManForHoudini-24.1"
 export RMAN_PROCEDURALPATH=$RFHTREE/18.5.596/openvdb:&

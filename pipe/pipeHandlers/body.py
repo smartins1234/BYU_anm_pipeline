@@ -308,7 +308,8 @@ class Asset(Body):
 	HIP = 'hip'
 	LAYOUT = 'layout'
 	USD = 'usd'
-	ALL = [GEO, CAMERA, ANIMATION, RIG, HDA, TEXTURES, MATERIALS, LIGHTS, HIP, LAYOUT, USD]
+	MAYA = 'maya'
+	ALL = [GEO, CAMERA, ANIMATION, RIG, HDA, TEXTURES, MATERIALS, LIGHTS, HIP, LAYOUT, USD, MAYA]
 
 	@staticmethod
 	def create_new_dict(name):
@@ -389,6 +390,10 @@ class Tool(Body):
 
 		datadict = Body.create_new_dict(name)
 		return datadict
+
+	@staticmethod
+	def get_parent_dir():
+		return Environment().get_tools_dir()
 
 	def __str__(self):
 		return super(Tool, self).__str__()
