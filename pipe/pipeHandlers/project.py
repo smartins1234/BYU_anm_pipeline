@@ -350,7 +350,17 @@ class Project:
 		'''
 		returns a list of strings containing the names of all tools in this project
 		'''
-		return self._list_bodies_in_dir(self._env.get_tools_dir())
+		list = self._list_bodies_in_dir(self._env.get_tools_dir())
+		tool_list = []
+
+		for item in list:
+			tool = self.get_tool(item)
+			if tool.is_tool():
+				tool_list.append(str(item))
+
+		tool_list.sort(key=str.lower)
+
+		return tool_list
 
 	def list_hdas(self):
 		'''
