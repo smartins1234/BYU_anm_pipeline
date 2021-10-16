@@ -1,0 +1,3289 @@
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//							macConCreate
+//
+//						Created by Mac McCann
+//						  September 08, 2010
+//
+//	This script is based on the cgTkAttachCtrl proc with a lot of
+//	changes, options, and a UI.  Thirteen of the shapes are from the cRigging
+//	proc created by Kris Savona Ventura and one shape from the kk_controllers
+//	proc created by karim kashefy; from whom I also got some inspiration 
+//	for my UI.  The other shapes were created by me.
+//
+//	Directions:  place the control_buttons folder in your maya icons folder.
+//				 Place the macConCreate in your maya scripts folder.
+//				 Type "macConCreate" in your mel command line to call
+//				 the UI.
+//
+//				 Connect Control buttons requires you to:
+//				 1. select control
+//				 2. shift select a joint
+//				 3. press connect control
+//
+//				 Create Control buttons will either
+//					create a control at world zero
+//								or
+//					create and connnect controls to selected joint.
+//
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+//////////////////////////////////////////////////////////////////////////
+//                  Main Window
+/////////////////////////////////////////////////////////////////////////
+
+//proc to be called to open window
+global proc macConCreate()
+	//main window
+{
+	//check if window exists and delete before recreating
+	if (`window -exists conCreateUI`)
+		deleteUI conCreateUI;
+	
+	window -title "Control Connect and Create UI"
+		-widthHeight 416 895
+		-menuBar on
+		-resizeToFitChildren on
+		-maximizeButton off
+		conCreateUI;
+	
+	//menus for window
+	menu -label "Options" macOptionsMenu;
+		menuItem -label "Reset"
+			-command "macReset"
+			macResetMI;
+	setParent -menu ..;
+	
+	menu -label "Help" macHelpMenu;
+		menuItem -label "Help on..."
+			-command "macHelp"
+			macHelpMI;
+	setParent -menu ..;
+		
+	//parent column layout
+	string $pColumn = `columnLayout -adjustableColumn on`;
+	
+//----------------connect control options framelayout-----------------------------
+	frameLayout -borderStyle "etchedIn"
+		-collapsable on
+		-label "Connect Control Options"
+		-font "boldLabelFont" connectFrame;
+	
+	columnLayout -adjustableColumn on connectColLayout;
+	
+	separator -style "in" -height 15;
+	
+	text -label "Constraint Type"
+		-align "center"
+		-font "smallBoldLabelFont"
+		constTypeTxt;
+	
+	//create radio buttons for parent, point, orient, aim selection
+	radioButtonGrp -numberOfRadioButtons 4 
+		-enable on
+		-columnWidth4 80 80 80 80
+		-columnAttach4 "left" "left" "left" "left"
+		-columnOffset4 30 30 30 30
+		-labelArray4 "Parent" "Point" "Orient" "Just Snap"
+		-columnAlign4 "center" "center" "center" "center"
+		-changeCommand "checkBxEnable"
+		-select 1
+		-parent connectColLayout
+		constrainRad;
+	
+	separator -style "in";
+	
+	text -label "Constraint Axes:"
+		-align "left" 
+		-font "smallBoldLabelFont";
+	
+	//checkboxes for axes constraint options
+	//translate checkboxes
+	checkBoxGrp -label "Translate:"
+		-label1 "All"
+		-columnAttach 1 "left" 85
+		-value1 on
+		-onCommand "tAllOn"
+		tAllChckBx;
+	
+	checkBoxGrp -numberOfCheckBoxes 3
+		-labelArray3 "X" "Y" "Z"
+		-columnWidth3 140 60 50
+		-columnAttach3 "left" "left" "left"
+		-columnOffset3 95 30 40
+		-onCommand "tAllOff"
+		tAxesChckBx;
+	
+	separator -height 10 -style "none";
+	
+	//rotate checkboxes
+	checkBoxGrp -label "Rotate:"
+		-label1 "All"
+		-columnAttach 1 "left" 95
+		-value1 on
+		-onCommand "rAllOn"
+		rAllChckBx;
+	
+	checkBoxGrp -numberOfCheckBoxes 3
+		-labelArray3 "X" "Y" "Z"
+		-columnWidth3 140 60 50
+		-columnAttach3 "left" "left" "left"
+		-columnOffset3 95 30 40
+		-onCommand "rAllOff"
+		rAxesChckBx;
+	
+	separator -height 10 -style "none";
+
+	//check boxes for extra options	
+	checkBoxGrp -numberOfCheckBoxes 3
+		-label "Additional Options:"
+		-columnWidth3 200 200 200
+		-labelArray3 "Orient to Joint" "Maintain Offset" "Freeze Transforms after Connection"
+		-columnAttach3 "center" "left" "left"
+		-columnOffset3 10 10 10
+		-columnAlign3 "left" "left" "left"
+		-valueArray3 on off on
+		-vertical
+		connectOptChckBx;
+	
+	//connect control button
+	button -label "Connect Control"
+		-align "center"
+		-height 30
+		-command "getSelection"
+		conControlBut;
+		
+	setParent $pColumn;
+	
+//-----------------Control Creation Layout---------------------------------
+	
+	frameLayout -borderStyle "etchedIn"
+		-height 650
+		-collapsable on
+		-label "Create Controls"
+		-font "boldLabelFont" createFrameLayout;
+	
+	columnLayout -adjustableColumn on createColLayout;
+	
+	separator -style "in" -height 15;
+	
+	checkBoxGrp -numberOfCheckBoxes 1
+		-label "Connect Control on Creation"
+		-columnWidth 1 180
+		-columnAlign 1 "right"
+		-value1 on
+		connectCreateChckBx;
+	
+	separator -style "none" -height 10;
+		
+	text -label "Naming Options"
+		-font "boldLabelFont"
+		-align "left";
+	
+	separator -style "none" -height 5;
+	
+	//use Joint name option
+	checkBoxGrp -numberOfCheckBoxes 1
+		-label "Name based on Selection:  "
+		-label1 "Adds an  '_' + Suffix"
+		-columnWidth1 200
+		-columnAlign 1 "right"
+		-onCommand "useName"
+		-offCommand "useName"
+		useJntNameChckBx;
+		
+	//text Field to use as a suffix
+	textFieldGrp -label "Enter Suffix:" -cw2 125 50 -cl2 "right" "left" -text "C"  -cc "mmUpdateName" -vis off mmSuffixFld;
+	
+	text -align "center" -font "boldLabelFont" -label "Find and Replace Name Options" -vis off mmText;
+	
+	textFieldGrp -label "Find:" -cw2 200 125 -cl2 "right" "right" -cc "mmUpdateName" -vis off mmFindFld;
+	
+	textFieldGrp -label "Replace with:" -cw2 200 125 -cl2 "right" "right" -cc "mmUpdateName" -vis off mmReplaceFld;
+	
+	separator -style "out" -height 20;
+	
+	//text field to specifiy name
+	textFieldGrp -label "     Control Name:"
+		-columnWidth 1 100
+		-columnAlign 1 "left"
+		controlNameTxt;
+		
+	separator -style "in" -height 20;
+		
+	//Color Override options
+	checkBoxGrp -label "CONTROL COLOR" -value1 on mmColorBx;
+	separator -style "none" -height 5;
+	
+	// create a palette of 12 columns and 3 rows
+      palettePort -dim 12 3 -topDown on -width 400 -height 120 -vis 1 -scc 16 mmColorPalette;
+      //set color palette to the local color index
+      for ($i=1; $i<=31; $i++ ) 
+      {
+
+          float $tmp[] = `colorIndex -q $i`;
+
+          if ($i<=23)
+          {
+              palettePort -e -r -rgb ($i-1) $tmp[0] $tmp[1] $tmp[2] mmColorPalette;
+          }
+          else
+          {
+
+               palettePort -e -r -rgb ($i) $tmp[0] $tmp[1] $tmp[2] mmColorPalette;
+          }
+      }
+    
+    separator -h 10 -style "none";
+    
+    button -label "Change Color of Selected" -c "mmColorChange" -vis on colorBtn;
+     
+    string $onCommands = ("palettePort -e -vis 1 mmColorPalette; button -e -vis on colorBtn;");
+    string $offCommands = ("palettePort -e -vis 0 mmColorPalette; button -e -vis off colorBtn;");  
+    checkBoxGrp -e -onCommand $onCommands -offCommand $offCommands mmColorBx;
+    
+	separator -style "in" -height 20;
+	
+	frameLayout -height 200 
+		-label "Controls"
+		-labelAlign "center" 
+		-parent "createFrameLayout" frameLay;
+	
+	//scrollLayout for buttons
+	scrollLayout -cr on
+		-height 200 -w 390
+		-verticalScrollBarThickness 20
+		-parent "frameLay"
+		buttonScrollLay;
+	
+	
+	//gridLayout for the buttons
+	gridLayout -numberOfColumns 8
+		-columnsResizable off
+		-autoGrow on
+		-cellWidthHeight 45 45
+		-allowEmptyCells on
+		-parent "buttonScrollLay"
+		buttonGridLay;
+	
+	//All symbol buttons to be displayed in the grid
+	
+		symbolButton -image "control_buttons/bt01.XPM"    -c bt01   btn01;
+		symbolButton -image "control_buttons/bt02.XPM"    -c bt02   btn02;
+		symbolButton -image "control_buttons/bt03.XPM"    -c bt03   btn03;
+		symbolButton -image "control_buttons/bt04.XPM"    -c bt04   btn04;
+		symbolButton -image "control_buttons/bt05.XPM"    -c bt05   btn05;
+		symbolButton -image "control_buttons/bt06.XPM"    -c bt06   btn06;
+		symbolButton -image "control_buttons/bt07.XPM"    -c bt07   btn07;
+		symbolButton -image "control_buttons/bt08.XPM"    -c bt08   btn08;
+		symbolButton -image "control_buttons/bt09.XPM"    -c bt09   btn09;
+		symbolButton -image "control_buttons/bt10.XPM"    -c bt10   btn10;
+		symbolButton -image "control_buttons/bt11.XPM"    -c bt11   btn11;
+		symbolButton -image "control_buttons/bt12.XPM"    -c bt12   btn12;
+		symbolButton -image "control_buttons/bt13.XPM"    -c bt13   btn13;
+		symbolButton -image "control_buttons/bt14.XPM"    -c bt14   btn14;
+		symbolButton -image "control_buttons/bt15.XPM"    -c bt15   btn15;
+		symbolButton -image "control_buttons/bt16.XPM"    -c bt16   btn16;
+		symbolButton -image "control_buttons/bt17.XPM"    -c bt17   btn17;
+		symbolButton -image "control_buttons/bt18.XPM"    -c bt18   btn18;
+		symbolButton -image "control_buttons/bt19.XPM"    -c bt19   btn19;
+		symbolButton -image "control_buttons/bt20.XPM"    -c bt20   btn20;
+		symbolButton -image "control_buttons/bt21.XPM"    -c bt21   btn21;
+		symbolButton -image "control_buttons/bt22.XPM"    -c bt22   btn22;
+		symbolButton -image "control_buttons/bt23.XPM"    -c bt23   btn23;
+		symbolButton -image "control_buttons/bt24.XPM"    -c bt24   btn24;
+		symbolButton -image "control_buttons/bt25.XPM"    -c bt25   btn25;
+		symbolButton -image "control_buttons/bt26.XPM"    -c bt26   btn26;
+		symbolButton -image "control_buttons/bt27.XPM"    -c bt27   btn27;
+		symbolButton -image "control_buttons/bt28.XPM"    -c bt28   btn28;
+	
+	setParent $pColumn;
+
+showWindow conCreateUI;
+}
+
+//////////////////////////////////////////////////
+//    checkBxEnable Proc
+//    turns on and off rotate and translate axes
+//    options 
+/////////////////////////////////////////////////
+
+global proc checkBxEnable ()
+{
+	//check with radio button is selected
+	int $constType = `radioButtonGrp -q -select constrainRad`;
+	
+	//check the value and turn on and off controls accordingly
+	if ($constType == 1)
+	{
+		//turn on both translate and rotate controls
+		checkBoxGrp -e -enable on tAllChckBx;
+		checkBoxGrp -e -enable on tAxesChckBx;
+		
+		checkBoxGrp -e -enable on rAllChckBx;
+		checkBoxGrp -e -enable on rAxesChckBx;
+	}
+	
+	//if point
+	if ($constType == 2)
+	{
+		//turn on translate controls
+		checkBoxGrp -e -enable on tAllChckBx;
+		checkBoxGrp -e -enable on tAxesChckBx;
+		
+		checkBoxGrp -e -enable off rAllChckBx;
+		checkBoxGrp -e -enable off rAxesChckBx;
+	}
+	
+	//if orient
+	if ($constType == 3)
+	{
+		//turn on rotate controls
+		checkBoxGrp -e -enable off tAllChckBx;
+		checkBoxGrp -e -enable off tAxesChckBx;
+		
+		checkBoxGrp -e -enable on rAllChckBx;
+		checkBoxGrp -e -enable on rAxesChckBx;
+	}
+	
+	//if Just Snap
+	if ($constType == 4)
+	{
+		//turn on both translate and rotate controls
+		checkBoxGrp -e -enable on tAllChckBx;
+		checkBoxGrp -e -enable on tAxesChckBx;
+		
+		checkBoxGrp -e -enable on rAllChckBx;
+		checkBoxGrp -e -enable on rAxesChckBx;
+	}
+
+}
+
+/////////////////////////////////////////////////////////////
+//	tAllOn proc
+//	turns off axes checkboxes
+/////////////////////////////////////////////////////////////
+
+global proc tAllOn ()
+{
+	//turn off x y and z options for translate
+	checkBoxGrp -e -valueArray3 off off off tAxesChckBx;
+}
+
+
+/////////////////////////////////////////////////////////////
+//	tAllOff proc
+//	turns off All translate checkbox
+/////////////////////////////////////////////////////////////
+
+global proc tAllOff ()
+{
+	//turn off All box translate
+	checkBoxGrp -e -value1 off tAllChckBx;
+}
+
+/////////////////////////////////////////////////////////////
+//	rAllOn proc
+//	turns off axes checkboxes
+/////////////////////////////////////////////////////////////
+
+global proc rAllOn ()
+{
+	//turn off x y and z options for translate
+	checkBoxGrp -e -valueArray3 off off off rAxesChckBx;
+}
+
+/////////////////////////////////////////////////////////////
+//	tAllOff proc
+//	turns off All translate checkbox
+/////////////////////////////////////////////////////////////
+
+global proc rAllOff ()
+{
+	//turn off All box translate
+	checkBoxGrp -e -value1 off rAllChckBx;
+}
+
+
+
+
+///////////////////////////////////////////////////////////
+//			macConnectControl proc
+//	this creates the initial groups and setup needed
+//	for the control according to what the user 
+//	has specified.  then it runs the proper proc 
+//	according to the type of constraint selected in the UI
+//////////////////////////////////////////////////////////
+global proc macConnectControl (string $controlObj, string $joint)
+{
+	
+	//get postion of joint for orientation
+	float $worldSpaceOfJoint[] = `xform -q -ws -rp $joint`;
+	
+	//get all the info from the UI
+	int $constType = `radioButtonGrp -q -select constrainRad`;
+
+	int $jointOrient = `checkBoxGrp -q -value1 connectOptChckBx`; 
+	int $offset = `checkBoxGrp -q -value2 connectOptChckBx`; 
+	int $freeze = `checkBoxGrp -q -value3 connectOptChckBx`; 
+	
+	if ( ($joint == "") || ($controlObj == "") )
+	{
+		
+		warning "Please select a controller object, then shift select a joint.";
+		
+	}
+	else
+	{
+		//check if maintain offset is on
+		if ($offset == 0 && $jointOrient == 1)
+		{
+		
+    		//Snap Control to joint
+    		delete `parentConstraint $joint $controlObj `;
+		}
+		
+		if ($offset == 1 && $jointOrient == 1 && $constType != 4)
+		{
+		
+    		//Snap Control to joint
+    		delete `parentConstraint -skipTranslate x -skipTranslate y -skipTranslate z $joint $controlObj `;
+		}
+		
+		if ($offset == 1 && $jointOrient == 0 && $constType == 4)
+		{
+		
+    		//Snap Control to joint
+    		delete `parentConstraint -skipRotate x -skipRotate y -skipRotate z $joint $controlObj `;
+		}
+		
+		if ($offset == 0 && $jointOrient == 0 && $constType == 4)
+		{
+		
+    		//Snap Control to joint
+    		delete `parentConstraint -skipRotate x -skipRotate y -skipRotate z $joint $controlObj `;
+		}
+		
+		if ($offset == 1 && $jointOrient == 1 && $constType == 4)
+		{
+		
+    		//Snap Control to joint
+    		delete `parentConstraint $joint $controlObj `;
+		}
+		
+		if ($offset == 0 && $jointOrient == 0 && $constType != 4)
+		{
+		
+    		//Snap Control to joint
+    		delete `parentConstraint $controlObj $joint `;
+		}
+		
+		//check if freeze transforms is on
+		if ($freeze == 1)
+		{
+		//Freeze the transformations on the controller
+		select $controlObj;
+		makeIdentity -apply on;
+		}
+		
+		if ($offset == 0 && $jointOrient == 1)
+		{
+    		//Snap Pivot to Joint
+    		xform -a -ws -rotatePivot $worldSpaceOfJoint[0] $worldSpaceOfJoint[1] $worldSpaceOfJoint[2] $controlObj;
+		}
+		
+		
+		//not necessary if orient to joint is off
+		if ($jointOrient ==1)
+		{
+    		//Create Null
+    		string $nameOfGroup = `group -em`;
+    		$nameOfGroup = `rename $nameOfGroup ($controlObj + "Null")`;
+    		
+    		//Snap Null to Joint
+    		move -rpr $worldSpaceOfJoint[0] $worldSpaceOfJoint[1] $worldSpaceOfJoint[2] $nameOfGroup;
+    		
+    		//Orient the null to the Joint
+    		delete `orientConstraint -offset 0 0 0 -weight 1 $joint $nameOfGroup `;
+    		
+    		//Parent the control object under the null
+    		parent $controlObj $nameOfGroup;
+		}
+		
+		//check if freeze transforms is on or off
+		if ($freeze == 1)
+		{
+    		//Freeze xforms on control again
+    		select $controlObj;
+    		FreezeTransformations;
+    		performFreezeTransformations (0);
+		}
+		//redeclare the control and joint to be passed to constraint procs
+		string $mcontrol = $controlObj;
+		string $mjoint = $joint;
+		
+		//type depends on what is selected		
+		//setup procs for each option
+		if ($constType == 1)
+		{
+			pConstrain($controlObj, $joint);
+		}
+		
+		//if point is chosen
+		if ($constType == 2)
+		{
+			poConstrain($controlObj, $joint);
+		}
+		
+		//if Orient is chosen
+		if ($constType == 3)
+		{
+			oConstrain($controlObj, $joint);
+		}
+		
+		//if Aim is Selected
+		if ($constType == 4)
+		{
+			aConstrain($controlObj, $joint);
+		}
+	}
+}
+
+////////////////////////////////////////////////////////////////////
+//					pConstrain proc
+//	checks constraint options and constrains with user desired
+//	axes options
+////////////////////////////////////////////////////////////////////
+
+global proc pConstrain (string $controlObj, string $joint)
+{
+	//check for translate axes	
+	int $tAll = `checkBoxGrp -q -value1 tAllChckBx`;
+	int $tX = `checkBoxGrp -q -value1 tAxesChckBx`;
+	int $tY = `checkBoxGrp -q -value2 tAxesChckBx`;
+	int $tZ = `checkBoxGrp -q -value3 tAxesChckBx`;
+	
+	int $rAll = `checkBoxGrp -q -value1 rAllChckBx`;
+	int $rX = `checkBoxGrp -q -value1 rAxesChckBx`;
+	int $rY = `checkBoxGrp -q -value2 rAxesChckBx`;
+	int $rZ = `checkBoxGrp -q -value3 rAxesChckBx`;
+	
+	int $offset = `checkBoxGrp -q -value2 connectOptChckBx`; 
+	
+	//start command to be evaluated at end of if then statements
+	string $conCmd = "parentConstraint -weight 1 ";
+	
+	//check tAll chckBx
+	if ($tAll == 0)
+	{
+		//check what is selected and add to command
+		if ($tX == 0)
+		{
+			$conCmd = ($conCmd + "-skipTranslate x ");	
+		}
+		if ($tY == 0)
+		{
+			$conCmd = ($conCmd + "-skipTranslate y ");	
+		}
+		
+		if ($tZ == 0)
+		{
+			$conCmd = ($conCmd + "-skipTranslate z ");	
+		}
+	} 
+	
+	//check rotate options
+	if ($rAll == 0)
+	{
+		//check what is selected and add to command
+		if ($rX == 0)
+		{
+			$conCmd = ($conCmd + "-skipRotate x ");	
+		}
+		if ($rY == 0)
+		{
+			$conCmd = ($conCmd + "-skipRotate y ");	
+		}
+		
+		if ($rZ == 0)
+		{
+			$conCmd = ($conCmd + "-skipRotate z ");	
+		}
+	}
+	
+	//check if maintain offset is on or off
+	if ($offset == 1)
+	{
+		$conCmd = ($conCmd + "-maintainOffset ");	
+	}
+	
+	//add object and joint to complete command
+	$conCmd = ($conCmd + $controlObj + " " + $joint);
+		
+	//run the parentConstraint cmd
+	print $conCmd;
+	eval $conCmd;
+
+}
+
+///////////////////////////////////////////////////////////////////
+//					poConstrain proc
+//	checks constraint options and constrains with user desired
+//	axes options
+////////////////////////////////////////////////////////////////////
+
+global proc poConstrain (string $controlObj, string $joint)
+{
+	//check for translate axes	
+	int $tAll = `checkBoxGrp -q -value1 tAllChckBx`;
+	int $tX = `checkBoxGrp -q -value1 tAxesChckBx`;
+	int $tY = `checkBoxGrp -q -value2 tAxesChckBx`;
+	int $tZ = `checkBoxGrp -q -value3 tAxesChckBx`;
+
+	int $offset = `checkBoxGrp -q -value2 connectOptChckBx`; 
+	
+	//start command to be evaluated at end of if then statements
+	string $conCmd = "pointConstraint -weight 1 ";
+	
+	//check tAll chckBx
+	if ($tAll == 0)
+	{
+		//check what is selected and add to command
+		if ($tX == 0)
+		{
+			$conCmd = ($conCmd + "-skip x ");	
+		}
+		if ($tY == 0)
+		{
+			$conCmd = ($conCmd + "-skip y ");	
+		}
+		
+		if ($tZ == 0)
+		{
+			$conCmd = ($conCmd + "-skip z ");	
+		}
+	} 
+	
+	//check if maintain offset is on or off
+	if ($offset == 1)
+	{
+		$conCmd = ($conCmd + "-maintainOffset ");	
+	}
+	
+	//add object and joint to complete command
+	$conCmd = ($conCmd + $controlObj + " " + $joint);
+		
+	//run the parentConstraint cmd
+	print $conCmd;
+	eval $conCmd;
+
+}
+
+///////////////////////////////////////////////////////////////////
+//					oConstrain proc
+//	checks constraint options and constrains with user desired
+//	axes options
+////////////////////////////////////////////////////////////////////
+
+global proc oConstrain (string $controlObj, string $joint)
+{
+	//check for rotate axes	
+	int $rAll = `checkBoxGrp -q -value1 rAllChckBx`;
+	int $rX = `checkBoxGrp -q -value1 rAxesChckBx`;
+	int $rY = `checkBoxGrp -q -value2 rAxesChckBx`;
+	int $rZ = `checkBoxGrp -q -value3 rAxesChckBx`;
+	
+	int $offset = `checkBoxGrp -q -value2 connectOptChckBx`; 
+	
+	//start command to be evaluated at end of if then statements
+	string $conCmd = "orientConstraint -weight 1 ";
+	
+	
+	//check rotate options
+	if ($rAll == 0)
+	{
+		//check what is selected and add to command
+		if ($rX == 0)
+		{
+			$conCmd = ($conCmd + "-skip x ");	
+		}
+		if ($rY == 0)
+		{
+			$conCmd = ($conCmd + "-skip y ");	
+		}
+		
+		if ($rZ == 0)
+		{
+			$conCmd = ($conCmd + "-skip z ");	
+		}
+	}
+	
+	//check if maintain offset is on or off
+	if ($offset == 1)
+	{
+		$conCmd = ($conCmd + "-maintainOffset ");	
+	}
+	
+	//add object and joint to complete command
+	$conCmd = ($conCmd + $controlObj + " " + $joint);
+		
+	//run the parentConstraint cmd
+	print $conCmd;
+	eval $conCmd;
+
+}
+
+///////////////////////////////////////////////////////////////////
+//					aConstrain proc
+//	checks constraint options and constrains with user desired
+//	axes options
+////////////////////////////////////////////////////////////////////
+
+global proc aConstrain (string $controlObj, string $joint)
+{
+	//check for rotate axes	
+	int $rAll = `checkBoxGrp -q -value1 rAllChckBx`;
+	int $rX = `checkBoxGrp -q -value1 rAxesChckBx`;
+	int $rY = `checkBoxGrp -q -value2 rAxesChckBx`;
+	int $rZ = `checkBoxGrp -q -value3 rAxesChckBx`;
+	
+	int $offset = `checkBoxGrp -q -value2 connectOptChckBx`; 
+	
+	//start command to be evaluated at end of if then statements
+	string $conCmd = "aimConstraint -weight 1 ";
+	
+	
+	//check rotate options
+	if ($rAll == 0)
+	{
+		//check what is selected and add to command
+		if ($rX == 0)
+		{
+			$conCmd = ($conCmd + "-skip x ");	
+		}
+		if ($rY == 0)
+		{
+			$conCmd = ($conCmd + "-skip y ");	
+		}
+		
+		if ($rZ == 0)
+		{
+			$conCmd = ($conCmd + "-skip z ");	
+		}
+	}
+	
+	//check if maintain offset is on or off
+	if ($offset == 1)
+	{
+		$conCmd = ($conCmd + "-maintainOffset ");	
+	}
+	
+	//add object and joint to complete command
+	$conCmd = ($conCmd + $controlObj + " " + $joint);
+		
+	//run the parentConstraint cmd
+	//print $conCmd;
+	//eval $conCmd;
+
+}
+
+/////////////////////////////////////////////////////////////////////////
+//						getSelection
+//	gets the selected items and sends to macConnectControl Proc
+/////////////////////////////////////////////////////////////////////////
+global proc getSelection ()
+{
+	//load current selection
+	string $sel[] = `ls -sl`;
+	string $controlObj = $sel[0];
+	string $joint = $sel[1];
+	
+	//check if two objs are selected
+	if ($sel[1] == "")
+	{
+		error "Please Select a control and then shift select a joint";
+		
+	}
+	else
+	{
+	
+	macConnectControl($controlObj, $joint);
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////
+//				macReset
+// Resets the UI to the defaults
+////////////////////////////////////////////////////////////////////////
+global proc macReset ()
+{
+	//set all controls back to default
+	
+	macConCreate;
+	
+}
+
+//////////////////////////////////////////////////////////////////////
+//					macHelp
+//	Help window and text that pops up when help is pressed
+/////////////////////////////////////////////////////////////////////
+global proc macHelp ()
+{
+	if (`window -exists macHelpWin`)
+		deleteUI macHelpWin;
+	
+	window -title "Connect Control Help"
+		-widthHeight 400 250
+		-maximizeButton off
+		macHelpWin;
+	columnLayout -adj on mainColHelp;
+	scrollField -wordWrap on -h 200 -editable off
+		-text ("::::::::::::Connect Control Help::::::::::::\n"
+		+ "\nThe UI is in 2 parts.  If you already have controls, simply "
+		+ "select your control and shift select the joint, then press the "
+		+ "Connect Control button.  You have the ability to define the type "
+		+ "of constraint you want along with the options found under the constraint "
+		+ "options menu.\n  \nBy selecting Orient to Joint your control will "
+		+ "be placed at the joint with that joints orientation, unless you have "
+		+ "the Maintain offset option on.  In which case, your control will remain "
+		+ "at its same position but will still have the joints orientation.\n"
+		+ "\nThe Create Controls options will work with the connection options "
+		+ "if the Connect Control on Creation option is on.  Otherwise, the "
+		+ "control will be created at world 0.  If you have either Connect Control "
+		+ "on Creation or the Name based on Joint option you will need to have a joint "
+		+ "selected before clicking on the desired control.\n"
+		+ "\nEnjoy!" + "\nCreated by Mac McCann\n"
+		+ "\nUpdate:\n"
+		+ "Due to requests this will now attach to any transfrom node and not just Joints."
+		+ "All prompts, however, still recommend that you select a joint");
+	
+	showWindow macHelpWin;
+	
+	
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//						useName
+// If a joint is selected when useJntName is turned on it will automatically
+// fill the text with what the controls name will be, based on the 
+// joints name.  When turned off it will clear the name text field.
+///////////////////////////////////////////////////////////////////////////////
+global proc useName ()
+{
+	//create scriptJob to update the text field everytime the selection changes
+	int $mmScJob = `scriptJob -e "SelectionChanged" "mmUpdateName" -p conCreateUI`;
+	textFieldGrp -e -vis on mmSuffixFld;
+	textFieldGrp -e -vis on mmFindFld;
+	textFieldGrp -e -vis on mmReplaceFld;
+	text -e -vis on mmText;
+	if (`checkBoxGrp -q -value1 useJntNameChckBx` == 1)
+	{
+		//create scriptJob to update the text field everytime the selection changes
+	    int $mmScJob = `scriptJob -e "SelectionChanged" "mmUpdateName" -p conCreateUI -killWithScene`;
+		//check if a joint is selected
+		string $selJoint[] = `ls -sl -type "transform"`;
+		string $mmSuffix = `textFieldGrp -q -text mmSuffixFld`;
+		string $mmFind = `textFieldGrp -q -text mmFindFld`;
+		string $mmReplace = `textFieldGrp -q -text mmReplaceFld`;
+		if ($selJoint[0] != "")
+		{
+			//fill control name text field
+			textFieldGrp -e -text ($selJoint[0] + "_" + $mmSuffix) controlNameTxt;
+			
+			//if there is text in the find field and it is in the selection name then rename the control name with the find and replace strings
+			if ($mmFind != "")
+			{
+			    if (`gmatch $selJoint[0] ("*" + $mmFind + "*")`)
+			    {
+			        string $replacedName = `substitute $mmFind $selJoint[0] $mmReplace`;
+			        textFieldGrp -e -text ($replacedName + "_" + $mmSuffix) controlNameTxt;
+			    }
+			}
+			
+		}
+	}
+	if (`checkBoxGrp -q -value1 useJntNameChckBx` == 0)
+	{
+		string $selJoint[] = `ls -sl -type "transform"`;
+		string $mmSuffix = `textFieldGrp -q -text mmSuffixFld`;
+		string $conName = ($selJoint[0] + "_" + $mmSuffix);
+		string $mmFind = `textFieldGrp -q -text mmFindFld`;
+		string $mmReplace = `textFieldGrp -q -text mmReplaceFld`;
+		string $replacedName = ((`substitute $mmFind $selJoint[0] $mmReplace`) + "_" + $mmSuffix);
+		//check if text field is the joint name + _C
+		if (`textFieldGrp -q -text controlNameTxt` == $conName || `textFieldGrp -q -text controlNameTxt` == $replacedName)
+		{
+			//delete textfield
+			textFieldGrp -e -text "" controlNameTxt;	
+		}
+		//kill Script Job
+		scriptJob -killAll;
+		textFieldGrp -e -vis off mmSuffixFld;
+		textFieldGrp -e -vis off mmFindFld;
+		textFieldGrp -e -vis off mmReplaceFld;
+		text -e -vis off mmText;
+	}
+		
+}
+
+//////////////////////////////////////////////////////////////////////////////////////
+//
+//                                mmUpdateName
+//    Changes the name in the control name text field whenever the selection changes
+//
+////////////////////////////////////////////////////////////////////////////////////////
+global proc mmUpdateName ()
+{
+    string $selJoint[] = `ls -sl -type "transform"`;
+	string $mmSuffix = `textFieldGrp -q -text mmSuffixFld`;
+	string $mmFind = `textFieldGrp -q -text mmFindFld`;
+	string $mmReplace = `textFieldGrp -q -text mmReplaceFld`;
+	if ($selJoint[0] != "")
+	{
+		//fill control name text field
+		textFieldGrp -e -text ($selJoint[0] + "_" + $mmSuffix) controlNameTxt;
+		
+		//if there is text in the find field and it is in the selection name then rename the control name with the find and replace strings
+		if ($mmFind != "")
+		{
+		    if (`gmatch $selJoint[0] ("*" + $mmFind + "*")`)
+		    {
+		        string $replacedName = `substitute $mmFind $selJoint[0] $mmReplace`;
+		        textFieldGrp -e -text ($replacedName + "_" + $mmSuffix) controlNameTxt;
+		    }
+		}
+		
+	}
+	else
+	{
+	    textFieldGrp -e -text "" controlNameTxt;
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//                            mmColorChang
+//    Changes the override color of the shape of whatever is selected
+//
+////////////////////////////////////////////////////////////////////////////////////////////////
+global proc mmColorChange ()
+{
+    string $selection[] = `ls -sl -type "transform"`;
+    string $shape[0] = `listRelatives -s $selection[0]`;	
+    //if control color checkbox is on change the color
+    if (`checkBoxGrp -q -v1 mmColorBx` == 1 && $shape[0] != "")
+    {
+        int $colors = `palettePort -q -scc mmColorPalette`;
+        //change the color of the curve
+        setAttr ($shape[0] + ".overrideEnabled") 1;
+
+        setAttr ($shape[0] + ".overrideColor") ($colors + 1);        
+    }
+    else
+    {
+        error "The current selection has no Shape node to change the color of.";
+    }
+}
+
+//---------------------------------------------------------------------Button Commands---------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+/////////////////////////////////////////////////////////////////////////
+//				bt01 proc
+//	creates selected controller and will connect and name it 
+//	if specified by the user
+/////////////////////////////////////////////////////////////////////////
+global proc bt01 ()
+{
+	//variables needed 
+	string $joint;
+	string $controlerObj[];
+	string $sel[];
+	
+	//check if connect on creation is on or name based on joint	//if either is on check for a selected joint if not throw an error
+
+	if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1 || `checkBoxGrp -q -value1 useJntNameChckBx` == 1)
+	{
+		//if on load joint
+		$sel = `ls -sl -type "transform"`;
+		
+		//check if joint was selected
+		if ($sel[0] == "")
+		{
+			error "nothing was selected.  Please select an object and try again.";
+		}
+		else
+		{
+			//else load joint into variable to be passed to macConnectControl proc
+			$joint = $sel[0];	
+		}
+	}
+	
+	
+
+		circle -degree 1 -sections 5 -sweep 360 -radius 1 -normal 1 0 0;
+
+	//load created controller into variable to be passed to macConnectControl proc
+	$controlerObj = `ls -sl -type "transform"`;
+
+	
+	//if the linear units are in meters make the controls smaller otherwise keep them the same size
+	if (`currentUnit -q -l` == "m")
+	{
+	xform -s 1 1 1 $controlerObj[0]; 
+	}
+	else
+	{
+	    xform -s 1 1 1 $controlerObj[0];
+	}
+	
+	//if There is a control Name given by the user rename the control to that
+	if (`textFieldGrp -q -text controlNameTxt` != "")
+	{
+		string $newName = `textFieldGrp -q -text controlNameTxt`;
+		rename $controlerObj[0] $newName;
+		//update $controlObj
+		$controlerObj = `ls -sl`;
+	} 
+		
+	string $shape[0] = `listRelatives -s $controlerObj[0]`;	
+    //if control color checkbox is on change the color
+    if (`checkBoxGrp -q -v1 mmColorBx` == 1)
+    {
+        int $colors = `palettePort -q -scc mmColorPalette`;
+        //change the color of the curve
+        setAttr ($shape[0] + ".overrideEnabled") 1;
+
+        setAttr ($shape[0] + ".overrideColor") ($colors + 1);
+        
+    }
+	
+	
+	//if connect on creation is selected call macConnectControl proc
+			if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1)
+			{
+				macConnectControl($controlerObj[0], $joint);	
+			}
+}
+
+/////////////////////////////////////////////////////////////////////////
+//				bt02 proc
+//	creates selected controller and will connect and name it 
+//	if specified by the user
+/////////////////////////////////////////////////////////////////////////
+global proc bt02 ()
+{
+	//variables needed
+	string $joint;
+	string $controlerObj[];
+	string $sel[];
+	
+	//check if connect on creation is on or name based on joint	//if either is on check for a selected joint if not throw an error
+
+	if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1 || `checkBoxGrp -q -value1 useJntNameChckBx` == 1)
+	{
+		//if on load joint
+		$sel = `ls -sl -type "transform"`;
+		
+		//check if joint was selected
+		if ($sel[0] == "")
+		{
+			error "nothing was selected.  Please select an object and try again.";
+		}
+		else
+		{
+			//else load joint into variable to be passed to macConnectControl proc
+			$joint = $sel[0];	
+		}
+	}
+	
+	
+	//create controller place in controlObj var 
+		curve -degree 1 -p 0 0 0 -p 1 0 -1 -p 2 0 -1 -p 2 0 -2 -p 1 0 -2 -p 1 0 -1;
+		
+		if (`currentUnit -q -l` == "m")
+    	{
+    	    xform -s 1 1 1 -rotation 90 0 45;;
+    	}
+    	else
+    	{
+    	    xform -s 1 1 1 -rotation 90 0 45;;
+    	} 
+		makeIdentity -apply on;
+	
+	//load created controller into variable to be passed to macConnectControl proc
+	$controlerObj = `ls -sl -type "transform"`;
+	
+	//if There is a control Name given by the user rename the control to that
+	if (`textFieldGrp -q -text controlNameTxt` != "")
+	{
+		string $newName = `textFieldGrp -q -text controlNameTxt`;
+		rename $controlerObj[0] $newName;
+		//update $controlObj
+		$controlerObj = `ls -sl`;
+	} 
+	
+	string $shape[0] = `listRelatives -s $controlerObj[0]`;
+	//if control color checkbox is on change the color
+    if (`checkBoxGrp -q -v1 mmColorBx` == 1)
+    {
+        int $colors = `palettePort -q -scc mmColorPalette`;
+        //change the color of the curve
+        setAttr ($shape[0] + ".overrideEnabled") 1;
+
+        setAttr ($shape[0] + ".overrideColor") ($colors + 1);
+        
+    }
+    
+	//if connect on creation is selected call macConnectControl proc
+			if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1)
+			{
+				macConnectControl($controlerObj[0], $joint);	
+			}
+}
+
+/////////////////////////////////////////////////////////////////////////
+//				bt03 proc
+//	creates selected controller and will connect and name it 
+//	if specified by the user
+/////////////////////////////////////////////////////////////////////////
+global proc bt03 ()
+{
+	//variables needed
+	string $joint;
+	string $controlerObj[];
+	string $sel[];
+	
+	//check if connect on creation is on or name based on joint	//if either is on check for a selected joint if not throw an error
+
+	if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1 || `checkBoxGrp -q -value1 useJntNameChckBx` == 1)
+	{
+		//if on load joint
+		$sel = `ls -sl -type "transform"`;
+		
+		//check if joint was selected
+		if ($sel[0] == "")
+		{
+			error "nothing was selected.  Please select an object and try again.";
+		}
+		else
+		{
+			//else load joint into variable to be passed to macConnectControl proc
+			$joint = $sel[0];	
+		}
+	}
+	
+	
+	//create controller place in controlObj var 
+	curve -degree 1 -p 0 0 0 -p 0 1 0 -p 0 -1 0 -p 0 0 0 -p 1 0 0 -p -1 0 0 -p 0 0 0 -p 0 0 1 -p 0 0 -1;
+	if (`currentUnit -q -l` == "m")
+    	{
+    	    xform -s 1 1 1;
+    	}
+    	else
+    	{
+    	    xform -s 1 1 1;
+    	}
+	makeIdentity -apply on;
+	
+	//load created controller into variable to be passed to macConnectControl proc
+	$controlerObj = `ls -sl -type "transform"`;
+	
+	//if There is a control Name given by the user rename the control to that
+	if (`textFieldGrp -q -text controlNameTxt` != "")
+	{
+		string $newName = `textFieldGrp -q -text controlNameTxt`;
+		rename $controlerObj[0] $newName;
+		//update $controlObj
+		$controlerObj = `ls -sl`;
+	} 
+	
+	string $shape[0] = `listRelatives -s $controlerObj[0]`;
+	//if control color checkbox is on change the color
+    if (`checkBoxGrp -q -v1 mmColorBx` == 1)
+    {
+        int $colors = `palettePort -q -scc mmColorPalette`;
+        //change the color of the curve
+        setAttr ($shape[0] + ".overrideEnabled") 1;
+
+        setAttr ($shape[0] + ".overrideColor") ($colors + 1);
+        
+    }
+	
+	//if connect on creation is selected call macConnectControl proc
+			if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1)
+			{
+				macConnectControl($controlerObj[0], $joint);	
+			}
+}
+
+/////////////////////////////////////////////////////////////////////////
+//				bt04 proc
+//	creates selected controller and will connect and name it 
+//	if specified by the user
+/////////////////////////////////////////////////////////////////////////
+global proc bt04 ()
+{
+	//variables needed
+	string $joint;
+	string $controlerObj[];
+	string $sel[];
+	
+	//check if connect on creation is on or name based on joint	//if either is on check for a selected joint if not throw an error
+
+	if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1 || `checkBoxGrp -q -value1 useJntNameChckBx` == 1)
+	{
+		//if on load joint
+		$sel = `ls -sl -type "transform"`;
+		
+		//check if joint was selected
+		if ($sel[0] == "")
+		{
+			error "nothing was selected.  Please select an object and try again.";
+		}
+		else
+		{
+			//else load joint into variable to be passed to macConnectControl proc
+			$joint = $sel[0];	
+		}
+	}
+	
+	string $mstars[];
+
+	$mstars = `circle -degree 1 -sections 16 -sweep 360 -radius 1 -normal 0 1 0`;
+
+	
+	select -r ($mstars[0] + ".cv[15]");
+	select -tgl ($mstars[0] + ".cv[13]");
+	select -tgl ($mstars[0] + ".cv[11]");
+	select -tgl ($mstars[0] + ".cv[9]");
+	select -tgl ($mstars[0] + ".cv[7]");
+	select -tgl ($mstars[0] + ".cv[5]");
+	select -tgl ($mstars[0] + ".cv[3]");
+	select -tgl ($mstars[0] + ".cv[1]");
+	
+	scale -r -p 0cm 0cm 0cm .5 .5 .5;
+	
+	select -r $mstars[0];
+	
+	//load created controller into variable to be passed to macConnectControl proc
+	$controlerObj = `ls -sl -type "transform"`;
+
+	if (`currentUnit -q -l` == "m")
+    	{
+    	    xform -s 1 1 1;
+    	}
+    	else
+    	{
+    	    xform -s 1 1 1;
+    	}
+	makeIdentity -apply on;
+	
+	//if There is a control Name given by the user rename the control to that
+	if (`textFieldGrp -q -text controlNameTxt` != "")
+	{
+		string $newName = `textFieldGrp -q -text controlNameTxt`;
+		rename $controlerObj[0] $newName;
+		//update $controlObj
+		$controlerObj = `ls -sl`;
+	} 
+	
+	string $shape[0] = `listRelatives -s $controlerObj[0]`;	
+	//if control color checkbox is on change the color
+    if (`checkBoxGrp -q -v1 mmColorBx` == 1)
+    {
+        int $colors = `palettePort -q -scc mmColorPalette`;
+        //change the color of the curve
+        setAttr ($shape[0] + ".overrideEnabled") 1;
+
+        setAttr ($shape[0] + ".overrideColor") ($colors + 1);
+        
+    }
+	
+	//if connect on creation is selected call macConnectControl proc
+			if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1)
+			{
+				macConnectControl($controlerObj[0], $joint);	
+			}
+}
+
+/////////////////////////////////////////////////////////////////////////
+//				bt05 proc
+//	creates selected controller and will connect and name it 
+//	if specified by the user
+/////////////////////////////////////////////////////////////////////////
+global proc bt05 ()
+{
+	//variables needed
+	string $joint;
+	string $controlerObj[];
+	string $sel[];
+	
+	//check if connect on creation is on or name based on joint	//if either is on check for a selected joint if not throw an error
+
+	if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1 || `checkBoxGrp -q -value1 useJntNameChckBx` == 1)
+	{
+		//if on load joint
+		$sel = `ls -sl -type "transform"`;
+		
+		//check if joint was selected
+		if ($sel[0] == "")
+		{
+			error "nothing was selected.  Please select an object and try again.";
+		}
+		else
+		{
+			//else load joint into variable to be passed to macConnectControl proc
+			$joint = $sel[0];	
+		}
+	}
+	
+	
+	//create controller place in controlObj var 
+	curve -degree 1 -p 0 0 2.5 -p 2 0 1 -p 1 0 1 -p 1 0 -1 -p -1 0 -1 -p -1 0 1 -p -2 0 1 -p 0 0 2.5;
+	if (`currentUnit -q -l` == "m")
+    	{
+    	    xform -s 1 1 1;
+    	}
+    	else
+    	{
+    	    xform -s 1 1 1;
+    	}
+	makeIdentity -apply on;
+	
+	//load created controller into variable to be passed to macConnectControl proc
+	$controlerObj = `ls -sl -type "transform"`;
+	
+	//if There is a control Name given by the user rename the control to that
+	if (`textFieldGrp -q -text controlNameTxt` != "")
+	{
+		string $newName = `textFieldGrp -q -text controlNameTxt`;
+		rename $controlerObj[0] $newName;
+		//update $controlObj
+		$controlerObj = `ls -sl`;
+	} 
+	string $shape[0] = `listRelatives -s $controlerObj[0]`;	
+	//if control color checkbox is on change the color
+    if (`checkBoxGrp -q -v1 mmColorBx` == 1)
+    {
+        int $colors = `palettePort -q -scc mmColorPalette`;
+        //change the color of the curve
+        setAttr ($shape[0] + ".overrideEnabled") 1;
+
+        setAttr ($shape[0] + ".overrideColor") ($colors + 1);
+        
+    }
+	
+	//if connect on creation is selected call macConnectControl proc
+			if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1)
+			{
+				macConnectControl($controlerObj[0], $joint);	
+			}
+}
+
+/////////////////////////////////////////////////////////////////////////
+//				bt06 procw
+//	creates selected controller and will connect and name it 
+//	if specified by the user
+/////////////////////////////////////////////////////////////////////////
+global proc bt06 ()
+{
+	//variables needed
+	string $joint;
+	string $controlerObj[];
+	string $sel[];
+	
+	//check if connect on creation is on or name based on joint	//if either is on check for a selected joint if not throw an error
+
+	if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1 || `checkBoxGrp -q -value1 useJntNameChckBx` == 1)
+	{
+		//if on load joint
+		$sel = `ls -sl -type "transform"`;
+		
+		//check if joint was selected
+		if ($sel[0] == "")
+		{
+			error "nothing was selected.  Please select an object and try again.";
+		}
+		else
+		{
+			//else load joint into variable to be passed to macConnectControl proc
+			$joint = $sel[0];	
+		}
+	}
+	
+	
+	//create controller place in controlObj var 
+	curve -degree 3 -p 0.52296625033593958 0.0 0.033765784911141239 -p 0.37849075291798273 0.0 -0.51400126305201232 -p 0.18044135091065527 0.0 -0.59692412049898369 -p -0.095005220769603507 0.0 -0.56046401915460708 -p -0.30962919033121356 0.0 -0.30822392874167309 -p -0.52296625033593958 0.0 -0.13580658839294782 -p -0.46184065995525092 0.0 0.057764899102854414 -p -0.25726245963102201 0.0 0.030463905087295764 -p -0.31890106385090805 0.0 0.33573436104009974 -p -0.16494903857214696 0.0 0.51449120854087493 -p -0.049907384713865216 0.0 0.38760608148294784 -p -0.049415001533895976 0.0 0.55147227007639221 -p 0.1699563248906952 0.0 0.59692412049898358 -p 0.2045638943017889 0.0 0.38824028656503567 -p 0.31340614921576387 0.0 0.54120362517985487 -p 0.47634370006468091 0.0 0.35522555972778752 -p 0.52296625033593958 0.0 0.033765784911141239;
+	if (`currentUnit -q -l` == "m")
+    	{
+    	    xform -s 1 1 1;
+    	}
+    	else
+    	{
+    	    xform -s 1 1 1;
+    	}
+	makeIdentity -apply on;
+	
+	//load created controller into variable to be passed to macConnectControl proc
+	$controlerObj = `ls -sl -type "transform"`;
+
+	closeCurve -rpo on $controlerObj[0];
+    select $controlerObj[0];
+	//if There is a control Name given by the user rename the control to that
+	if (`textFieldGrp -q -text controlNameTxt` != "")
+	{
+		string $newName = `textFieldGrp -q -text controlNameTxt`;
+		rename $controlerObj[0] $newName;
+		//update $controlObj
+		$controlerObj = `ls -sl`;
+	} 
+	string $shape[0] = `listRelatives -s $controlerObj[0]`;	
+	//if control color checkbox is on change the color
+    if (`checkBoxGrp -q -v1 mmColorBx` == 1)
+    {
+        int $colors = `palettePort -q -scc mmColorPalette`;
+        //change the color of the curve
+        setAttr ($shape[0] + ".overrideEnabled") 1;
+
+        setAttr ($shape[0] + ".overrideColor") ($colors + 1);
+        
+    }
+    
+	//if connect on creation is selected call macConnectControl proc
+			if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1)
+			{
+				macConnectControl($controlerObj[0], $joint);	
+			}
+}
+
+/////////////////////////////////////////////////////////////////////////
+//				bt07 proc
+//	creates selected controller and will connect and name it 
+//	if specified by the user
+/////////////////////////////////////////////////////////////////////////
+global proc bt07 ()
+{
+	//variables needed
+	string $joint;
+	string $controlerObj[];
+	string $sel[];
+	
+	//check if connect on creation is on or name based on joint	//if either is on check for a selected joint if not throw an error
+
+	if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1 || `checkBoxGrp -q -value1 useJntNameChckBx` == 1)
+	{
+		//if on load joint
+		$sel = `ls -sl -type "transform"`;
+		
+		//check if joint was selected
+		if ($sel[0] == "")
+		{
+			error "nothing was selected.  Please select an object and try again.";
+		}
+		else
+		{
+			//else load joint into variable to be passed to macConnectControl proc
+			$joint = $sel[0];	
+		}
+	}
+	
+	
+	//create controller place in controlObj var 
+	curve -degree 3 -p 0.19238228065972179 0 -0.62597170700031479 -p 0.0 0 -0.68106699471008825 -p -0.19238228065972407 0 -0.62597170700031479 -p -0.31973423407877588 0.0 -0.46907360198477294 -p -0.38622210045406746 0.0 -0.058352438365115375 -p -0.49603937875545401 0.0 0.20980391265838649 -p -0.42465331586618049 0.0 0.44167856454965049 -p -0.22442281639632028 0.0 0.40728904901553847 -p -0.16596625215583116 0 0.62597170700031468 -p 0.0 0 0.68106699471008814 -p 0.16596625215583344 0 0.62597170700031468 -p 0.22442281639632028 0.0 0.40728904901553792 -p 0.42465331586618049 0.0 0.44167856454965049 -p 0.49603937875545628 0.0 0.20980391265838619 -p 0.45759441684951524 0.0 -0.13435277869186193 -p 0.31973423407877588 0.0 -0.46907360198477294 -p 0.19238228065972179 0 -0.62597170700031479;
+	if (`currentUnit -q -l` == "m")
+    	{
+    	    xform -s 1 1 1;
+    	}
+    	else
+    	{
+    	    xform -s 1 1 1;
+    	}
+	makeIdentity -apply on;
+	
+	//load created controller into variable to be passed to macConnectControl proc
+	$controlerObj = `ls -sl -type "transform"`;
+
+	closeCurve -rpo on $controlerObj[0];
+	select $controlerObj[0];
+	
+	//if There is a control Name given by the user rename the control to that
+	if (`textFieldGrp -q -text controlNameTxt` != "")
+	{
+		string $newName = `textFieldGrp -q -text controlNameTxt`;
+		rename $controlerObj[0] $newName;
+		//update $controlObj
+		$controlerObj = `ls -sl`;
+	} 
+	
+	string $shape[0] = `listRelatives -s $controlerObj[0]`;	
+	//if control color checkbox is on change the color
+    if (`checkBoxGrp -q -v1 mmColorBx` == 1)
+    {
+        int $colors = `palettePort -q -scc mmColorPalette`;
+        //change the color of the curve
+        setAttr ($shape[0] + ".overrideEnabled") 1;
+
+        setAttr ($shape[0] + ".overrideColor") ($colors + 1);
+        
+    }
+    
+	//if connect on creation is selected call macConnectControl proc
+			if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1)
+			{
+				macConnectControl($controlerObj[0], $joint);	
+			}
+}
+
+/////////////////////////////////////////////////////////////////////////
+//				bt08 proc
+//	creates selected controller and will connect and name it 
+//	if specified by the user
+/////////////////////////////////////////////////////////////////////////
+global proc bt08 ()
+{
+	//variables needed
+	string $joint;
+	string $controlerObj[];
+	string $sel[];
+	
+	//check if connect on creation is on or name based on joint	//if either is on check for a selected joint if not throw an error
+
+	if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1 || `checkBoxGrp -q -value1 useJntNameChckBx` == 1)
+	{
+		//if on load joint
+		$sel = `ls -sl -type "transform"`;
+		
+		//check if joint was selected
+		if ($sel[0] == "")
+		{
+			error "nothing was selected.  Please select an object and try again.";
+		}
+		else
+		{
+			//else load joint into variable to be passed to macConnectControl proc
+			$joint = $sel[0];	
+		}
+	}
+	
+	
+
+	circle -degree 1 -sections 8 -sweep 360 -radius 1 -normal 0 1 0;
+
+	
+	//load created controller into variable to be passed to macConnectControl proc
+	$controlerObj = `ls -sl -type "transform"`;
+	
+	if (`currentUnit -q -l` == "m")
+	{
+	    xform -s 1 1 1;
+	}
+	else
+	{
+	    xform -s 1 1 1;
+	}
+	makeIdentity -apply on;	
+	
+	//if There is a control Name given by the user rename the control to that
+	if (`textFieldGrp -q -text controlNameTxt` != "")
+	{
+		string $newName = `textFieldGrp -q -text controlNameTxt`;
+		rename $controlerObj[0] $newName;
+		//update $controlObj
+		$controlerObj = `ls -sl`;
+	} 
+	
+	string $shape[0] = `listRelatives -s $controlerObj[0]`;	
+	//if control color checkbox is on change the color
+    if (`checkBoxGrp -q -v1 mmColorBx` == 1)
+    {
+        int $colors = `palettePort -q -scc mmColorPalette`;
+        //change the color of the curve
+        setAttr ($shape[0] + ".overrideEnabled") 1;
+
+        setAttr ($shape[0] + ".overrideColor") ($colors + 1);
+        
+    }
+    
+	//if connect on creation is selected call macConnectControl proc
+			if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1)
+			{
+				macConnectControl($controlerObj[0], $joint);	
+			}
+}
+
+/////////////////////////////////////////////////////////////////////////
+//				bt09 proc
+//	creates selected controller and will connect and name it 
+//	if specified by the user
+/////////////////////////////////////////////////////////////////////////
+global proc bt09 ()
+{
+	//variables needed
+	string $joint;
+	string $controlerObj[];
+	string $sel[];
+	
+	//check if connect on creation is on or name based on joint	//if either is on check for a selected joint if not throw an error
+
+	if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1 || `checkBoxGrp -q -value1 useJntNameChckBx` == 1)
+	{
+		//if on load joint
+		$sel = `ls -sl -type "transform"`;
+		
+		//check if joint was selected
+		if ($sel[0] == "")
+		{
+			error "nothing was selected.  Please select an object and try again.";
+		}
+		else
+		{
+			//else load joint into variable to be passed to macConnectControl proc
+			$joint = $sel[0];	
+		}
+	}
+	
+	
+	//create controller place in controlObj var 
+		curve -degree 1 -p 0 0 0 -p 1 0 -1 -p 2 0 -1 -p 2 0 -2 -p 1 0 -2 -p 1 0 -1 -p -1 0 1 -p -2 0 1 -p -2 0 2 -p -1 0 2 -p -1 0 1;
+		
+		xform -rotation 90 0 45;
+		makeIdentity -apply on;
+	
+	//load created controller into variable to be passed to macConnectControl proc
+	$controlerObj = `ls -sl -type "transform"`;
+
+	if (`currentUnit -q -l` == "m")
+    	{
+    	    xform -s 1 1 1;
+    	}
+    	else
+    	{
+    	    xform -s 1 1 1;
+    	}
+	makeIdentity -apply on;	
+	
+	//if There is a control Name given by the user rename the control to that
+	if (`textFieldGrp -q -text controlNameTxt` != "")
+	{
+		string $newName = `textFieldGrp -q -text controlNameTxt`;
+		rename $controlerObj[0] $newName;
+		//update $controlObj
+		$controlerObj = `ls -sl`;
+	} 
+
+	string $shape[0] = `listRelatives -s $controlerObj[0]`;	
+	//if control color checkbox is on change the color
+    if (`checkBoxGrp -q -v1 mmColorBx` == 1)
+    {
+        int $colors = `palettePort -q -scc mmColorPalette`;
+        //change the color of the curve
+        setAttr ($shape[0] + ".overrideEnabled") 1;
+
+        setAttr ($shape[0] + ".overrideColor") ($colors + 1);
+        
+    }
+    
+	//if connect on creation is selected call macConnectControl proc
+			if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1)
+			{
+				macConnectControl($controlerObj[0], $joint);	
+			}
+}
+
+/////////////////////////////////////////////////////////////////////////
+//				bt10 proc
+//	creates selected controller and will connect and name it 
+//	if specified by the user
+/////////////////////////////////////////////////////////////////////////
+global proc bt10 ()
+{
+	//variables needed
+	string $joint;
+	string $controlerObj[];
+	string $sel[];
+	
+	//check if connect on creation is on or name based on joint	//if either is on check for a selected joint if not throw an error
+
+	if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1 || `checkBoxGrp -q -value1 useJntNameChckBx` == 1)
+	{
+		//if on load joint
+		$sel = `ls -sl -type "transform"`;
+		
+		//check if joint was selected
+		if ($sel[0] == "")
+		{
+			error "nothing was selected.  Please select an object and try again.";
+		}
+		else
+		{
+			//else load joint into variable to be passed to macConnectControl proc
+			$joint = $sel[0];	
+		}
+	}
+	
+	
+	//create controller place in controlObj var 
+	curve -degree 1 -p 1 0 .5 -p 1.5 0 0 -p 1 0 -.5 -p 0 0 -.25 - p -1 0 -.5 -p -1.5 0 0 -p -1 0 .5 -p 0 0 .25 -p 1 0 .5;
+	if (`currentUnit -q -l` == "m")
+	{
+	    xform -s 1 1 1;
+	}
+	else
+	{
+	    xform -s 1 1 1;
+	}
+	makeIdentity -apply on;	
+	
+	//load created controller into variable to be passed to macConnectControl proc
+	$controlerObj = `ls -sl -type "transform"`;
+
+	//xform -s .1 .1 .1;
+	makeIdentity -apply on;	
+	
+	//if There is a control Name given by the user rename the control to that
+	if (`textFieldGrp -q -text controlNameTxt` != "")
+	{
+		string $newName = `textFieldGrp -q -text controlNameTxt`;
+		rename $controlerObj[0] $newName;
+		//update $controlObj
+		$controlerObj = `ls -sl`;
+	} 
+
+	string $shape[0] = `listRelatives -s $controlerObj[0]`;	
+	//if control color checkbox is on change the color
+    if (`checkBoxGrp -q -v1 mmColorBx` == 1)
+    {
+        int $colors = `palettePort -q -scc mmColorPalette`;
+        //change the color of the curve
+        setAttr ($shape[0] + ".overrideEnabled") 1;
+
+        setAttr ($shape[0] + ".overrideColor") ($colors + 1);
+        
+    }
+    
+	//if connect on creation is selected call macConnectControl proc
+			if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1)
+			{
+				macConnectControl($controlerObj[0], $joint);	
+			}
+}
+
+/////////////////////////////////////////////////////////////////////////
+//				bt11 proc
+//	creates selected controller and will connect and name it 
+//	if specified by the user
+/////////////////////////////////////////////////////////////////////////
+global proc bt11 ()
+{
+	//variables needed
+	string $joint;
+	string $controlerObj[];
+	string $sel[];
+	
+	//check if connect on creation is on or name based on joint	//if either is on check for a selected joint if not throw an error
+
+	if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1 || `checkBoxGrp -q -value1 useJntNameChckBx` == 1)
+	{
+		//if on load joint
+		$sel = `ls -sl -type "transform"`;
+		
+		//check if joint was selected
+		if ($sel[0] == "")
+		{
+			error "nothing was selected.  Please select an object and try again.";
+		}
+		else
+		{
+			//else load joint into variable to be passed to macConnectControl proc
+			$joint = $sel[0];	
+		}
+	}
+	
+	
+	//create controller place in controlObj var 
+	circle -degree 1 -sections 4 -sweep 360 -radius 1 -normal 0 1 0;
+	if (`currentUnit -q -l` == "m")
+	{
+	    xform -s 1 1 1;
+	}
+	else
+	{
+	    xform -s 1 1 1;
+	}
+	makeIdentity -apply on;	
+	
+	//load created controller into variable to be passed to macConnectControl proc
+	$controlerObj = `ls -sl -type "transform"`;
+
+	//xform -s .1 .1 .1;
+	makeIdentity -apply on;	
+	
+	//if There is a control Name given by the user rename the control to that
+	if (`textFieldGrp -q -text controlNameTxt` != "")
+	{
+		string $newName = `textFieldGrp -q -text controlNameTxt`;
+		rename $controlerObj[0] $newName;
+		//update $controlObj
+		$controlerObj = `ls -sl`;
+	} 
+	
+	string $shape[0] = `listRelatives -s $controlerObj[0]`;	
+	//if control color checkbox is on change the color
+    if (`checkBoxGrp -q -v1 mmColorBx` == 1)
+    {
+        int $colors = `palettePort -q -scc mmColorPalette`;
+        //change the color of the curve
+        setAttr ($shape[0] + ".overrideEnabled") 1;
+
+        setAttr ($shape[0] + ".overrideColor") ($colors + 1);
+        
+    }
+    
+	//if connect on creation is selected call macConnectControl proc
+			if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1)
+			{
+				macConnectControl($controlerObj[0], $joint);	
+			}
+}
+
+/////////////////////////////////////////////////////////////////////////
+//				bt12 proc
+//	creates selected controller and will connect and name it 
+//	if specified by the user
+/////////////////////////////////////////////////////////////////////////
+global proc bt12 ()
+{
+	//variables needed
+	string $joint;
+	string $controlerObj[];
+	string $sel[];
+	
+	//check if connect on creation is on or name based on joint	//if either is on check for a selected joint if not throw an error
+
+	if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1 || `checkBoxGrp -q -value1 useJntNameChckBx` == 1)
+	{
+		//if on load joint
+		$sel = `ls -sl -type "transform"`;
+		
+		//check if joint was selected
+		if ($sel[0] == "")
+		{
+			error "nothing was selected.  Please select an object and try again.";
+		}
+		else
+		{
+			//else load joint into variable to be passed to macConnectControl proc
+			$joint = $sel[0];	
+		}
+	}
+	
+	
+	//create controller place in controlObj var 
+		curve -d 1 -p 8.09017 -5.877852 -22.058496 -p 10 0 -32.058496 -p 10 0 -28.058496 -p 9.51057 3.090172 -28.058497 -p 8.090174 5.877855 -28.058497 -p 5.877855 8.090174 -28.058497 -p 3.090172 9.510569 -28.058497 -p -1.86982e-009 10.000004 -28.058497 -p -3.090172 9.51057 -28.058497 -p -5.877855 8.090175 -28.058497 -p -8.090174 5.877855 -28.058497 -p -9.51057 3.090172 -28.058497 
+			-p -10 -3.29388e-008 -28.058496 -p -10.000001 -2.42675e-007 -32.058496 -p -8.09017 -5.877852 -22.058496 -p -10.000002 -4.12357e-007 -12.058496 -p -9.999999 -2.44218e-007 -16.058496 -p -9.507973 3.095267 -16.058496 -p -8.119284 5.820727 -16.058495 -p -5.91661 8.05142 -16.058495 -p -5.877855 8.090174 -18.196848 -p -5.877855 8.090174 -20.120738 -p -3.090172 9.510568 -20.120738 
+			-p -3.090172 9.510569 -22.058496 -p -1.549181 9.754637 -22.058496 -p -1.549181 9.754638 -24.164625 -p -3.090172 9.51057 -24.164625 -p -5.877855 8.090174 -24.164625 -p -5.877855 8.090174 -26.060117 -p -3.090172 9.51057 -26.060117 -p -3.54718e-009 10.000004 -26.060117 
+			-p 3.090172 9.510568 -26.060117 -p 5.877855 8.090173 -26.060117 -p 3.090172 9.510568 -24.164625 -p 3.090172 9.510569 -22.058496 -p 3.090172 9.510568 -20.120738 -p 3.32788e-008 10.000004 -20.120739 -p -6.90597e-009 10.000004 -22.058496 -p -5.13817e-009 10.000004 -24.164625 -p 3.090172 9.510568 -24.164625 -p 5.877855 8.090173 -26.060117 -p 5.877855 8.090173 -24.164625 
+			-p 5.877855 8.090174 -22.058496 -p 5.877855 8.090174 -20.120738 -p 5.877855 8.090174 -18.196848 -p 3.090172 9.510568 -18.196848 -p 7.3176e-008 10.000004 -18.196848 -p -1.549181 9.754637 -18.196848 -p -1.549181 9.754637 -20.120739 -p -3.090172 9.510568 -20.120738 -p -3.090172 9.510568 -18.196848 -p -5.877855 8.090174 -18.196848 -p -5.877855 8.090175 -16.058495 
+			-p -3.090172 9.510569 -16.058496 -p 1.17521e-007 10.000004 -16.058496 -p 3.090172 9.51057 -16.058496 -p 5.877855 8.090175 -16.058496 -p 8.090175 5.877855 -16.058496 -p 9.51057 3.090172 -16.058496 -p 10 -1.48835e-007 -16.058496 -p 10.000001 -2.42675e-007 -12.058496 -p 8.09017 -5.877852 -22.058496 
+			-k 0 -k 1 -k 2 -k 3 -k 4 -k 5 -k 6 -k 7 -k 8 -k 9 -k 10 -k 11 -k 12 -k 13 -k 14 -k 15 -k 16 -k 17 -k 18 -k 19 -k 20 -k 21 -k 22 -k 23 -k 24 -k 25 -k 26 -k 27 -k 28 -k 29 -k 30 -k 31 -k 32 -k 33 -k 34 -k 35 -k 36 -k 37 -k 38 -k 39 -k 40 -k 41 -k 42 -k 43 -k 44 -k 45 -k 46 -k 47 -k 48 -k 49 -k 50 -k 51 -k 52 -k 53 -k 54 -k 55 -k 56 -k 57 -k 58 -k 59 -k 60 -k 61 ;
+		CenterPivot;
+		
+		if (`currentUnit -q -l` == "m")
+    	{
+    	    xform -s 1 1 1;
+    	}
+    	else
+    	{
+    	    xform -s 1 1 1;
+    	}
+		move -rpr 0 0 0;
+		makeIdentity -apply on;
+
+	
+	//load created controller into variable to be passed to macConnectControl proc
+	$controlerObj = `ls -sl -type "transform"`;
+
+	xform -s .1 .1 .1;
+	makeIdentity -apply on;	
+	
+	//if There is a control Name given by the user rename the control to that
+	if (`textFieldGrp -q -text controlNameTxt` != "")
+	{
+		string $newName = `textFieldGrp -q -text controlNameTxt`;
+		rename $controlerObj[0] $newName;
+		//update $controlObj
+		$controlerObj = `ls -sl`;
+	} 
+
+	string $shape[0] = `listRelatives -s $controlerObj[0]`;	
+	//if control color checkbox is on change the color
+    if (`checkBoxGrp -q -v1 mmColorBx` == 1)
+    {
+        int $colors = `palettePort -q -scc mmColorPalette`;
+        //change the color of the curve
+        setAttr ($shape[0] + ".overrideEnabled") 1;
+
+        setAttr ($shape[0] + ".overrideColor") ($colors + 1);
+        
+    }
+    
+	//if connect on creation is selected call macConnectControl proc
+			if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1)
+			{
+				macConnectControl($controlerObj[0], $joint);	
+			}
+}
+
+/////////////////////////////////////////////////////////////////////////
+//				bt13 proc
+//	creates selected controller and will connect and name it 
+//	if specified by the user
+/////////////////////////////////////////////////////////////////////////
+global proc bt13 ()
+{
+	//variables needed
+	string $joint;
+	string $controlerObj[];
+	string $sel[];
+	
+	//check if connect on creation is on or name based on joint	//if either is on check for a selected joint if not throw an error
+
+	if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1 || `checkBoxGrp -q -value1 useJntNameChckBx` == 1)
+	{
+		//if on load joint
+		$sel = `ls -sl -type "transform"`;
+		
+		//check if joint was selected
+		if ($sel[0] == "")
+		{
+			error "nothing was selected.  Please select an object and try again.";
+		}
+		else
+		{
+			//else load joint into variable to be passed to macConnectControl proc
+			$joint = $sel[0];	
+		}
+	}
+	
+	
+	//create controller place in controlObj var 
+		curve -d 1 -p -8.09017 -5.877852 -43.976124 -p -10.000001 -2.42675e-007 -53.976123 -p -10 -3.29388e-008 -49.976124 -p -9.51057 3.090172 -49.976124 -p -8.090174 5.877855 -49.976124 -p -5.877855 8.090175 -49.976124 -p -5.877855 8.090174 -47.977744 -p -5.877855 8.090174 -40.114475 -p -3.090172 9.510568 -40.114475 -p -3.090172 9.510569 -43.976123 
+			-p -6.90597e-009 10.000004 -43.976123 -p 3.090172 9.510569 -43.976124 -p 5.877855 8.090174 -43.976123 -p 5.877855 8.090173 -47.977744 -p 3.090172 9.510568 -47.977744 -p -3.54718e-009 10.000004 -47.977744 -p -3.090172 9.51057 -47.977744 -p -5.877855 8.090174 -47.977744 -p -5.877855 8.090175 -49.976124 -p -3.090172 9.51057 -49.976124 
+			-p -1.86982e-009 10.000004 -49.976124 -p 3.090172 9.510569 -49.976124 -p 5.877855 8.090174 -49.976124 -p 8.090174 5.877855 -49.976124 -p 9.51057 3.090172 -49.976124 -p 10 0 -49.976124 -p 10 0 -53.976123 -p 8.09017 -5.877852 -43.976124 -p 10.000001 -2.42675e-007 -33.976123 -p 10 -1.48835e-007 -37.976124 -p 9.51057 3.090172 -37.976123 
+			-p 8.090175 5.877855 -37.976123 -p 5.877855 8.090175 -37.976123 -p 3.090172 9.51057 -37.976123 -p 1.17521e-007 10.000004 -37.976124 -p -3.090172 9.510569 -37.976123 -p -5.877855 8.090175 -37.976122 -p -8.090176 5.877855 -37.976122 -p -9.510569 3.090172 -37.976123 -p -9.999999 -2.44218e-007 -37.976123 -p -10.000002 -4.12357e-007 -33.976123 -p -8.09017 -5.877852 -43.976124 
+			-k 0 -k 1 -k 2 -k 3 -k 4 -k 5 -k 6 -k 7 -k 8 -k 9 -k 10 -k 11 -k 12 -k 13 -k 14 -k 15 -k 16 -k 17 -k 18 -k 19 -k 20 -k 21 -k 22 -k 23 -k 24 -k 25 -k 26 -k 27 -k 28 -k 29 -k 30 -k 31 -k 32 -k 33 -k 34 -k 35 -k 36 -k 37 -k 38 -k 39 -k 40 -k 41 ;
+		CenterPivot;
+		
+		if (`currentUnit -q -l` == "m")
+    	{
+    	    xform -s 1 1 1;
+    	}
+    	else
+    	{
+    	    xform -s 1 1 1;
+    	}
+		move -rpr 0 0 0;
+		makeIdentity -apply on;
+	
+	//load created controller into variable to be passed to macConnectControl proc
+	$controlerObj = `ls -sl -type "transform"`;
+
+	xform -s .1 .1 .1;
+	makeIdentity -apply on;
+	
+	//if There is a control Name given by the user rename the control to that
+	if (`textFieldGrp -q -text controlNameTxt` != "")
+	{
+		string $newName = `textFieldGrp -q -text controlNameTxt`;
+		rename $controlerObj[0] $newName;
+		//update $controlObj
+		$controlerObj = `ls -sl`;
+	} 
+
+	string $shape[0] = `listRelatives -s $controlerObj[0]`;	
+	//if control color checkbox is on change the color
+    if (`checkBoxGrp -q -v1 mmColorBx` == 1)
+    {
+        int $colors = `palettePort -q -scc mmColorPalette`;
+        //change the color of the curve
+        setAttr ($shape[0] + ".overrideEnabled") 1;
+
+        setAttr ($shape[0] + ".overrideColor") ($colors + 1);
+        
+    }
+	//if connect on creation is selected call macConnectControl proc
+			if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1)
+			{
+				macConnectControl($controlerObj[0], $joint);	
+			}
+}
+
+/////////////////////////////////////////////////////////////////////////
+//				bt14 proc
+//	creates selected controller and will connect and name it 
+//	if specified by the user
+/////////////////////////////////////////////////////////////////////////
+global proc bt14 ()
+{
+	//variables needed
+	string $joint;
+	string $controlerObj[];
+	string $sel[];
+	
+	//check if connect on creation is on or name based on joint	//if either is on check for a selected joint if not throw an error
+
+	if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1 || `checkBoxGrp -q -value1 useJntNameChckBx` == 1)
+	{
+		//if on load joint
+		$sel = `ls -sl -type "transform"`;
+		
+		//check if joint was selected
+		if ($sel[0] == "")
+		{
+			error "nothing was selected.  Please select an object and try again.";
+		}
+		else
+		{
+			//else load joint into variable to be passed to macConnectControl proc
+			$joint = $sel[0];	
+		}
+	}
+	
+	
+	//create controller place in controlObj var 
+	curve -d 1 -p 2.938927 9.510566 0.954915 -p 2.5 9.510566 1.816356 -p 1.816356 9.510566 2.5 -p 0.954915 9.510566 2.938927 -p 1.402908 8.910066 4.317707 -p 1.816356 8.09017 5.590171 -p 2.18508 7.071068 6.724986 -p 2.5 5.877852 7.69421 -p 2.753362 4.539905 8.473976 -p 2.938927 3.09017 9.045086 -p 5.590171 3.09017 7.69421 -p 3.052125 1.564344 9.393476 -p 6.30018e-008 2.85778e-010 10.000001 -p -3.052125 1.564344 9.393474 -p -5.59017 3.090169 7.694208 -p -2.938927 3.090169 9.045085 -p -2.753362 4.539905 8.473975 
+		-p -2.5 5.877852 7.69421 -p -2.18508 7.071068 6.724986 -p -1.816356 8.09017 5.590171 -p -1.403599 8.908695 4.319833 -p -0.954915 9.510565 2.938927 -p -1.816356 9.510566 2.5 -p -2.5 9.510566 1.816356 -p -2.938926 9.510566 0.954915 -p -4.317707 8.910066 1.402908 -p -5.59017 8.09017 1.816356 -p -6.724985 7.071068 2.18508 -p -7.694209 5.877852 2.5 -p -8.473976 4.539905 2.753362 -p -9.045085 3.09017 2.938927 -p -7.69421 3.09017 5.590171 -p -9.393476 1.564344 3.052125 -p -10 3.5245e-008 -8.29577e-008 -p -9.393476 1.564344 -3.052126 -p -7.69421 3.09017 -5.590172 
+		-p -9.045085 3.09017 -2.938927 -p -8.473976 4.539905 -2.753362 -p -7.694209 5.877852 -2.5 -p -6.724985 7.071068 -2.18508 -p -5.590169 8.090169 -1.816356 -p -4.317706 8.910065 -1.402908 -p -2.938926 9.510565 -0.954915 -p -2.5 9.510566 -1.816357 -p -1.816356 9.510566 -2.500001 -p -0.954915 9.510565 -2.938927 -p -1.402908 8.910065 -4.317707 -p -1.816357 8.09017 -5.590171 -p -2.18508 7.071068 -6.724987 -p -2.5 5.877852 -7.694211 -p -2.753362 4.539905 -8.473975 -p -2.938927 3.09017 -9.045085 
+		-p -5.59017 3.090169 -7.694208 -p -3.052125 1.564344 -9.393474 -p 7.47562e-008 4.4626e-008 -10.000002 -p 3.052125 1.564344 -9.393476 -p 5.590171 3.090169 -7.69421 -p 2.938927 3.09017 -9.045086 -p 2.753362 4.539905 -8.473976 -p 2.5 5.877852 -7.69421 -p 2.18508 7.071068 -6.724986 -p 1.816356 8.090169 -5.590171 -p 1.402908 8.910066 -4.317707 -p 0.954915 9.510567 -2.938927 -p 1.816356 9.510566 -2.500001 -p 2.5 9.510566 -1.816357 -p 2.938927 9.510566 -0.954915 -p 4.317707 8.910066 -1.402908 
+		-p 5.59017 8.09017 -1.816356 -p 6.724985 7.071068 -2.18508 -p 7.694209 5.877852 -2.5 -p 8.473976 4.539905 -2.753362 -p 9.045085 3.09017 -2.938927 -p 7.69421 3.090169 -5.590171 -p 9.393474 1.564344 -3.052126 -p 10 4.71336e-008 -7.07742e-008 -p 9.393474 1.564344 3.052125 -p 7.69421 3.09017 5.590171 -p 9.045085 3.09017 2.938927 -p 8.473976 4.539905 2.753362 -p 7.694209 5.877852 2.5 -p 6.724985 7.071068 2.18508 -p 5.59017 8.09017 1.816356 -p 4.317707 8.910066 1.402908 -p 2.94154 9.510566 0.938414 
+		-k 0 -k 1 -k 2 -k 3 -k 4 -k 5 -k 6 -k 7 -k 8 -k 9 -k 10 -k 11 -k 12 -k 13 -k 14 -k 15 -k 16 -k 17 -k 18 -k 19 -k 20 -k 21 -k 22 -k 23 -k 24 -k 25 -k 26 -k 27 -k 28 -k 29 -k 30 -k 31 -k 32 -k 33 -k 34 -k 35 -k 36 -k 37 -k 38 -k 39 -k 40 -k 41 -k 42 -k 43 -k 44 -k 45 -k 46 -k 47 -k 48 -k 49 -k 50 -k 51 -k 52 -k 53 -k 54 -k 55 -k 56 -k 57 -k 58 -k 59 -k 60 -k 61 -k 62 -k 63 -k 64 -k 65 -k 66 -k 67 -k 68 -k 69 -k 70 -k 71 -k 72 -k 73 -k 74 -k 75 -k 76 -k 77 -k 78 -k 79 -k 80 -k 81 -k 82 -k 83 -k 84 ;
+		CenterPivot;
+		if (`currentUnit -q -l` == "m")
+    	{
+    	    xform -s .001 .001 .001 -rotation 0 0 0;
+    	}
+    	else
+    	{
+    	    xform -s .1 .1 .1 -rotation 0 0 0;
+    	} 
+		move -rpr 0 0 0;
+		makeIdentity -apply on;
+		
+	//load created controller into variable to be passed to macConnectControl proc
+	$controlerObj = `ls -sl -type "transform"`;
+
+	if (`currentUnit -q -l` == "m")
+    	{
+    	    xform -s 1 1 1;
+    	}
+    	else
+    	{
+    	    xform -s 1 1 1;
+    	}
+	makeIdentity -apply on;
+	
+	//if There is a control Name given by the user rename the control to that
+	if (`textFieldGrp -q -text controlNameTxt` != "")
+	{
+		string $newName = `textFieldGrp -q -text controlNameTxt`;
+		rename $controlerObj[0] $newName;
+		//update $controlObj
+		$controlerObj = `ls -sl`;
+	} 
+
+	string $shape[0] = `listRelatives -s $controlerObj[0]`;	
+	//if control color checkbox is on change the color
+    if (`checkBoxGrp -q -v1 mmColorBx` == 1)
+    {
+        int $colors = `palettePort -q -scc mmColorPalette`;
+        //change the color of the curve
+        setAttr ($shape[0] + ".overrideEnabled") 1;
+
+        setAttr ($shape[0] + ".overrideColor") ($colors + 1);
+        
+    }
+    
+	//if connect on creation is selected call macConnectControl proc
+			if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1)
+			{
+				macConnectControl($controlerObj[0], $joint);	
+			}
+}
+
+/////////////////////////////////////////////////////////////////////////
+//				bt15 proc
+//	creates selected controller and will connect and name it 
+//	if specified by the user
+/////////////////////////////////////////////////////////////////////////
+global proc bt15 ()
+{
+	//variables needed
+	string $joint;
+	string $controlerObj[];
+	string $sel[];
+	
+	//check if connect on creation is on or name based on joint	//if either is on check for a selected joint if not throw an error
+
+	if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1 || `checkBoxGrp -q -value1 useJntNameChckBx` == 1)
+	{
+		//if on load joint
+		$sel = `ls -sl -type "transform"`;
+		
+		//check if joint was selected
+		if ($sel[0] == "")
+		{
+			error "nothing was selected.  Please select an object and try again.";
+		}
+		else
+		{
+			//else load joint into variable to be passed to macConnectControl proc
+			$joint = $sel[0];	
+		}
+	}
+	
+	
+	//create controller place in controlObj var 
+	
+		curve -d 1 -p 6.30018e-008 10.047254 -56.527352 -p -3.052125 10.646686 -57.133879 -p -5.59017 11.231359 -58.833145 -p -2.938926 11.231359 -57.482268 -p -2.753362 11.786875 -58.053378 -p -2.5 12.299556 -58.833143 -p -2.18508 12.756778 -59.802367 -p -1.816356 13.147282 -60.937182 -p -1.402908 13.461452 -62.209646 
+			-p -0.954915 13.691555 -63.588427 -p -1.816356 13.691556 -64.027353 -p -2.5 13.691556 -64.710997 -p -2.938926 13.691556 -65.572438 -p -4.317707 13.461453 -65.124445 -p -5.59017 13.147282 -64.710997 -p -6.724985 12.756778 -64.342273 -p -7.694209 12.299556 -64.027353 -p -8.473976 11.786875 -63.773991 
+			-p -9.045085 11.231359 -63.588426 -p -7.694211 11.231359 -60.937182 -p -9.393476 10.646686 -63.475228 -p -10 10.047254 -66.527353 -p -9.393476 10.646687 -69.579479 -p -7.694211 11.231359 -72.117525 -p -9.045085 11.231359 -69.46628 -p -8.473976 11.786875 -69.280716 -p -7.694209 12.299556 -69.027353 
+			-p -6.724985 12.756778 -68.712434 -p -5.590169 13.147282 -68.343709 -p -4.317706 13.461452 -67.930261 -p -2.938926 13.691555 -67.482268 -p -2.5 13.691556 -68.34371 -p -1.816356 13.691556 -69.027354 -p -0.954915 13.691555 -69.46628 -p -1.402908 13.461452 -70.84506 -p -1.816357 13.147282 -72.117525 
+			-p -2.18508 12.756778 -73.25234 -p -2.5 12.299556 -74.221564 -p -2.753362 11.786875 -75.001328 -p -2.938926 11.231359 -75.572438 -p -5.59017 11.231359 -74.221561 -p -3.052125 10.646686 -75.920828 -p 7.47562e-008 10.047254 -76.527355 -p 3.052125 10.646686 -75.920829 -p 5.590171 11.231359 -74.221564 
+			-p 2.938926 11.231359 -75.572439 -p 2.753362 11.786875 -75.001329 -p 2.5 12.299556 -74.221564 -p 2.18508 12.756778 -73.25234 -p 1.816356 13.147282 -72.117525 -p 1.402908 13.461453 -70.84506 -p 0.954915 13.691556 -69.46628 -p 1.816356 13.691556 -69.027354 -p 2.5 13.691556 -68.34371 -p 2.938926 13.691556 -67.482268 
+			-p 4.317707 13.461453 -67.930261 -p 5.59017 13.147282 -68.34371 -p 6.724985 12.756778 -68.712434 -p 7.694209 12.299556 -69.027353 -p 8.473976 11.786875 -69.280716 -p 9.045085 11.231359 -69.46628 -p 7.694211 11.231359 -72.117525 -p 9.393475 10.646686 -69.579479 -p 10 10.047254 -66.527353 -p 9.393475 10.646686 -63.475228 
+			-p 7.694211 11.231359 -60.937182 -p 9.045085 11.231359 -63.588427 -p 8.473976 11.786875 -63.773991 -p 7.694209 12.299556 -64.027353 -p 6.724985 12.756778 -64.342273 -p 5.59017 13.147282 -64.710997 -p 4.317707 13.461453 -65.124445 -p 2.938926 13.691556 -65.572438 -p 2.5 13.691556 -64.710997 
+			-p 1.816356 13.691556 -64.027353 -p 0.954915 13.691556 -63.588427 -p 0.954915 -13.692107 -63.588427 -p 1.402908 -13.461995 -62.209646 -p 1.816356 -13.147811 -60.937182 -p 2.18508 -12.757291 -59.802367 -p 2.5 -12.300051 -58.833143 -p 2.753362 -11.78735 -58.053377 -p 2.938927 -11.231811 -57.482267 
+			-p 5.590171 -11.231811 -58.833143 -p 3.052125 -10.647115 -57.133878 -p 6.30018e-008 -10.047658 -56.527352 -p -3.052125 -10.647115 -57.133879 -p -5.59017 -11.231811 -58.833145 -p -2.938926 -11.231811 -57.482268 -p -2.753362 -11.78735 -58.053378 -p -2.5 -12.300051 -58.833143 -p -2.18508 -12.757291 -59.802367 
+			-p -1.816356 -13.147811 -60.937182 -p -1.402908 -13.461995 -62.209646 -p -0.954915 -13.692106 -63.588427 -p -0.954915 13.691555 -63.588427 -p -0.954915 -13.692106 -63.588427 -p -1.816356 -13.692107 -64.027353 -p -2.5 -13.692107 -64.710997 -p -2.938926 -13.692107 -65.572438 -p -4.317707 -13.461995 -65.124445 
+			-p -5.59017 -13.147811 -64.710997 -p -6.724985 -12.757291 -64.342273 -p -7.694209 -12.300051 -64.027353 -p -8.473976 -11.78735 -63.773991 -p -9.045085 -11.231812 -63.588426 -p -7.694211 -11.231812 -60.937182 -p -9.393476 -10.647115 -63.475228 -p -10 -10.047658 -66.527353 -p -9.393476 -10.647115 -69.579479 
+			-p -7.694211 -11.231812 -72.117525 -p -9.045085 -11.231812 -69.46628 -p -8.473976 -11.78735 -69.280716 -p -7.694209 -12.300051 -69.027353 -p -6.724985 -12.757291 -68.712434 -p -5.590169 -13.147811 -68.343709 -p -4.317706 -13.461995 -67.930261 -p -2.938926 -13.692106 -67.482268 -p -2.938926 13.691555 -67.482268 
+			-p -2.938926 -13.692106 -67.482268 -p -2.5 -13.692107 -68.34371 -p -1.816356 -13.692107 -69.027354 -p -0.954915 -13.692106 -69.46628 -p -1.402908 -13.461995 -70.84506 -p -1.816357 -13.147811 -72.117525 -p -2.18508 -12.757291 -73.25234 -p -2.5 -12.300051 -74.221564 -p -2.753362 -11.78735 -75.001328 
+			-p -2.938926 -11.231811 -75.572438 -p -5.59017 -11.231811 -74.221561 -p -3.052125 -10.647115 -75.920828 -p 7.47562e-008 -10.047658 -76.527355 -p 3.052125 -10.647115 -75.920829 -p 5.590171 -11.231811 -74.221564 -p 2.938926 -11.231811 -75.572439 -p 2.753362 -11.78735 -75.001329 -p 2.5 -12.300051 -74.221564 
+			-p 2.18508 -12.757291 -73.25234 -p 1.816356 -13.147811 -72.117525 -p 1.402908 -13.461995 -70.84506 -p 0.954915 -13.692107 -69.46628 -p 0.954915 13.691556 -69.46628 -p 0.954915 -13.692107 -69.46628 -p 1.816356 -13.692107 -69.027354 -p 2.5 -13.692107 -68.34371 -p 2.938926 -13.692107 -67.482268 
+			-p 4.317707 -13.461995 -67.930261 -p 5.59017 -13.147811 -68.34371 -p 6.724985 -12.757291 -68.712434 -p 7.694209 -12.300051 -69.027353 -p 8.473976 -11.78735 -69.280716 -p 9.045085 -11.231811 -69.46628 -p 7.694211 -11.231811 -72.117525 -p 9.393475 -10.647115 -69.579479 -p 10 -10.047658 -66.527353 
+			-p 9.393475 -10.647115 -63.475228 -p 7.694211 -11.231811 -60.937182 -p 9.045085 -11.231811 -63.588427 -p 8.473976 -11.78735 -63.773991 -p 7.694209 -12.300051 -64.027353 -p 6.724985 -12.757291 -64.342273 -p 5.59017 -13.147811 -64.710997 -p 4.317707 -13.461995 -65.124445 -p 2.938926 -13.692107 -65.572438 
+			-p 2.938926 13.691556 -65.572438 -p 2.938926 -13.692107 -65.572438 -p 2.5 -13.692107 -64.710997 -p 1.816356 -13.692107 -64.027353 -p 0.954915 -13.692107 -63.588427 -p 0.954915 13.691556 -63.588427 -p 1.402908 13.461453 -62.209646 -p 1.816356 13.147282 -60.937182 -p 2.18508 12.756778 -59.802367 -p 2.5 12.299556 -58.833143 
+			-p 2.753362 11.786875 -58.053377 -p 2.938927 11.231359 -57.482267 -p 5.590171 11.231359 -58.833143 -p 3.052125 10.646686 -57.133878 -p 6.30018e-008 10.047254 -56.527352 -k 0 -k 1 -k 2 -k 3 -k 4 -k 5 -k 6 -k 7 -k 8 -k 9 -k 10 -k 11 -k 12 -k 13 -k 14 -k 15 -k 16 -k 17 -k 18 -k 19 -k 20 -k 21 -k 22 -k 23 -k 24 
+			-k 25 -k 26 -k 27 -k 28 -k 29 -k 30 -k 31 -k 32 -k 33 -k 34 -k 35 -k 36 -k 37 -k 38 -k 39 -k 40 -k 41 -k 42 -k 43 -k 44 -k 45 -k 46 -k 47 -k 48 -k 49 -k 50 -k 51 -k 52 -k 53 -k 54 -k 55 -k 56 -k 57 -k 58 -k 59 -k 60 -k 61 -k 62 -k 63 -k 64 -k 65 -k 66 -k 67 -k 68 -k 69 -k 70 -k 71 -k 72 -k 73 -k 74 -k 75 -k 76 -k 77 
+			-k 78 -k 79 -k 80 -k 81 -k 82 -k 83 -k 84 -k 85 -k 86 -k 87 -k 88 -k 89 -k 90 -k 91 -k 92 -k 93 -k 94 -k 95 -k 96 -k 97 -k 98 -k 99 -k 100 -k 101 -k 102 -k 103 -k 104 -k 105 -k 106 -k 107 -k 108 -k 109 -k 110 -k 111 -k 112 -k 113 -k 114 -k 115 -k 116 -k 117 -k 118 -k 119 -k 120 -k 121 -k 122 -k 123 -k 124 -k 125 
+			-k 126 -k 127 -k 128 -k 129 -k 130 -k 131 -k 132 -k 133 -k 134 -k 135 -k 136 -k 137 -k 138 -k 139 -k 140 -k 141 -k 142 -k 143 -k 144 -k 145 -k 146 -k 147 -k 148 -k 149 -k 150 -k 151 -k 152 -k 153 -k 154 -k 155 -k 156 -k 157 -k 158 -k 159 -k 160 -k 161 -k 162 -k 163 -k 164 -k 165 -k 166 -k 167 -k 168 -k 169 -k 170 -k 171 -k 172 -k 173 -k 174 -k 175 -k 176 -k 177 -k 178 ;
+		CenterPivot;
+		
+		if (`currentUnit -q -l` == "m")
+    	{
+    	    xform -s 1 1 1;
+    	}
+    	else
+    	{
+    	    xform -s 1 1 1;
+    	}
+		move -rpr 0 0 0;
+		makeIdentity -apply on;
+		
+	//load created controller into variable to be passed to macConnectControl proc
+	$controlerObj = `ls -sl -type "transform"`;
+
+	xform -s .1 .1 .1;
+	makeIdentity -apply on;
+		
+	//if There is a control Name given by the user rename the control to that
+	if (`textFieldGrp -q -text controlNameTxt` != "")
+	{
+		string $newName = `textFieldGrp -q -text controlNameTxt`;
+		rename $controlerObj[0] $newName;
+		//update $controlObj
+		$controlerObj = `ls -sl`;
+	} 
+
+	string $shape[0] = `listRelatives -s $controlerObj[0]`;	
+	//if control color checkbox is on change the color
+    if (`checkBoxGrp -q -v1 mmColorBx` == 1)
+    {
+        int $colors = `palettePort -q -scc mmColorPalette`;
+        //change the color of the curve
+        setAttr ($shape[0] + ".overrideEnabled") 1;
+
+        setAttr ($shape[0] + ".overrideColor") ($colors + 1);
+        
+    }
+    
+	//if connect on creation is selected call macConnectControl proc
+			if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1)
+			{
+				macConnectControl($controlerObj[0], $joint);	
+			}
+}
+
+/////////////////////////////////////////////////////////////////////////
+//				bt16 proc
+//	creates selected controller and will connect and name it 
+//	if specified by the user
+/////////////////////////////////////////////////////////////////////////
+global proc bt16 ()
+{
+	//variables needed
+	string $joint;
+	string $controlerObj[];
+	string $sel[];
+	
+	//check if connect on creation is on or name based on joint	//if either is on check for a selected joint if not throw an error
+
+	if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1 || `checkBoxGrp -q -value1 useJntNameChckBx` == 1)
+	{
+		//if on load joint
+		$sel = `ls -sl -type "transform"`;
+		
+		//check if joint was selected
+		if ($sel[0] == "")
+		{
+			error "no joint was selected.  Please select an object and try again.";
+		}
+		else
+		{
+			//else load joint into variable to be passed to macConnectControl proc
+			$joint = $sel[0];	
+		}
+	}
+	
+	
+	//create controller place in controlObj var 
+		curve -d 1 -p -17.279629 5.41263e-007 -92.823354 -p -16.43391 1.796398 -90.25412 -p -13.979518 3.50458 -86.767967 -p -10.156715 4.402965 -82.823355 -p -11.002406 4.402965 -87.183598 -p -10.035902 4.402964 -89.490021 -p -5.339701 5.175994 -89.490021 -p 2.64718e-007 5.442364 -89.490021 
+			-p 5.339702 5.175995 -89.490021 -p 10.035902 4.402965 -89.490021 -p 11.002406 4.402965 -87.183598 -p 10.156715 4.402965 -82.823355 -p 13.979519 3.504581 -86.767966 -p 16.43391 1.796398 -90.25412 -p 17.279629 4.26872e-008 -92.823355 -p 16.43391 1.796398 -95.392589 -p 13.979519 3.504581 -98.878743 
+			-p 10.156715 4.402965 -102.823355 -p 11.002406 4.402965 -98.463111 -p 10.035902 4.402965 -96.156688 -p 5.339701 5.175995 -96.156688 -p 1.20243e-007 5.442363 -96.156688 -p -5.339701 5.175995 -96.156688 -p -10.035902 4.402965 -96.156688 -p -11.002406 4.402965 -98.46311 
+			-p -10.156715 4.402965 -102.823355 -p -13.979518 3.50458 -98.878742 -p -16.43391 1.796398 -95.392589 -p -17.279629 5.41263e-007 -92.823354 -k 0 -k 1 -k 2 -k 3 -k 4 -k 5 -k 6 -k 7 -k 8 -k 9 -k 10 -k 11 -k 12 -k 13 -k 14 -k 15 -k 16 -k 17 -k 18 -k 19 -k 20 -k 21 -k 22 -k 23 -k 24 -k 25 -k 26 -k 27 -k 28 ;
+		CenterPivot;
+		
+		if (`currentUnit -q -l` == "m")
+    	{
+    	    xform -s 1 1 1;
+    	}
+    	else
+    	{
+    	    xform -s 1 1 1;
+    	}
+		move -rpr 0 0 0;
+		makeIdentity -apply on;
+	
+	//load created controller into variable to be passed to macConnectControl proc
+	$controlerObj = `ls -sl -type "transform"`;
+
+	xform -s .1 .1 .1;
+	makeIdentity -apply on;
+		
+	//if There is a control Name given by the user rename the control to that
+	if (`textFieldGrp -q -text controlNameTxt` != "")
+	{
+		string $newName = `textFieldGrp -q -text controlNameTxt`;
+		rename $controlerObj[0] $newName;
+		//update $controlObj
+		$controlerObj = `ls -sl`;
+	} 
+
+	string $shape[0] = `listRelatives -s $controlerObj[0]`;	
+	//if control color checkbox is on change the color
+    if (`checkBoxGrp -q -v1 mmColorBx` == 1)
+    {
+        int $colors = `palettePort -q -scc mmColorPalette`;
+        //change the color of the curve
+        setAttr ($shape[0] + ".overrideEnabled") 1;
+
+        setAttr ($shape[0] + ".overrideColor") ($colors + 1);
+        
+    }
+    
+	//if connect on creation is selected call macConnectControl proc
+			if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1)
+			{
+				macConnectControl($controlerObj[0], $joint);	
+			}
+}
+
+/////////////////////////////////////////////////////////////////////////
+//				bt17 proc
+//	creates selected controller and will connect and name it 
+//	if specified by the user
+/////////////////////////////////////////////////////////////////////////
+global proc bt17 ()
+{
+	//variables needed
+	string $joint;
+	string $controlerObj[];
+	string $sel[];
+	
+	//check if connect on creation is on or name based on joint	//if either is on check for a selected joint if not throw an error
+
+	if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1 || `checkBoxGrp -q -value1 useJntNameChckBx` == 1)
+	{
+		//if on load joint
+		$sel = `ls -sl -type "transform"`;
+		
+		//check if joint was selected
+		if ($sel[0] == "")
+		{
+			error "nothing was selected.  Please select an object and try again.";
+		}
+		else
+		{
+			//else load joint into variable to be passed to macConnectControl proc
+			$joint = $sel[0];	
+		}
+	}
+	
+	
+	//create controller place in controlObj var 
+		curve -d 1 -p -17.279629 5.41263e-007 -126.820203 -p -16.43391 1.796398 -124.250968 -p -13.979519 3.50458 -120.764815 -p -10.156715 4.402965 -116.820203 -p -11.002406 4.402965 -121.180447 -p -10.035902 4.402964 -123.486869 -p -5.339701 5.175994 -123.486869 -p -3.333333 5.263821 -123.486869 
+			-p -3.333333 5.175994 -121.480503 -p -3.333333 4.402965 -116.784301 -p -5.639755 4.402965 -115.817797 -p -9.999999 4.402965 -116.663488 -p -6.055387 3.50458 -112.840684 -p -2.569234 1.796398 -110.386293 -p 7.64476e-007 5.41263e-007 -109.540575 -p 2.569236 1.796398 -110.386293 
+			-p 6.055388 3.50458 -112.840684 -p 10.156715 4.402965 -116.820203 -p 5.639757 4.402965 -115.817797 -p 3.333334 4.402964 -116.784301 -p 3.333334 5.175994 -121.480503 -p 3.333334 5.241682 -123.486869 -p 5.339702 5.175994 -123.486869 -p 10.035902 4.402965 -123.486869 
+			-p 11.002406 4.402965 -121.180447 -p 10.156715 4.402965 -116.820203 -p 13.97952 3.504581 -120.764814 -p 16.43391 1.796398 -124.250968 -p 17.279629 4.26872e-008 -126.820203 -p 16.43391 1.796398 -129.389437 -p 13.97952 3.504581 -132.875591 -p 10.156715 4.402965 -136.820203 
+			-p 11.002406 4.402965 -132.459959 -p 10.035902 4.402965 -130.153536 -p 5.339701 5.175995 -130.153536 -p 3.333334 5.27043 -130.153536 -p 3.333334 5.175994 -132.159905 -p 3.333334 4.402965 -136.856105 -p 5.639757 4.402965 -137.822609 -p 10 4.402965 -136.976919 -p 6.055389 3.504581 -140.799723 
+			-p 2.569236 1.796398 -143.254114 -p 7.1841e-007 4.26872e-008 -144.099832 -p -2.569234 1.796398 -143.254114 -p -6.055388 3.504581 -140.799723 -p -10 4.402965 -136.976919 -p -5.639756 4.402965 -137.822609 -p -3.333333 4.402965 -136.856105 -p -3.333333 5.175995 -132.159904 
+			-p -3.333333 5.27043 -130.153537 -p -5.339701 5.175994 -130.153536 -p -10.035902 4.402965 -130.153536 -p -11.002406 4.402965 -132.459959 -p -10.156715 4.402965 -136.820202 -p -13.979519 3.50458 -132.87559 -p -16.43391 1.796398 -129.389437 -p -17.279629 5.41263e-007 -126.820203 
+			-k 0 -k 1 -k 2 -k 3 -k 4 -k 5 -k 6 -k 7 -k 8 -k 9 -k 10 -k 11 -k 12 -k 13 -k 14 -k 15 -k 16 -k 17 -k 18 -k 19 -k 20 -k 21 -k 22 -k 23 -k 24 -k 25 -k 26 -k 27 -k 28 -k 29 -k 30 -k 31 -k 32 -k 33 -k 34 -k 35 -k 36 -k 37 -k 38 -k 39 -k 40 -k 41 -k 42 -k 43 -k 44 -k 45 -k 46 -k 47 -k 48 -k 49 -k 50 -k 51 -k 52 -k 53 -k 54 -k 55 -k 56 ;
+		CenterPivot;
+		
+		if (`currentUnit -q -l` == "m")
+    	{
+    	    xform -s 1 1 1;
+    	}
+    	else
+    	{
+    	    xform -s 1 1 1;
+    	}
+		move -rpr 0 0 0;
+		makeIdentity -apply on;
+	
+	//load created controller into variable to be passed to macConnectControl proc
+	$controlerObj = `ls -sl -type "transform"`;
+
+	xform -s .1 .1 .1;
+	makeIdentity -apply on;
+		
+	//if There is a control Name given by the user rename the control to that
+	if (`textFieldGrp -q -text controlNameTxt` != "")
+	{
+		string $newName = `textFieldGrp -q -text controlNameTxt`;
+		rename $controlerObj[0] $newName;
+		//update $controlObj
+		$controlerObj = `ls -sl`;
+	} 
+
+	string $shape[0] = `listRelatives -s $controlerObj[0]`;	
+	//if control color checkbox is on change the color
+    if (`checkBoxGrp -q -v1 mmColorBx` == 1)
+    {
+        int $colors = `palettePort -q -scc mmColorPalette`;
+        //change the color of the curve
+        setAttr ($shape[0] + ".overrideEnabled") 1;
+
+        setAttr ($shape[0] + ".overrideColor") ($colors + 1);
+        
+    }
+    
+	//if connect on creation is selected call macConnectControl proc
+			if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1)
+			{
+				macConnectControl($controlerObj[0], $joint);	
+			}
+}
+
+/////////////////////////////////////////////////////////////////////////
+//				bt18 proc
+//	creates selected controller and will connect and name it 
+//	if specified by the user
+/////////////////////////////////////////////////////////////////////////
+global proc bt18 ()
+{
+	//variables needed
+	string $joint;
+	string $controlerObj[];
+	string $sel[];
+	
+	//check if connect on creation is on or name based on joint	//if either is on check for a selected joint if not throw an error
+
+	if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1 || `checkBoxGrp -q -value1 useJntNameChckBx` == 1)
+	{
+		//if on load joint
+		$sel = `ls -sl -type "transform"`;
+		
+		//check if joint was selected
+		if ($sel[0] == "")
+		{
+			error "nothing was selected.  Please select an object and try again.";
+		}
+		else
+		{
+			//else load joint into variable to be passed to macConnectControl proc
+			$joint = $sel[0];	
+		}
+	}
+	
+	
+	//create controller place in controlObj var 
+		curve -d 1 -p -8.794737 4.759473 -150.536725 -p -6.772816 7.357238 -150.536725 -p -6.772816 7.357238 -156.189315 -p -8.794737 4.759473 -156.189315 -p -8.794737 4.759473 -150.536725 -p -9.863612 1.645945 -150.536725 -p -9.863612 1.645945 -156.189315 -p -8.794737 4.759473 -156.189315 -p -9.863612 1.645945 -156.189315 
+			-p -9.863612 -1.645946 -156.189315 -p -9.863612 -1.645946 -150.536725 -p -9.863612 1.645945 -150.536725 -p -9.863612 -1.645946 -150.536725 -p -8.794737 -4.759474 -150.536725 -p -8.794737 -4.759474 -156.189315 -p -9.863612 -1.645946 -156.189315 -p -8.794737 -4.759474 -156.189315 -p -8.794737 -4.759474 -150.536725 
+			-p -6.772815 -7.357239 -150.536725 -p -6.772815 -7.357239 -156.189315 -p -8.794737 -4.759474 -156.189315 -p -6.772815 -7.357239 -156.189315 -p -4.016953 -9.157733 -156.189315 -p -4.016953 -9.157733 -150.536725 -p -6.772815 -7.357239 -150.536725 -p -4.016953 -9.157733 -150.536725 -p -4.016953 -9.157733 -156.189315 
+			-p -0.825793 -9.965845 -156.189315 -p -0.825793 -9.965845 -150.536725 -p -4.016953 -9.157733 -150.536725 -p -0.825793 -9.965845 -150.536725 -p 2.454855 -9.694002 -150.536725 -p 2.454855 -9.694002 -156.189315 -p -0.825793 -9.965845 -156.189315 -p 2.454855 -9.694002 -156.189315 -p 5.469482 -8.371664 -156.189315 
+			-p 5.469482 -8.371664 -150.536725 -p 2.454855 -9.694002 -150.536725 -p 5.469482 -8.371664 -150.536725 -p 7.891405 -6.142127 -150.536725 -p 7.891405 -6.142127 -156.189315 -p 5.469482 -8.371664 -156.189315 -p 7.891405 -6.142127 -156.189315 -p 9.458172 -3.246995 -156.189315 -p 9.458172 -3.246995 -150.536725 
+			-p 7.891405 -6.142127 -150.536725 -p 9.458172 -3.246995 -150.536725 -p 10 0 -150.536725 -p 10 0 -156.189315 -p 9.458172 -3.246995 -156.189315 -p 10 0 -156.189315 -p 9.458171 3.246995 -156.189315 -p 9.458171 3.246995 -150.536725 -p 10 0 -150.536725 -p 9.458171 3.246995 -150.536725 -p 9.458171 3.246995 -156.189315 
+			-p 7.891403 6.142127 -156.189315 -p 7.891403 6.142127 -150.536725 -p 9.458171 3.246995 -150.536725 -p 7.891403 6.142127 -150.536725 -p 5.46948 8.371664 -150.536725 -p 5.46948 8.371664 -156.189315 -p 7.891403 6.142127 -156.189315 -p 5.46948 8.371664 -156.189315 -p 2.454854 9.694002 -156.189315 -p 2.454854 9.694002 -150.536725 
+			-p 5.46948 8.371664 -150.536725 -p 2.454854 9.694002 -150.536725 -p -0.825794 9.965844 -150.536725 -p -0.825794 9.965844 -156.189315 -p 2.454854 9.694002 -156.189315 -p -0.825794 9.965844 -156.189315 -p -4.016955 9.157732 -156.189315 -p -4.016955 9.157732 -150.536725 -p -0.825794 9.965844 -150.536725 
+			-p -4.016955 9.157732 -150.536725 -p -6.772816 7.357238 -150.536725 -p -6.772816 7.357238 -156.189315 -p -4.016955 9.157732 -156.189315 -p -6.772816 7.357238 -156.189315 -p -6.772816 7.357238 -150.536725 -k 0 -k 1 -k 2 -k 3 -k 4 -k 5 -k 6 -k 7 -k 8 -k 9 -k 10 -k 11 -k 12 -k 13 -k 14 -k 15 -k 16 -k 17 -k 18 -k 19 -k 20 -k 21 
+			-k 22 -k 23 -k 24 -k 25 -k 26 -k 27 -k 28 -k 29 -k 30 -k 31 -k 32 -k 33 -k 34 -k 35 -k 36 -k 37 -k 38 -k 39 -k 40 -k 41 -k 42 -k 43 -k 44 -k 45 -k 46 -k 47 -k 48 -k 49 -k 50 -k 51 -k 52 -k 53 -k 54 -k 55 -k 56 -k 57 -k 58 -k 59 -k 60 -k 61 -k 62 -k 63 -k 64 -k 65 -k 66 -k 67 -k 68 -k 69 -k 70 -k 71 -k 72 -k 73 -k 74 -k 75 -k 76 -k 77 -k 78 -k 79 -k 80 ;
+		CenterPivot;
+
+		if (`currentUnit -q -l` == "m")
+    	{
+    	    xform -s 1 1 1;
+    	}
+    	else
+    	{
+    	    xform -s 1 1 1;
+    	}
+		move -rpr 0 0 0;
+		makeIdentity -apply on;
+	
+	//load created controller into variable to be passed to macConnectControl proc
+	$controlerObj = `ls -sl -type "transform"`;
+
+	xform -s .1 .1 .1;
+	makeIdentity -apply on;
+		
+	//if There is a control Name given by the user rename the control to that
+	if (`textFieldGrp -q -text controlNameTxt` != "")
+	{
+		string $newName = `textFieldGrp -q -text controlNameTxt`;
+		rename $controlerObj[0] $newName;
+		//update $controlObj
+		$controlerObj = `ls -sl`;
+	} 
+		
+	string $shape[0] = `listRelatives -s $controlerObj[0]`;	
+	//if control color checkbox is on change the color
+    if (`checkBoxGrp -q -v1 mmColorBx` == 1)
+    {
+        int $colors = `palettePort -q -scc mmColorPalette`;
+        //change the color of the curve
+        setAttr ($shape[0] + ".overrideEnabled") 1;
+
+        setAttr ($shape[0] + ".overrideColor") ($colors + 1);
+        
+    }
+    
+	//if connect on creation is selected call macConnectControl proc
+			if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1)
+			{
+				macConnectControl($controlerObj[0], $joint);	
+			}
+}
+
+/////////////////////////////////////////////////////////////////////////
+//				bt20 proc
+//	creates selected controller and will connect and name it 
+//	if specified by the user
+/////////////////////////////////////////////////////////////////////////
+global proc bt20 ()
+{
+	//variables needed
+	string $joint;
+	string $controlerObj[];
+	string $sel[];
+	
+	//check if connect on creation is on or name based on joint	//if either is on check for a selected joint if not throw an error
+
+	if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1 || `checkBoxGrp -q -value1 useJntNameChckBx` == 1)
+	{
+		//if on load joint
+		$sel = `ls -sl -type "transform"`;
+		
+		//check if joint was selected
+		if ($sel[0] == "")
+		{
+			error "nothing was selected.  Please select an object and try again.";
+		}
+		else
+		{
+			//else load joint into variable to be passed to macConnectControl proc
+			$joint = $sel[0];	
+		}
+	}
+	
+	
+	//create controller place in controlObj var 
+		curve -d 1 -p 3.090172 10 -206.306951 -p 3.090172 9.999999 -203.847187 -p 6.049705 9.999999 -203.847185 -p -4.59149e-008 9.999999 -198.952511 -p -6.049705 10 -203.847185 -p -3.090172 9.999999 -203.847188 -p -3.090172 10 -206.306951 -p -5.877855 10 -207.727346 -p -8.090174 10.000001 -209.939665 
+			-p -9.51057 10.000001 -212.727348 -p -11.970332 9.999998 -212.727349 -p -11.970331 9.999998 -209.767816 -p -16.865009 9.999998 -215.81752 -p -11.970332 9.999999 -221.867225 -p -11.970333 9.999999 -218.907692 -p -9.51057 10.000001 -218.907692 -p -8.090174 10.000001 -221.695375 -p -5.877855 10 -223.907694 
+			-p -3.090172 10 -225.328089 -p -3.090172 10 -227.787853 -p -6.049705 9.999999 -227.787854 -p 3.51205e-010 10 -232.682529 -p 6.049705 10 -227.787853 -p 3.090172 10 -227.787853 -p 3.090172 10 -225.328089 -p 5.877855 10 -223.907694 -p 8.090174 10 -221.695375 -p 9.51057 10 -218.907692 -p 11.970333 10 -218.907692 
+			-p 11.970333 10 -221.867225 -p 16.865009 10 -215.81752 -p 11.970332 9.999999 -209.767816 -p 11.970333 9.999999 -212.727348 -p 9.51057 10.000001 -212.727348 -p 8.090174 10.000001 -209.939665 -p 5.877855 10 -207.727346 -p 3.090172 10 -206.306951 -k 0 -k 1 -k 2 -k 3 -k 4 -k 5 -k 6 -k 7 -k 8 -k 9 -k 10 
+			-k 11 -k 12 -k 13 -k 14 -k 15 -k 16 -k 17 -k 18 -k 19 -k 20 -k 21 -k 22 -k 23 -k 24 -k 25 -k 26 -k 27 -k 28 -k 29 -k 30 -k 31 -k 32 -k 33 -k 34 -k 35 -k 36 ;
+		CenterPivot;
+			
+		if (`currentUnit -q -l` == "m")
+    	{
+    	    xform -s .1 .1 .1;
+    	}
+    	else
+    	{
+    	    xform -s .1 .1 .1;
+    	}
+		move -rpr 0 0 0;
+		makeIdentity -apply on;
+		
+	//load created controller into variable to be passed to macConnectControl proc
+	$controlerObj = `ls -sl -type "transform"`;
+	
+	//if There is a control Name given by the user rename the control to that
+	if (`textFieldGrp -q -text controlNameTxt` != "")
+	{
+		string $newName = `textFieldGrp -q -text controlNameTxt`;
+		rename $controlerObj[0] $newName;
+		//update $controlObj
+		$controlerObj = `ls -sl`;
+	} 
+
+	string $shape[0] = `listRelatives -s $controlerObj[0]`;	
+	//if control color checkbox is on change the color
+    if (`checkBoxGrp -q -v1 mmColorBx` == 1)
+    {
+        int $colors = `palettePort -q -scc mmColorPalette`;
+        //change the color of the curve
+        setAttr ($shape[0] + ".overrideEnabled") 1;
+
+        setAttr ($shape[0] + ".overrideColor") ($colors + 1);
+        
+    }
+    
+	//if connect on creation is selected call macConnectControl proc
+			if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1)
+			{
+				macConnectControl($controlerObj[0], $joint);	
+			}
+}
+
+/////////////////////////////////////////////////////////////////////////
+//				bt19 proc
+//	creates selected controller and will connect and name it 
+//	if specified by the user
+/////////////////////////////////////////////////////////////////////////
+global proc bt19 ()
+{
+	//variables needed
+	string $joint;
+	string $controlerObj[];
+	string $sel[];
+	
+	//check if connect on creation is on or name based on joint	//if either is on check for a selected joint if not throw an error
+
+	if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1 || `checkBoxGrp -q -value1 useJntNameChckBx` == 1)
+	{
+		//if on load joint
+		$sel = `ls -sl -type "transform"`;
+		
+		//check if joint was selected
+		if ($sel[0] == "")
+		{
+			error "nothing was selected.  Please select an object and try again.";
+		}
+		else
+		{
+			//else load joint into variable to be passed to macConnectControl proc
+			$joint = $sel[0];	
+		}
+	}
+	
+	
+	//create controller place in controlObj var 
+		curve -d 1 -p 9.783014 10 -175.800851 -p 7.717783 10 -172.156164 -p 3.09017 10 -173.268214 -p 9.92484e-008 10 -169.648504 -p -3.489795 10 -171.488252 -p -7.717783 10 -172.156161 -p -8.090172 10 -176.900926 -p -12.487637 10 -178.7213 -p -11.692843 10 -182.77878 -p -12.487636 10 -186.836259 
+			-p -8.090172 10 -188.656634 -p -7.717784 10 -193.401397 -p -3.489795 10 -194.069308 -p -2.27392e-007 10 -195.909058 -p 3.090171 10 -192.289348 -p 7.717784 10 -193.401395 -p 9.783015 10 -189.756711 -p 12.487638 10 -186.836261 -p 10 10 -182.77878 -p 12.487633 10 -178.7213 -p 9.783014 10 -175.800851 
+			-k 0 -k 1 -k 2 -k 3 -k 4 -k 5 -k 6 -k 7 -k 8 -k 9 -k 10 -k 11 -k 12 -k 13 -k 14 -k 15 -k 16 -k 17 -k 18 -k 19 -k 20 ;
+		CenterPivot;
+		
+		if (`currentUnit -q -l` == "m")
+    	{
+    	    xform -s .1 .1 .1;
+    	}
+    	else
+    	{
+    	    xform -s .1 .1 .1;
+    	}
+		move -rpr 0 0 0;
+		makeIdentity -apply on;
+
+	
+	//load created controller into variable to be passed to macConnectControl proc
+	$controlerObj = `ls -sl -type "transform"`;
+	
+	//if There is a control Name given by the user rename the control to that
+	if (`textFieldGrp -q -text controlNameTxt` != "")
+	{
+		string $newName = `textFieldGrp -q -text controlNameTxt`;
+		rename $controlerObj[0] $newName;
+		//update $controlObj
+		$controlerObj = `ls -sl`;
+	} 
+
+	string $shape[0] = `listRelatives -s $controlerObj[0]`;	
+	//if control color checkbox is on change the color
+    if (`checkBoxGrp -q -v1 mmColorBx` == 1)
+    {
+        int $colors = `palettePort -q -scc mmColorPalette`;
+        //change the color of the curve
+        setAttr ($shape[0] + ".overrideEnabled") 1;
+
+        setAttr ($shape[0] + ".overrideColor") ($colors + 1);
+        
+    }
+    
+	//if connect on creation is selected call macConnectControl proc
+			if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1)
+			{
+				macConnectControl($controlerObj[0], $joint);	
+			}
+}
+
+/////////////////////////////////////////////////////////////////////////
+//				bt21 proc
+//	creates selected controller and will connect and name it 
+//	if specified by the user
+/////////////////////////////////////////////////////////////////////////
+global proc bt21 ()
+{
+	//variables needed
+	string $joint;
+	string $controlerObj[];
+	string $sel[];
+	
+	//check if connect on creation is on or name based on joint	//if either is on check for a selected joint if not throw an error
+
+	if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1 || `checkBoxGrp -q -value1 useJntNameChckBx` == 1)
+	{
+		//if on load joint
+		$sel = `ls -sl -type "transform"`;
+		
+		//check if joint was selected
+		if ($sel[0] == "")
+		{
+			error "nothing was selected.  Please select an object and try again.";
+		}
+		else
+		{
+			//else load joint into variable to be passed to macConnectControl proc
+			$joint = $sel[0];	
+		}
+	}
+	
+	
+	//create controller place in controlObj var 
+		curve -d 1 -p 3.090172 10 -244.910567 -p 3.090172 9.999999 -242.450802 -p 6.049705 9.999999 -242.4508 -p -4.59149e-008 9.999999 -237.556126 -p -6.049705 10 -242.4508 -p -3.090172 9.999999 -242.450803 -p -3.090172 10 -244.910567 -p -5.877855 10 -246.330961 -p -8.090174 10.000001 -248.54328 
+			-p -9.51057 10.000001 -251.330964 -p -10 10 -254.421135 -p -9.51057 10.000001 -257.511307 -p -8.090174 10.000001 -260.29899 -p -5.877855 10 -262.511309 -p -3.090172 10 -263.931704 -p -3.090172 10 -266.391468 -p -6.049705 9.999999 -266.391469 -p 3.51205e-010 10 -271.286144 -p 6.049705 10 -266.391468 
+			-p 3.090172 10 -266.391468 -p 3.090172 10 -263.931704 -p 5.877855 10 -262.511309 -p 8.090174 10 -260.29899 -p 9.51057 10 -257.511307 -p 10 10 -254.421135 -p 9.51057 10.000001 -251.330964 -p 8.090174 10.000001 -248.54328 -p 5.877855 10 -246.330961 -p 3.090172 10 -244.910567 
+			-k 0 -k 1 -k 2 -k 3 -k 4 -k 5 -k 6 -k 7 -k 8 -k 9 -k 10 -k 11 -k 12 -k 13 -k 14 -k 15 -k 16 -k 17 -k 18 -k 19 -k 20 -k 21 -k 22 -k 23 -k 24 -k 25 -k 26 -k 27 -k 28 ;
+		CenterPivot;
+		
+		if (`currentUnit -q -l` == "m")
+    	{
+    	    xform -s .1 .1 .1;
+    	}
+    	else
+    	{
+    	    xform -s .1 .1 .1;
+    	}
+		move -rpr 0 0 0;
+		makeIdentity -apply on;
+	
+	//load created controller into variable to be passed to macConnectControl proc
+	$controlerObj = `ls -sl -type "transform"`;
+	
+	//if There is a control Name given by the user rename the control to that
+	if (`textFieldGrp -q -text controlNameTxt` != "")
+	{
+		string $newName = `textFieldGrp -q -text controlNameTxt`;
+		rename $controlerObj[0] $newName;
+		//update $controlObj
+		$controlerObj = `ls -sl`;
+	} 
+
+	string $shape[0] = `listRelatives -s $controlerObj[0]`;	
+	//if control color checkbox is on change the color
+    if (`checkBoxGrp -q -v1 mmColorBx` == 1)
+    {
+        int $colors = `palettePort -q -scc mmColorPalette`;
+        //change the color of the curve
+        setAttr ($shape[0] + ".overrideEnabled") 1;
+
+        setAttr ($shape[0] + ".overrideColor") ($colors + 1);
+        
+    }
+    
+	//if connect on creation is selected call macConnectControl proc
+			if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1)
+			{
+				macConnectControl($controlerObj[0], $joint);	
+			}
+}
+
+/////////////////////////////////////////////////////////////////////////
+//				bt22 proc
+//	creates selected controller and will connect and name it 
+//	if specified by the user
+/////////////////////////////////////////////////////////////////////////
+global proc bt22 ()
+{
+	//variables needed
+	string $joint;
+	string $controlerObj[];
+	string $sel[];
+	
+	//check if connect on creation is on or name based on joint	//if either is on check for a selected joint if not throw an error
+
+	if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1 || `checkBoxGrp -q -value1 useJntNameChckBx` == 1)
+	{
+		//if on load joint
+		$sel = `ls -sl -type "transform"`;
+		
+		//check if joint was selected
+		if ($sel[0] == "")
+		{
+			error "nothing was selected.  Please select an object and try again.";
+		}
+		else
+		{
+			//else load joint into variable to be passed to macConnectControl proc
+			$joint = $sel[0];	
+		}
+	}
+	
+	
+	//create controller place in controlObj var 
+	circle -degree 3 -sections 8 -sweep 360 -radius 1 -normal 1 0 0;
+	if (`currentUnit -q -l` == "m")
+	{
+	    xform -s 1 1 1 -rotation 0 0 90;
+	}
+	else
+	{
+	    xform -s 1 1 1 -rotation 0 0 90;
+	}
+	makeIdentity -apply on;
+	
+	//load created controller into variable to be passed to macConnectControl proc
+	$controlerObj = `ls -sl -type "transform"`;
+	
+	//if There is a control Name given by the user rename the control to that
+	if (`textFieldGrp -q -text controlNameTxt` != "")
+	{
+		string $newName = `textFieldGrp -q -text controlNameTxt`;
+		rename $controlerObj[0] $newName;
+		//update $controlObj
+		$controlerObj = `ls -sl`;
+	} 
+
+	string $shape[0] = `listRelatives -s $controlerObj[0]`;	
+	//if control color checkbox is on change the color
+    if (`checkBoxGrp -q -v1 mmColorBx` == 1)
+    {
+        int $colors = `palettePort -q -scc mmColorPalette`;
+        //change the color of the curve
+        setAttr ($shape[0] + ".overrideEnabled") 1;
+
+        setAttr ($shape[0] + ".overrideColor") ($colors + 1);
+        
+    }
+    
+	//if connect on creation is selected call macConnectControl proc
+			if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1)
+			{
+				macConnectControl($controlerObj[0], $joint);	
+			}
+}
+
+/////////////////////////////////////////////////////////////////////////
+//				bt23 proc
+//	creates selected controller and will connect and name it 
+//	if specified by the user
+/////////////////////////////////////////////////////////////////////////
+global proc bt23 ()
+{
+	//variables needed
+	string $joint;
+	string $controlerObj[];
+	string $sel[];
+	
+	//check if connect on creation is on or name based on joint	//if either is on check for a selected joint if not throw an error
+
+	if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1 || `checkBoxGrp -q -value1 useJntNameChckBx` == 1)
+	{
+		//if on load joint
+		$sel = `ls -sl -type "transform"`;
+		
+		//check if joint was selected
+		if ($sel[0] == "")
+		{
+			error "nothing was selected.  Please select an object and try again.";
+		}
+		else
+		{
+			//else load joint into variable to be passed to macConnectControl proc
+			$joint = $sel[0];	
+		}
+	}
+	
+	
+	//create controller place in controlObj var 
+		curve -d 1 -p 17.279629 4.26872e-008 -288.061971 -p 16.43391 1.796398 -290.631205 -p 13.979519 3.504581 -294.117359 -p 10.156715 4.402965 -298.061971 -p 11.002406 4.402965 -293.701727 -p 10.035902 4.402965 -291.395304 -p 5.339701 5.175995 -291.395304 -p 1.92481e-007 15.746232 -288.061971 
+			-p 1.20243e-007 5.442363 -291.395304 -p 5.339701 5.175995 -291.395304 -p 1.20243e-007 5.442363 -291.395304 -p -5.339701 5.175995 -291.395304 -p 1.92481e-007 15.746232 -288.061971 -p -5.339701 5.175995 -291.395304 -p -10.035902 4.402965 -291.395304 -p -11.002406 4.402965 -293.701727 
+			-p -10.156715 4.402965 -298.061971 -p -13.979518 3.50458 -294.117358 -p -16.43391 1.796398 -290.631205 -p -17.279629 5.41263e-007 -288.061971 -p -16.43391 1.796398 -285.492736 -p -13.979518 3.50458 -282.006584 -p -10.156715 4.402965 -278.061971 -p -11.002406 4.402965 -282.422215 
+			-p -10.035902 4.402964 -284.728637 -p -5.339701 5.175994 -284.728637 -p 1.92481e-007 15.746232 -288.061971 -p -5.339701 5.175994 -284.728637 -p 2.64718e-007 5.442364 -284.728637 -p 1.92481e-007 15.746232 -288.061971 -p 2.64718e-007 5.442364 -284.728637 -p 5.339702 5.175995 -284.728637 
+			-p 1.92481e-007 15.746232 -288.061971 -p 5.339702 5.175995 -284.728637 -p 10.035902 4.402965 -284.728637 -p 11.002406 4.402965 -282.422215 -p 10.156715 4.402965 -278.061971 -p 13.979519 3.504581 -282.006582 -p 16.43391 1.796398 -285.492736 -p 17.279629 4.26872e-008 -288.061971 
+			-k 0 -k 1 -k 2 -k 3 -k 4 -k 5 -k 6 -k 7 -k 8 -k 9 -k 10 -k 11 -k 12 -k 13 -k 14 -k 15 -k 16 -k 17 -k 18 -k 19 -k 20 -k 21 -k 22 -k 23 -k 24 -k 25 -k 26 -k 27 -k 28 -k 29 -k 30 -k 31 -k 32 -k 33 -k 34 -k 35 -k 36 -k 37 -k 38 -k 39 ;
+		CenterPivot;
+		
+		if (`currentUnit -q -l` == "m")
+    	{
+    	    xform -s .1 .1 .1;
+    	}
+    	else
+    	{
+    	    xform -s .1 .1 .1;
+    	}
+		move -rpr 0 0 0;
+		makeIdentity -apply on;
+	
+	//load created controller into variable to be passed to macConnectControl proc
+	$controlerObj = `ls -sl -type "transform"`;
+	
+	//if There is a control Name given by the user rename the control to that
+	if (`textFieldGrp -q -text controlNameTxt` != "")
+	{
+		string $newName = `textFieldGrp -q -text controlNameTxt`;
+		rename $controlerObj[0] $newName;
+		//update $controlObj
+		$controlerObj = `ls -sl`;
+	} 
+
+	string $shape[0] = `listRelatives -s $controlerObj[0]`;	
+	//if control color checkbox is on change the color
+    if (`checkBoxGrp -q -v1 mmColorBx` == 1)
+    {
+        int $colors = `palettePort -q -scc mmColorPalette`;
+        //change the color of the curve
+        setAttr ($shape[0] + ".overrideEnabled") 1;
+
+        setAttr ($shape[0] + ".overrideColor") ($colors + 1);
+        
+    }
+    
+	//if connect on creation is selected call macConnectControl proc
+			if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1)
+			{
+				macConnectControl($controlerObj[0], $joint);	
+			}
+}
+
+/////////////////////////////////////////////////////////////////////////
+//				bt24 proc
+//	creates selected controller and will connect and name it 
+//	if specified by the user
+/////////////////////////////////////////////////////////////////////////
+global proc bt24 ()
+{
+	//variables needed
+	string $joint;
+	string $controlerObj[];
+	string $sel[];
+	
+	//check if connect on creation is on or name based on joint	//if either is on check for a selected joint if not throw an error
+
+	if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1 || `checkBoxGrp -q -value1 useJntNameChckBx` == 1)
+	{
+		//if on load joint
+		$sel = `ls -sl -type "transform"`;
+		
+		//check if joint was selected
+		if ($sel[0] == "")
+		{
+			error "nothing was selected.  Please select an object and try again.";
+		}
+		else
+		{
+			//else load joint into variable to be passed to macConnectControl proc
+			$joint = $sel[0];	
+		}
+	}
+	
+	
+	//create controller place in controlObj var 
+		curve -d 1 -p 7.46361e-007 15.746232 -322.05882 -p 3.333334 5.241682 -318.725485 -p 3.333334 5.175994 -316.719119 -p 3.333334 4.402964 -312.022917 -p 5.639757 4.402965 -311.056413 -p 10 4.402965 -311.902104 -p 6.055388 3.50458 -308.079301 -p 2.569236 1.796398 -305.624909 
+			-p 7.64476e-007 5.41263e-007 -304.779191 -p -2.569234 1.796398 -305.624909 -p -6.055387 3.50458 -308.079301 -p -9.999999 4.402965 -311.902104 -p -5.639755 4.402965 -311.056413 -p -3.333333 4.402965 -312.022917 -p -3.333333 5.175994 -316.719119 -p -3.333333 5.263821 -318.725485 
+			-p 7.46361e-007 15.746232 -322.05882 -p -3.333333 5.263821 -318.725485 -p -5.339701 5.175994 -318.725485 -p -10.035902 4.402964 -318.725486 -p -11.002406 4.402965 -316.419063 -p -10.156715 4.402965 -312.058819 -p -13.979519 3.50458 -316.003432 -p -16.43391 1.796398 -319.489584 
+			-p -17.279629 5.41263e-007 -322.058819 -p -16.43391 1.796398 -324.628054 -p -13.979519 3.50458 -328.114206 -p -10.156715 4.402965 -332.058819 -p -11.002406 4.402965 -327.698575 -p -10.035902 4.402965 -325.392152 -p -5.339701 5.175994 -325.392152 -p -3.333333 5.27043 -325.392153 
+			-p 7.46361e-007 15.746232 -322.05882 -p -3.333333 5.27043 -325.392153 -p -3.333333 5.175995 -327.398521 -p -3.333333 4.402965 -332.094722 -p -5.639756 4.402965 -333.061226 -p -10 4.402965 -332.215535 -p -6.055388 3.504581 -336.038339 -p -2.569234 1.796398 -338.49273 
+			-p 7.1841e-007 4.26872e-008 -339.338448 -p 2.569236 1.796398 -338.49273 -p 6.055389 3.504581 -336.038339 -p 10 4.402965 -332.215535 -p 5.639757 4.402965 -333.061226 -p 3.333334 4.402965 -332.094722 -p 3.333334 5.175994 -327.398521 -p 3.333334 5.27043 -325.392152 
+			-p 7.46361e-007 15.746232 -322.05882 -p 3.333334 5.27043 -325.392152 -p 5.339701 5.175995 -325.392152 -p 10.035902 4.402965 -325.392152 -p 11.002406 4.402965 -327.698575 -p 10.156715 4.402965 -332.058819 -p 13.97952 3.504581 -328.114207 -p 16.43391 1.796398 -324.628054 
+			-p 17.279629 4.26872e-008 -322.058819 -p 16.43391 1.796398 -319.489584 -p 13.97952 3.504581 -316.003431 -p 10.156715 4.402965 -312.058819 -p 11.002406 4.402965 -316.419063 -p 11.002406 4.402965 -316.419063 -p 10.035902 4.402965 -318.725485 -p 5.339702 5.175994 -318.725485 -p 3.333334 5.241682 -318.725485 
+			-k 0 -k 1 -k 2 -k 3 -k 4 -k 5 -k 6 -k 7 -k 8 -k 9 -k 10 -k 11 -k 12 -k 13 -k 14 -k 15 -k 16 -k 17 -k 18 -k 19 -k 20 -k 21 -k 22 -k 23 -k 24 -k 25 -k 26 -k 27 -k 28 -k 29 -k 30 -k 31 -k 32 -k 33 -k 34 -k 35 -k 36 -k 37 -k 38 -k 39 -k 40 -k 41 -k 42 -k 43 -k 44 -k 45 -k 46 
+			-k 47 -k 48 -k 49 -k 50 -k 51 -k 52 -k 53 -k 54 -k 55 -k 56 -k 57 -k 58 -k 59 -k 60 -k 61 -k 62 -k 63 -k 64 ;
+		CenterPivot;
+
+		if (`currentUnit -q -l` == "m")
+    	{
+    	    xform -s .1 .1 .1;
+    	}
+    	else
+    	{
+    	    xform -s .1 .1 .1;
+    	}
+		move -rpr 0 0 0;
+		makeIdentity -apply on;
+	
+	//load created controller into variable to be passed to macConnectControl proc
+	$controlerObj = `ls -sl -type "transform"`;
+	
+	//if There is a control Name given by the user rename the control to that
+	if (`textFieldGrp -q -text controlNameTxt` != "")
+	{
+		string $newName = `textFieldGrp -q -text controlNameTxt`;
+		rename $controlerObj[0] $newName;
+		//update $controlObj
+		$controlerObj = `ls -sl`;
+	} 
+	
+	string $shape[0] = `listRelatives -s $controlerObj[0]`;	
+	//if control color checkbox is on change the color
+    if (`checkBoxGrp -q -v1 mmColorBx` == 1)
+    {
+        int $colors = `palettePort -q -scc mmColorPalette`;
+        //change the color of the curve
+        setAttr ($shape[0] + ".overrideEnabled") 1;
+
+        setAttr ($shape[0] + ".overrideColor") ($colors + 1);
+        
+    }
+    
+	//if connect on creation is selected call macConnectControl proc
+			if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1)
+			{
+				macConnectControl($controlerObj[0], $joint);	
+			}
+}
+
+/////////////////////////////////////////////////////////////////////////
+//				bt25 proc
+//	creates selected controller and will connect and name it 
+//	if specified by the user
+/////////////////////////////////////////////////////////////////////////
+global proc bt25 ()
+{
+	//variables needed
+	string $joint;
+	string $controlerObj[];
+	string $sel[];
+	
+	//check if connect on creation is on or name based on joint	//if either is on check for a selected joint if not throw an error
+
+	if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1 || `checkBoxGrp -q -value1 useJntNameChckBx` == 1)
+	{
+		//if on load joint
+		$sel = `ls -sl -type "transform"`;
+		
+		//check if joint was selected
+		if ($sel[0] == "")
+		{
+			error "nothing was selected.  Please select an object and try again.";
+		}
+		else
+		{
+			//else load joint into variable to be passed to macConnectControl proc
+			$joint = $sel[0];	
+		}
+	}
+	
+	
+	//create controller place in controlObj var 
+		curve -d 1 -p 5 -5 -364.902251 -p 5 -5 -374.902251 -p -5 -5 -374.902251 -p -5 -5 -364.902251 -p 5 -5 -364.902251 -p 5 5 -364.902251 -p -5 5 -364.902251 -p -5 5 -374.902251 -p 5 5 -374.902251 -p 5 5 -364.902251 -p 5 -5 -364.902251 -p -5 -5 -364.902251 
+			-p -5 5 -364.902251 -p -5 5 -374.902251 -p -5 -5 -374.902251 -p 5 -5 -374.902251 -p 5 5 -374.902251 -p 5 -5 -374.902251 -k 0 -k 1 -k 2 -k 3 -k 4 -k 5 -k 6 -k 7 -k 8 -k 9 -k 10 -k 11 -k 12 -k 13 -k 14 -k 15 -k 16 -k 17 ;
+		CenterPivot;
+		
+		if (`currentUnit -q -l` == "m")
+    	{
+    	    xform -s .1 .1 .1;
+    	}
+    	else
+    	{
+    	    xform -s .1 .1 .1;
+    	}
+		move -rpr 0 0 0;
+		makeIdentity -apply on;
+	
+	//load created controller into variable to be passed to macConnectControl proc
+	$controlerObj = `ls -sl -type "transform"`;
+	
+	//if There is a control Name given by the user rename the control to that
+	if (`textFieldGrp -q -text controlNameTxt` != "")
+	{
+		string $newName = `textFieldGrp -q -text controlNameTxt`;
+		rename $controlerObj[0] $newName;
+		//update $controlObj
+		$controlerObj = `ls -sl`;
+	} 
+
+	string $shape[0] = `listRelatives -s $controlerObj[0]`;	
+	//if control color checkbox is on change the color
+    if (`checkBoxGrp -q -v1 mmColorBx` == 1)
+    {
+        int $colors = `palettePort -q -scc mmColorPalette`;
+        //change the color of the curve
+        setAttr ($shape[0] + ".overrideEnabled") 1;
+
+        setAttr ($shape[0] + ".overrideColor") ($colors + 1);
+        
+    }
+    
+	//if connect on creation is selected call macConnectControl proc
+			if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1)
+			{
+				macConnectControl($controlerObj[0], $joint);	
+			}
+}
+
+/////////////////////////////////////////////////////////////////////////
+//				bt26 proc
+//	creates selected controller and will connect and name it 
+//	if specified by the user
+/////////////////////////////////////////////////////////////////////////
+global proc bt26 ()
+{
+	//variables needed
+	string $joint;
+	string $controlerObj[];
+	string $sel[];
+	
+	//check if connect on creation is on or name based on joint	//if either is on check for a selected joint if not throw an error
+
+	if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1 || `checkBoxGrp -q -value1 useJntNameChckBx` == 1)
+	{
+		//if on load joint
+		$sel = `ls -sl -type "transform"`;
+		
+		//check if joint was selected
+		if ($sel[0] == "")
+		{
+			error "nothing was selected.  Please select an object and try again.";
+		}
+		else
+		{
+			//else load joint into variable to be passed to macConnectControl proc
+			$joint = $sel[0];	
+		}
+	}
+	
+	
+	//create controller place in controlObj var 
+	curve -degree 1 -p 0 0 -1 -p -1 0 0 -p 0 0 1 -p 1 0 0 -p 0 0 -1 -p 0 1 0 -p 0 0 1 -p 0 -1 0 -p 0 0 -1 -p 1 0 0 -p 0 1 0 -p -1 0 0 -p 0 -1 0 -p 1 0 0;
+	
+	//load created controller into variable to be passed to macConnectControl proc
+	$controlerObj = `ls -sl -type "transform"`;
+
+	select $controlerObj[0];
+	if (`currentUnit -q -l` == "m")
+    	{
+    	    xform -s 1 1 1;
+    	}
+    	else
+    	{
+    	    xform -s 1 1 1;
+    	}
+	makeIdentity -apply on $controlerObj[0];
+	
+	//if There is a control Name given by the user rename the control to that
+	if (`textFieldGrp -q -text controlNameTxt` != "")
+	{
+		string $newName = `textFieldGrp -q -text controlNameTxt`;
+		rename $controlerObj[0] $newName;
+		//update $controlObj
+		$controlerObj = `ls -sl`;
+	} 
+
+	string $shape[0] = `listRelatives -s $controlerObj[0]`;	
+	//if control color checkbox is on change the color
+    if (`checkBoxGrp -q -v1 mmColorBx` == 1)
+    {
+        int $colors = `palettePort -q -scc mmColorPalette`;
+        //change the color of the curve
+        setAttr ($shape[0] + ".overrideEnabled") 1;
+
+        setAttr ($shape[0] + ".overrideColor") ($colors + 1);
+        
+    }
+    
+	//if connect on creation is selected call macConnectControl proc
+			if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1)
+			{
+				macConnectControl($controlerObj[0], $joint);	
+			}
+}
+
+/////////////////////////////////////////////////////////////////////////
+//				bt27 proc
+//	creates selected controller and will connect and name it 
+//	if specified by the user
+/////////////////////////////////////////////////////////////////////////
+global proc bt27 ()
+{
+	//variables needed
+	string $joint;	
+	string $controlerObj[];
+	string $sel[];
+	
+	//check if connect on creation is on or name based on joint	//if either is on check for a selected joint if not throw an error
+
+	if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1 || `checkBoxGrp -q -value1 useJntNameChckBx` == 1)
+	{
+		//if on load joint
+		$sel = `ls -sl -type "transform"`;
+		
+		//check if joint was selected
+		if ($sel[0] == "")
+		{
+			error "nothing was selected.  Please select an object and try again.";
+		}
+		else
+		{
+			//else load joint into variable to be passed to macConnectControl proc
+			$joint = $sel[0];	
+		}
+	}
+	
+	
+	//create controller place in controlObj var 
+		curve -d 1 -p 0 0 -6 -p 0 0 -8 -p 2.06834 0 -7.720474 -p 3.996656 0 -6.921725 -p 5.656898 0 -5.656901 -p 6.921731 0 -3.996654 -p 7.720465 0 -2.068341 -p 8.000062 0 5.15532e-007 -p 7.720465 0 2.06834 -p 6.921731 0 3.996656 -p 5.656898 0 5.656898 
+			-p 3.996656 0 6.921731 -p 2.06834 0 7.720465 -p 0 0 8.000062 -p -2.06834 0 7.720465 -p -3.996656 0 6.921731 -p -5.656898 0 5.656898 -p -6.921731 0 3.996656 -p -7.720465 0 2.06834 -p -8.000062 0 5.15532e-007 -p -10.117476 0 0 -p -6.959211 0 -6.31653 
+			-p -3.800946 0 0 -p -6.000046 0 3.86931e-007 -p -5.790349 0 1.551256 -p -5.191298 0 2.997491 -p -4.242674 0 4.242673 -p -2.997491 0 5.191298 -p -1.551256 0 5.790349 -p 0 0 6.000046 -p 1.551256 0 5.790349 -p 2.997491 0 5.191298 -p 4.242674 0 4.242673 
+			-p 5.191298 0 2.997491 -p 5.790349 0 1.551256 -p 6.000046 0 3.86931e-007 -p 5.790349 0 -1.551257 -p 5.191298 0 -2.99749 -p 4.242674 0 -4.242676 -p 2.997491 0 -5.191294 -p 1.551256 0 -5.790355 -p 0 0 -6 -k 0 -k 2 -k 4.087143 -k 6.174343 -k 8.261489 
+			-k 10.348646 -k 12.435838 -k 14.522991 -k 16.610143 -k 18.697338 -k 20.78449 -k 22.871642 -k 24.958836 -k 27.045989 -k 29.133141 -k 31.220335 -k 33.307488 -k 35.394639 -k 37.481834 -k 39.568986 -k 41.6864 -k 48.748496 -k 55.810591 -k 58.009692 
+			-k 59.575056 -k 61.140451 -k 62.705816 -k 64.271181 -k 65.836575 -k 67.40194 -k 68.967305 -k 70.532699 -k 72.098064 -k 73.663429 -k 75.228823 -k 76.794188 -k 78.359554 -k 79.924946 -k 81.490314 -k 83.055675 -k 84.621073 -k 86.186431 ;
+	
+	//load created controller into variable to be passed to macConnectControl proc
+	$controlerObj = `ls -sl -type "transform"`;
+		
+		select $controlerObj[0];
+		if (`currentUnit -q -l` == "m")
+    	{
+    	    xform -s .1 .1 .1;
+    	}
+    	else
+    	{
+    	    xform -s .1 .1 .1;
+    	}
+		move -rpr 0 0 0;
+		makeIdentity -apply on;
+	
+	//if There is a control Name given by the user rename the control to that
+	if (`textFieldGrp -q -text controlNameTxt` != "")
+	{
+		string $newName = `textFieldGrp -q -text controlNameTxt`;
+		rename $controlerObj[0] $newName;
+		//update $controlObj
+		$controlerObj = `ls -sl`;
+	} 
+
+	string $shape[0] = `listRelatives -s $controlerObj[0]`;	
+	//if control color checkbox is on change the color
+    if (`checkBoxGrp -q -v1 mmColorBx` == 1)
+    {
+        int $colors = `palettePort -q -scc mmColorPalette`;
+        //change the color of the curve
+        setAttr ($shape[0] + ".overrideEnabled") 1;
+
+        setAttr ($shape[0] + ".overrideColor") ($colors + 1);
+        
+    }
+    
+	//if connect on creation is selected call macConnectControl proc
+			if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1)
+			{
+				macConnectControl($controlerObj[0], $joint);	
+			}
+}
+
+/////////////////////////////////////////////////////////////////////////
+//				bt28 proc
+//	creates selected controller and will connect and name it 
+//	if specified by the user
+/////////////////////////////////////////////////////////////////////////
+global proc bt28 ()
+{
+	//variables needed
+	string $joint;
+	string $controlerObj[];
+	string $sel[];
+	
+	//check if connect on creation is on or name based on joint	//if either is on check for a selected joint if not throw an error
+
+	if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1 || `checkBoxGrp -q -value1 useJntNameChckBx` == 1)
+	{
+		//if on load joint
+		$sel = `ls -sl -type "transform"`;
+		
+		//check if joint was selected
+		if ($sel[0] == "")
+		{
+			error "nothing was selected.  Please select an object and try again.";
+		}
+		else
+		{
+			//else load joint into variable to be passed to macConnectControl proc
+			$joint = $sel[0];	
+		}
+	}
+	
+	
+	//create controller place in controlObj var 
+	circle -degree 1 -sections 3 -sweep 360 -radius 1 -normal 1 0 0;
+	if (`currentUnit -q -l` == "m")
+	{
+	    xform -s 1 1 1 -rotation 0 0 90;
+	}
+	else
+	{
+	    xform -s 1 1 1 -rotation 0 0 90;
+	}
+	makeIdentity -apply on;
+		
+	//load created controller into variable to be passed to macConnectControl proc
+	$controlerObj = `ls -sl -type "transform"`;
+	
+	//if There is a control Name given by the user rename the control to that
+	if (`textFieldGrp -q -text controlNameTxt` != "")
+	{
+		string $newName = `textFieldGrp -q -text controlNameTxt`;
+		rename $controlerObj[0] $newName;
+		//update $controlObj
+		$controlerObj = `ls -sl`;
+	} 
+
+	string $shape[0] = `listRelatives -s $controlerObj[0]`;		
+	//if control color checkbox is on change the color
+    if (`checkBoxGrp -q -v1 mmColorBx` == 1)
+    {
+        int $colors = `palettePort -q -scc mmColorPalette`;
+        //change the color of the curve
+        setAttr ($shape[0] + ".overrideEnabled") 1;
+
+        setAttr ($shape[0] + ".overrideColor") ($colors + 1);
+        
+    }
+    
+	//if connect on creation is selected call macConnectControl proc
+			if(`checkBoxGrp -q -value1 connectCreateChckBx` == 1)
+			{
+				macConnectControl($controlerObj[0], $joint);	
+			}
+}
+
+

@@ -49,14 +49,21 @@ class UsdReader:
             return
 
         if self.quick:
-            latest = self.element.get_last_publish()
+            path = os.path.join(self.element._filepath, self.shot_name+".usda")
+            if os.path.exists(path):
+                self.open_scene_file(path)
+                return
+            else:
+                self.choose_layout()
+                return
+            '''latest = self.element.get_last_publish()
             if latest is None:
                 self.choose_layout()
                 return
             else:
                 selected_scene_file = latest[3]
                 self.open_scene_file(selected_scene_file)
-                return
+                return'''
 
         self.publishes = self.element.list_publishes()
 
