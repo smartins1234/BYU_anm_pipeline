@@ -69,7 +69,7 @@ class MbExporter:
         path = asset.get_filepath()
         path = os.path.join(path, Asset.RIG)
 
-        self.element = Element(path)
+        self.element = asset.get_element(Asset.RIG)
 
         path = os.path.join(path, name)
         last_version = self.element.get_last_version()

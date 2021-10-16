@@ -29,6 +29,16 @@
 			"double-click":"clone(quick=False)",
 			"tool":"mayaTools.cloners.cloner",
 			"function":"Cloner.clone()"
+		},
+		{
+			"itemType":"button",
+			"icon":"person.svg",
+			"annotation":"macConCreate",
+			"label":"",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.utilities.createControl",
+			"function":"createControl.run()"
 		}
     ]
 }

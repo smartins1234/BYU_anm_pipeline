@@ -29,6 +29,66 @@
 			"double-click":"go(quick=False)",
 			"tool":"mayaTools.usd_io.readUsd",
 			"function":"UsdReader.go()"
+		},
+		{
+			"itemType":"button",
+			"icon":"save.png",
+			"annotation":"Save this shot file to the pipe",
+			"label":"Save",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.shot_management.shot_save",
+			"function":"ShotSaver.save()"
+		},
+		{
+			"itemType":"button",
+			"icon":"load.png",
+			"annotation":"Open a shot file from the pipe",
+			"label":"Open",
+			"menu":0,
+			"double-click":"open(quick=False)",
+			"tool":"mayaTools.shot_management.shot_open",
+			"function":"ShotOpener.open()"
+		},
+		{
+			"itemType":"button",
+			"icon":"ik-fk.svg",
+			"annotation":"Overlapper tool",
+			"label":"Overlapper",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.utilities.overlapper",
+			"function":"Overlapper.run()"
+		},
+		{
+			"itemType":"button",
+			"icon":"person.svg",
+			"annotation":"Add a basic global control to any object",
+			"label":"AutoControl",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.utilities.autoControl",
+			"function":"AutoControl.go()"
+		},
+		{
+			"itemType":"button",
+			"icon":"rollback.svg",
+			"annotation":"Remove unknown nodes",
+			"label":"rmNodes",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.utilities.rmUnknownNodes",
+			"function":"rmNodes.go()"
+		},
+		{
+			"itemType":"button",
+			"icon":"playblast.svg",
+			"annotation":"Playblast with correct settings",
+			"label":"playblast",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.utilities.playblast",
+			"function":"playblast.go()"
 		}
     ]
 }

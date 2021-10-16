@@ -68,7 +68,7 @@ class Cloner:
 			print('File does not exist: '+assetName)
 
 	def clone_geo(self):
-		pm.loadPlugin("objImport")
+		#pm.loadPlugin("objImport")
 		self.type = Asset.GEO
 
 		asset_list = self.project.list_existing_assets()
@@ -246,6 +246,8 @@ class Cloner:
 			qd.warning("Nothing was cloned.")
 			return
 
+		self.element = element
+
 		if self.quick:
 			latest = element.get_last_publish()
 			if not latest:
@@ -291,10 +293,15 @@ class Cloner:
 				selected_publish=item
 
 		selected_scene_file=None
+		position = 0
 		for publish in self.publishes:
 			label=publish[0] + " " + publish[1] + " " + publish[2]
 			if label == selected_publish:
-				selected_scene_file=publish[3]
+				version_path = self.element.get_version_dir(position)
+				version_path = os.path.join(version_path, self.name + self.element.get_app_ext())
+				selected_scene_file = version_path
+				break
+			position += 1
 
 		# selected_scene_file is the one that contains the scene file for the selected commit
 		self.open_scene_file(selected_scene_file)
