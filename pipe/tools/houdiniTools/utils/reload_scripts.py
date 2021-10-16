@@ -3,8 +3,11 @@ from pipe.tools.houdiniTools.creator import creator as hou_creator
 from pipe.tools.houdiniTools.assembler import assembler as hou_assembler
 from pipe.tools.houdiniTools.cloner import cloner as hou_cloner
 from pipe.tools.houdiniTools.cloner import anim_cloner# as hou_cloner
+from pipe.tools.houdiniTools.cloner import tool_cloner
 from pipe.tools.houdiniTools.publisher import mat_publisher as hou_publisher
 from pipe.tools.houdiniTools.publisher import shot_publisher
+from pipe.tools.houdiniTools.publisher import light_publisher
+from pipe.tools.houdiniTools.publisher import tool_publisher
 from pipe.tools.houdiniTools.cloner import unpacker as hou_unpacker
 from pipe.tools.houdiniTools.updater import update_assets as hou_updater
 from pipe.tools.houdiniTools.updater import update_shots
@@ -19,10 +22,15 @@ class ReloadScripts:
         reload(hou_assembler)
         reload(hou_creator)
         reload(hou_cloner)
+        reload(tool_cloner)
         reload(hou_publisher)
+        reload(shot_publisher)
+        reload(light_publisher)
+        reload(tool_publisher)
         reload(hou_unpacker)
         reload(hou_updater)
         reload(anim_cloner)
         reload(update_shots)
+        
         #reload(hou_parser)
         reload(qd)
