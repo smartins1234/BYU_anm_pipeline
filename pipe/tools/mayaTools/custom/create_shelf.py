@@ -83,6 +83,9 @@ def load_shelf(shelfName, fileName):
 	print("*** Shelf loaded :) ***")
 	sys.path.append(os.getcwd())
 
+	#load up this plugin bc rigging used it
+	pm.loadPlugin("ngSkinTools2")
+
 def build_menu_string(command_base, menu_items):
 	menu = []
 	menu_python = [0,1,2,3]
