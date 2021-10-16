@@ -9,7 +9,7 @@ from pipe.pipeHandlers.body import Asset
 from pipe.pipeHandlers.body import AssetType
 from pipe.pipeHandlers.element import Element
 from pipe.pipeHandlers.environment import Environment
-from pipe.pipeHandlers import pipeline_io
+from pipe.pipeHandlers import pipeline_io as pio
 
 class LayoutPublisher:
 
@@ -81,6 +81,8 @@ class LayoutPublisher:
             refrop.parm("lopoutput").set(os.path.join(self.element._filepath, self.layout_name + "_ref.usda"))
             refrop.parm("enableoutputprocessor_simplerelativepaths").set(0)
             refrop.parm("execute").pressButton()
+
+            pio.set_permissions(os.path.join(self.element._filepath, self.layout_name + "_ref.usda"))
             #   this only needs to be done once since with every new publish, the file being referenced gets updated
             ref.destroy()
             refrop.destroy()

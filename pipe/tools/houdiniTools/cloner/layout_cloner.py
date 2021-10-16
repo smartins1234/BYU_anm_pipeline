@@ -61,4 +61,4 @@ class LayoutCloner:
         rop.parm("lopoutput").set(file)
         rop.setName("save_layout", 1)
 
-        hou.node("/stage").layoutChildren()
+        #hou.node("/stage").layoutChildren()

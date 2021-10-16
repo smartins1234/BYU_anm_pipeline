@@ -130,7 +130,7 @@ class UpdateAssets:
 
 
         comment = "Automatic publish"
-        username = Environment().get_user().get_username()
+        username = "auto_update"
         name = main_name
 
         element.publish(username, path, comment, name)
@@ -146,9 +146,14 @@ class UpdateAssets:
         ref1.parm("primpath").set(self.primpath)
         geo_path = self.getGeoPath(var)
         ref1.parm("filepath1").set(geo_path)
+
+        disp = stage.createNode("rendergeometrysettings")
+        disp.parm("xn__primvarsdisplacementboundsphere_control_n4br").set("set")
+        disp.parm("xn__primvarsdisplacementboundsphere_mrbr").set(1)
+        disp.setInput(0, ref1)
         
         lib1 = stage.createNode("reference")
-        lib1.setInput(0, ref1)
+        lib1.setInput(0, disp)
         lib1.parm("primpath").set("/materials/")
         mat_path = self.getMatPath(var)
         lib1.parm("filepath1").set(mat_path)
@@ -215,7 +220,7 @@ class UpdateAssets:
             dst = os.path.join(element._filepath, var + "_main.usda")
 
             mat_lib = hou.node("/stage").createNode("materiallibrary")
-            pink = mat_lib.createNode("pxrsurface::3.0")
+            pink = mat_lib.createNode("usdpreviewsurface")
             pink.setName(var)
             pink.parm("diffuseColorr").set(1)
             pink.parm("diffuseColorg").set(0)
