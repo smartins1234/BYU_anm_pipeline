@@ -86,6 +86,9 @@ def input(label, title='Input', text=None):
     else:
         return None
 
+def chooseFile(parent=None, caption=None, dir="/"):
+    fileName = QtWidgets.QFileDialog.getSaveFileName(parent, caption, dir)
+    return fileName
 
 '''
 	Have to use this instead of input in houdini to avoid black text on black bar
