@@ -1,126 +1,110 @@
 from pxr import Usd, UsdShade, Sdf
 #from parser import Parser
 import os, hou
+from parser import *
 
 class Unpacker:
 
     def __init__(self):
         print("starting unpacker...")
+        self.obj = hou.node("/obj")
+        self.layout = self.obj.createNode("subnet")
+        self.layout.setName("layout", 1)
 
-    def unpack_usd(self, file):
+    def unpack(self):
+        myParser = Parser()
+        stage = myParser.parse("/groups/cenote/BYU_anm_pipeline/production/layouts/xochimilco/layout/xochimilco_ref.usda")
+        #stage.printAll()
+        stage.printStructure()
+        atts = []
+        for p in stage.prims:
+            self.traverse(p, atts)
+        '''if prim.getTypeName() == "Mesh":
+            parent = prim.getParent()
+            for prop in parent.properties:
+                if prop.getName() == "reference":
+                    path = prop.getValue()
+                    geo = self.layout.createNode("geo")
+                    geo.setName(parent.getName(), 1)
+                    im = geo.createNode("usdimport")
+                    im.setName(parent.getName()+"_import", 1)
+                    im.parm("filepath1").set(path)
+                    im.parm("unpack_geomtype").set(1)'''
 
-        '''THIS IS TEMPORARY, REMOVE ONCE THE TOOL IS COMPLETE
-        for node in hou.node("/obj").children():
-            node.destroy()
-        for node in hou.node("/mat").children():
-            node.destroy()
-        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'''
+    def traverse(self, prim, atts):
+        print(prim.getTypeName()+ " " +prim.getName())
+        '''for p in prim.prims:
+            print("\t"+p.getName()+ " " +p.getTypeName())'''
 
-        node = hou.node("/stage").createNode("reference")
-        node.parm("filepath1").set(file)
-
-        #node = hou.selectedNodes()[0]
-        stage = node.stage()
-
-        prims = stage.Traverse()                            
-                                
-        for p in prims: 
-            path = p.GetAttribute("ref_path")
-            if path:
-                print(p.GetName() + " is referenced and is a " + p.GetTypeName())
-                
-                if p.GetTypeName() == "Xform":
-                    self.build_geo(p, path)
+        if prim.getTypeName() == "Mesh":
             
-            path = p.GetAttribute("hda_path")
-            if path:    #we're going to assume this is a material
-                print("Loading material " + p.GetName())
-                mat = hou.node("/mat")
-                hou.hda.installFile(path.Get())
-                definition = hou.hda.definitionsInFile(path.Get())[0]
-                nodeType = definition.nodeTypeName()
+            parent = prim.getParent()
+            if parent is None:
+                print("errr, what?")
+                return
+            for prop in parent.properties:
+                if prop.getName() == "reference":
+                    path = prop.getValue()
+                    geo = self.layout.createNode("geo")
+                    geo.setName(parent.getName(), 1)
+                    im = geo.createNode("usdimport")
+                    im.setName(parent.getName()+"_import", 1)
+                    im.parm("filepath1").set(path)
+                    im.parm("unpack_geomtype").set(1)
+                    prev = im
 
-                newMat = mat.createNode(nodeType, p.GetName())
-                newMat.setColor(hou.Color((01.0,1.0,0.2)))
-                    
-        node.destroy()
+                    for a in atts:
+                        edit = a.getValue()
+                        vex = "matrix trans = {{"
+                        for x in range(0, 4):
+                            for y in range(0, 4):
+                                vex += str(edit[x][y])
+                                if y != 3:
+                                    vex += ","
+                                else:
+                                    vex += "}"
+                            if x != 3:
+                                vex += ",{"
+                            else:
+                                vex += "}"
+                        print(vex)
+                        vex += ";\n@P = @P * trans;"
 
-    '''def create_materials(self, prims):
-        mat = hou.node("/mat")
-        for p in prims:
-            if p.GetTypeName() == "Material":
-                hou.hda.installFile(hda_path)
-                definition = hou.hda.definitionsInFile(hda_path)
-                nodeType = definition.nodeTypeName()
-                
-                newMat = mat.createNode(nodeType, p.GetName())
-                newMat.setColor(hou.Color((0.2,0.0,0.8)))
-            path = p.GetAttribute("ref_path")
-            if path and p.GetTypeName != "Xform": #these are materials then
-                children = p.GetAllChildren()
-                #print(children)
-                for child in children:
-                    if child.GetTypeName() == "Material":
-                        #create material node
-                        myMat = mat.createNode("pxrmaterialbuilder", child.GetName())
-                        shaders = child.GetAllChildren()
-                        self.build_shaders(shaders, myMat)
+                        wrangle = geo.createNode("attribwrangle")
+                        wrangle.parm("snippet").set(vex)
+                        wrangle.setInput(0, prev)
+                        wrangle.setDisplayFlag(True)
+                        wrangle.setRenderFlag(True)
 
-        mat.layoutChildren()'''
-    '''
-    def build_shaders(self, shaders, material):
-        for shader in shaders:
-            if shader.GetAttribute("info:id").Get() != "UsdPreviewSurface":
-                node = material.createNode(shader.GetAttribute("info:id").Get().lower(), shader.GetName())
-                #print(shader.GetAttributes())
-                for att in shader.GetPropertiesInNamespace("inputs"):
-                    print(att)
+                        prev = wrangle
 
+                    for att in parent.attributes:
+                        if att.getType() == "rel":
+                            mat = att.getValue()
+                            mat = os.path.basename(str(mat))
+                            geo.parm("shop_materialpath").set("/mat/" + mat)
 
-        material.layoutChildren()'''
+                            return
 
-    def build_geo(self, p, path):
-        geo = hou.node("/obj").createNode("geo", p.GetName())
-        im = geo.createNode("usdimport", p.GetName())
-        imPath = im.parm('filepath1')
-        imPath.set(path.Get())
-        im.parm("input_unpack").set(1)
-        im.parm("unpack_geomtype").set(1)
-        
-        edit = p.GetAttribute("xformOp:transform:edit").Get()
-        vex = "matrix trans = {{"
-        for x in range(0, 4):
-            for y in range(0, 4):
-                vex += str(edit[x][y])
-                if y != 3:
-                    vex += ","
-                else:
-                    vex += "}"
-            if x != 3:
-                vex += ",{"
-            else:
-                vex += "}"
-        #print(vex)
-        vex += ";\n@P = @P * trans;"
-        
-        wrangle = geo.createNode("attribwrangle")
-        wrangle.parm("snippet").set(vex)
-        wrangle.setInput(0, im)
-        wrangle.setDisplayFlag(True)
-        wrangle.setRenderFlag(True)
-        
-        rel = p.GetRelationship("material:binding").GetTargets()[0]
-        rel = os.path.basename(str(rel))
-        print(rel)
-        
-        geo.parm("shop_materialpath").set("/mat/" + rel)
-        
-        geo.layoutChildren()
-        hou.node("/obj").layoutChildren()
+        elif prim.getTypeName() == "Material":
+            pass
 
-    def unpack_usd2(self, file):
-        #read in the file
-        #stage = Parser().parse(file)
-        #get the file it references
-        #build the prims
-        pass
+        else:
+            for a in prim.attributes:
+                if a.getType() == "matrix4d":
+                    atts.append(a)
+
+            for a in prim.attributes:
+                print("\t"+a.getType())
+                if a.getType() == "variantset":
+                    for v in a.value:                        
+                        self.traverse(v, atts)
+
+            for p in prim.prims:
+                self.traverse(p, atts)
+
+        #if a mesh, go up a prim and create the reference and apply the transforms, then return
+        #else if material:
+        #load the material somehow idk :)
+        #else:
+        #add transforms from this prim, if any, go to the next

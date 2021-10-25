@@ -375,6 +375,19 @@ reload.run()
 				]]>
 				</scriptCode>
 			</scriptItem>
+			
+			<scriptItem id="h.test">
+				<label>Test</label>
+				<scriptCode scriptType="python">
+				<![CDATA[
+from pipe.tools.houdiniTools.cloner import layout_unpacker
+import hou
+unpack = layout_unpacker.LayoutUnpacker()
+hou.session.unpack = unpack
+unpack.clone()
+				]]>
+				</scriptCode>
+			</scriptItem>
 		</subMenu>
 
 	</subMenu>

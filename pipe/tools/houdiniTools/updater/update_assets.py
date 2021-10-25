@@ -40,6 +40,8 @@ class UpdateAssets:
         for asset in assets:
             name = asset["name"]
             variants = asset["children"][:]
+            print("name: "+name)
+            print("variants: ",variants)
 
             self.build_asset(name, variants)
 
@@ -206,8 +208,9 @@ class UpdateAssets:
             body = self.project.create_asset(var)
 
         element = body.get_element(Asset.MATERIALS)
-        if element.get_last_version() >= 0:
-            return element.get_last_publish()[3]
+        myPath = os.path.join(element._filepath, var+"_main.usda")
+        if os.path.exists(myPath):
+            return myPath
 
         else:
             #create and publish a basic material, return the path
@@ -222,9 +225,9 @@ class UpdateAssets:
             mat_lib = hou.node("/stage").createNode("materiallibrary")
             pink = mat_lib.createNode("usdpreviewsurface")
             pink.setName(var)
-            pink.parm("diffuseColorr").set(1)
-            pink.parm("diffuseColorg").set(0)
-            pink.parm("diffuseColorb").set(1)
+            pink.parm("diffuseColorr").set(.6)
+            pink.parm("diffuseColorg").set(.6)
+            pink.parm("diffuseColorb").set(.6)
 
             rop = hou.node("/stage").createNode("usd_rop")
             rop.setInput(0, mat_lib)
