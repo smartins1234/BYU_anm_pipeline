@@ -3,7 +3,8 @@ import os
 
 class Parser:
     def __init__(self):
-        print("starting parser...")
+        #print("starting parser...")
+        pass
     
     def parse(self, path=None):
         stage = Stage()
@@ -41,8 +42,8 @@ class Parser:
                             var = att.dict[varName]
                             var.isLoaded = True
 
-        stage.printAll()
-        print("finished")
+        #stage.printAll()
+        #print("finished")
         return stage
 
 class Stage:
@@ -61,7 +62,7 @@ class Stage:
     def printPrim(self, prim, tabs):
         if not prim.isLoaded:
             return
-        print(tabs + prim.getName() + " " + prim.getPrimPath())
+        print(tabs + prim.getName() + " " + prim.getPrimPath() + " " + prim.getTypeName())
         for prop in prim.properties:
             print(tabs + "\t" + prop.getName() + " = " + prop.getValue())
         for att in prim.attributes:
@@ -76,6 +77,26 @@ class Stage:
         tabs += "\t"
         for p in prim.prims:
             self.printPrim(p, tabs)
+
+    def printStructure(self):
+        tabs = ""
+        for prim in self.prims:
+            if prim.isLoaded:
+                self.printPrimShort(prim, tabs)
+
+    def printPrimShort(self, prim, tabs):
+        if not prim.isLoaded:
+            return
+        print(tabs + prim.getName() + " " + prim.getPrimPath() + " " + prim.getTypeName())
+        for att in prim.attributes:
+            if isinstance(att, VariantSet):
+                tabs += "\t"
+                for v in att.value:
+                    self.printPrimShort(v, tabs)
+                tabs = tabs[:-1]
+        tabs += "\t"
+        for p in prim.prims:
+            self.printPrimShort(p, tabs)
 
 
 class Prim(object):
@@ -190,6 +211,16 @@ class Prim(object):
                                 finalVal += char
 
                         self.properties.append(Property(name, finalVal))
+                        layer = Parser().parse(finalVal)
+                        
+                        for prim in layer.prims:
+                            #print("from ref: "+prim.getName())
+                            prim.parent = self
+                            if prim.getName != self.name:
+                                self.prims.append(prim)
+                            '''for subPrim in prim.prims:
+                                print(subPrim.getName())
+                                self.prims.append(subPrim)'''
                 elif word == "variants":
                     line = next(lineIter).split()
                     setName = line[1]
@@ -220,6 +251,14 @@ class Shader(Prim):
     def __init__(self, parent=None):
         super(Shader, self).__init__(parent)
         self.typeName = "Shader"
+
+class Mesh(Prim):
+    def __init__(self, parent=None):
+        super(Mesh, self).__init__(parent)
+        self.typeName = "Mesh"
+
+    def parse(self, lineIter, word, line):
+        pass
 
 
 class Def(Prim):
@@ -453,12 +492,14 @@ class PrimTypes:
     SCOPE = "Scope"
     MATERIAL = "Material"
     SHADER = "Shader"
-    ALL = [XFORM, SCOPE, MATERIAL, SHADER]
+    MESH = "Mesh"
+    ALL = [XFORM, SCOPE, MATERIAL, SHADER, MESH]
     PRIM = {
         XFORM: Xform,
         SCOPE: Scope,
         MATERIAL: Material,
-        SHADER: Shader
+        SHADER: Shader,
+        MESH: Mesh
     }
 
 class AttributeTypes:
@@ -484,6 +525,8 @@ class Property:
     def getValue(self):
         return self.value
     
-    
-
-Parser().parse()
+'''    
+myParser = Parser()
+myStage = myParser.parse("/groups/cenote/BYU_anm_pipeline/production/layouts/xochimilco/layout/xochimilco_ref.usda")
+myStage.printAll()
+print("finished")'''
