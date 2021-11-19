@@ -1,7 +1,7 @@
 import os
 import shutil
 
-from pipeHandlers.body import Body, Asset, Shot, Tool, CrowdCycle, AssetType, Layout
+from pipeHandlers.body import Body, Asset, Shot, Tool, CrowdCycle, AssetType, Layout, Sequence
 from pipeHandlers.element import Checkout, Element
 from pipeHandlers.environment import Environment, User
 from pipeHandlers import pipeline_io
@@ -48,6 +48,12 @@ class Project:
 		return the absolute filepath to the layouts directory of this project
 		'''
 		return self._env.get_layouts_dir()
+
+	def get_sequences_dir(self):
+		'''
+		return the absolute filepath to the layouts directory of this project
+		'''
+		return self._env.get_sequences_dir()
 
 	def get_rendered_shots_dir(self):
 		rendered_shots = Environment().get_shots_dir()
@@ -122,6 +128,16 @@ class Project:
 		if not os.path.exists(filepath):
 			return None
 		return Tool(filepath)
+
+	def get_sequence(self, name):
+		'''
+		returns the sequence object associated with the given name.
+		name -- the name of the sequence
+		'''
+		filepath = os.path.join(self._env.get_sequences_dir(), name)
+		if not os.path.exists(filepath):
+			return None
+		return Sequence(filepath)
 	
 	def get_layout(self, name):
 		'''
@@ -215,6 +231,14 @@ class Project:
 			return None # set already exists
 
 		return layout
+
+	def create_sequence(self, name):
+		sequence = self.create_body(name, Sequence)
+
+		if sequence is None:
+			return None # set already exists
+
+		return sequence
 
 	def create_tool(self, name):
 		'''
@@ -314,6 +338,18 @@ class Project:
 
 		layouts.sort(key=str.lower)
 		return layouts
+
+	def list_sequences(self):
+		path = self._env.get_sequences_dir() + ".sequence_list"
+		sequences = []
+		f = open(path, "r")
+		for sequence in f:
+			if sequence[-1] == "\n":
+				sequence = sequence[:-1]
+			sequences.append(sequence)
+
+		sequences.sort(key=str.lower)
+		return sequences
 
 	def list_existing_shots(self, filter=None):
 		'''
