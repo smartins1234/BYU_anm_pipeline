@@ -32,7 +32,7 @@ cd -
 export JOB=${MEDIA_PROJECT_DIR}
 HOUDINI_TOOLS=${MEDIA_PROJECT_DIR}/pipe/tools/houdiniTools
 export PYTHONPATH=${PYTHONPATH}:${HOUDINI_TOOLS}
-export HOUDINI_PATH=${HOUDINI_PATH}:${HOUDINI_TOOLS}"/custom;&":${HOUDINI_TOOLS}:${MEDIA_PROJECT_DIR}"/production;&":${MEDIA_PROJECT_DIR}"/production/tools;&"
+export HOUDINI_PATH=${HOUDINI_PATH}:${HOUDINI_TOOLS}"/custom;&":${HOUDINI_TOOLS}"/custom/otls;&":${HOUDINI_TOOLS}:${MEDIA_PROJECT_DIR}"/production;&":${MEDIA_PROJECT_DIR}"/production/tools;&"
 export HOUDINI_DSO_PATH=${HOUDINI_DSO_PATH}:${MEDIA_PROJECT_DIR}"/production/dso;&"
 
 export HOUDINI_MENU_PATH=${HOUDINI_TOOLS}"/custom/menu;&"
