@@ -178,7 +178,12 @@ class Exporter:
             print(str(shot.get_frame_range()))'''
 
         else:
+            print("we're here")
             shot = self.project.get_shot(self.chosen_shot)
+
+        if shot is None:
+            print("uh oh stinky")
+            return
 
         #pre-vis publish
         publish_info = []

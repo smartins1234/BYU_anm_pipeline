@@ -12,16 +12,6 @@
 		},
 		{
 			"itemType":"button",
-			"icon":"rollback.svg",
-			"annotation":"Remove namespaces tool",
-			"label":"",
-			"menu":0,
-			"double-click":"",
-			"tool":"mayaTools.utilities.rm_namespaces",
-			"function":"RemoveNamespaces.go()"
-		},
-		{
-			"itemType":"button",
 			"icon":"clone.svg",
 			"annotation":"Clone in an asset",
 			"label":"Clone",
@@ -32,6 +22,16 @@
 		},
 		{
 			"itemType":"button",
+			"icon":"quote.svg",
+			"annotation":"Remove namespaces tool",
+			"label":"",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.utilities.rm_namespaces",
+			"function":"RemoveNamespaces.go()"
+		},
+		{
+			"itemType":"button",
 			"icon":"person.svg",
 			"annotation":"macConCreate",
 			"label":"",
@@ -39,6 +39,36 @@
 			"double-click":"",
 			"tool":"mayaTools.utilities.createControl",
 			"function":"createControl.run()"
+		},
+		{
+			"itemType":"button",
+			"icon":"wheel.png",
+			"annotation":"Control Color",
+			"label":"",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.utilities.curveColor",
+			"function":"CurveColor.run()"
+		},
+		{
+			"itemType":"button",
+			"icon":"link.svg",
+			"annotation":"Curve Follow Tool",
+			"label":"",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.utilities.curveFollow",
+			"function":"CurveFollow.run()"
+		},
+		{
+			"itemType":"button",
+			"icon":"mirror.png",
+			"annotation":"Mirror Clusters Tool",
+			"label":"",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.utilities.mirrorClusters",
+			"function":"MirrorClusters.run()"
 		}
     ]
 }
