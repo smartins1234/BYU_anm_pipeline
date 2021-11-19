@@ -29,6 +29,16 @@
 			"double-click":"clone(quick=False)",
 			"tool":"mayaTools.cloners.cloner",
 			"function":"Cloner.clone()"
+		},
+		{
+			"itemType":"button",
+			"icon":"playblast.svg",
+			"annotation":"Playblast with correct settings",
+			"label":"playblast",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.utilities.playblast",
+			"function":"playblast.go(previs=True)"
 		}
     ]
 }
