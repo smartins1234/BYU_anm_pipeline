@@ -49,6 +49,13 @@ class LayoutUnpacker:
         self.unpack(dst)
 
     def unpack(self, file):
+        hdaFile = os.path.join(self.project.get_project_dir(), "pipe/tools/houdiniTools/custom/otls/cenoteLayout.hdanc")
+        hou.hda.installFile(hdaFile)
+
+        #delete copies of the same layout node for simplicity
+        for lopNode in hou.node("/stage").children():
+            if lopNode.type().name() == "cenoteLayout" and lopNode.parm("filepath").eval() == file:
+                lopNode.destroy()
 
         ref = hou.node("/stage").createNode("loadlayer")
         ref.setName("layout_ref", 1)
@@ -64,33 +71,28 @@ class LayoutUnpacker:
 
         obj = hou.node("/obj")
         matContext = hou.node("/mat")
-        layout = obj.createNode("subnet")
+        layout = obj.createNode("cenoteLayout")
         layout.setName("layout", 1)
+        layout.parm("scale").set(0.01)
+        
         stage = ref.stage()
 
         for prim in stage.Traverse():
             #print(prim.GetName() + " " + prim.GetTypeName())
 
             mat_path = prim.GetRelationship("material:binding")
+            #we decide what to copy into it's own geometry node by what has its own material
             if mat_path:
-                print(prim.GetName() + " has a material at path " + str(mat_path.GetForwardedTargets()[0]))
-
-                '''else:
-                    print("no dice")
-                    break
-
-                if prim.GetTypeName() == "Mesh":'''
-                    #print(prim.GetName())
+                #print(prim.GetName() + " has a material at path " + str(mat_path.GetForwardedTargets()[0]))
 
                 geo = layout.createNode("geo")
                 geo.setName(prim.GetName(), 1)
-                #add spare parameters and set default to subdivide
+                #add renderman spare parameters and set default to subdivide
                 try:
                     self.addSpareParms(geo)
+                    geo.parm("rendersubd").set(True)
                 except Exception as e:
                     print(e)
-                geo.parm("rendersubd").set(True)
-
 
                 im = geo.createNode("lopimport")
                 im.parm("loppath").set(ref.path())
@@ -99,26 +101,31 @@ class LayoutUnpacker:
                 unpack = geo.createNode("unpackusd")
                 unpack.parm("unpack_geomtype").set(1)
                 unpack.setInput(0, im)
+                unpack.setDisplayFlag(True)
+                unpack.setRenderFlag(True)
                 
-                transform = geo.createNode("xform")
+                '''transform = geo.createNode("xform")
                 transform.parm("scale").set(0.01)
                 transform.setInput(0, unpack)
                 transform.setRenderFlag(True)
-                transform.setDisplayFlag(True)
+                transform.setDisplayFlag(True)'''
                 
-                #mat_path = prim.GetRelationship("material:binding")
                 mat_path = mat_path.GetForwardedTargets()
                 if mat_path[0].IsPrimPath():
                     #print(mat_path[0])
                     mat_name = os.path.basename(str(mat_path[0]))
                     print("\t" + mat_name)
+
+                    #if the material already exists in /mat, delete it, as it
+                    #may have been updated since the layout was last cloned
+                    oldMat = hou.node("/mat/"+mat_name)
+                    if oldMat:
+                        oldMat.destroy()
                     
                     matNode = obj.node("/mat").createNode("subnet")
                     matNode.setName(mat_name, 1)
                     mat_name = matNode.name()
                     matNode.setMaterialFlag(True)
-
-                    #output = matNode.createNode("collect")
                     
                     geo.parm("shop_materialpath").set("/mat/"+mat_name)
                     
@@ -187,7 +194,6 @@ class LayoutUnpacker:
 
         shaderApiPrim = UsdShade.ConnectableAPI(prim)
         outs = shaderApiPrim.GetOutputs()
-        #index = 1
         for out in outs:
             connection = out.GetRawConnectedSourcePaths()
             if len(connection) > 0:
@@ -198,11 +204,8 @@ class LayoutUnpacker:
                 outNode = outNode.split(".")[0]
 
                 inNode = output
-                #inParm = "shader"+str(index)
 
-                #print(outNode, outParm, inNode, inParm)
                 outNode = hou.node("/mat/"+node.name()+"/"+outNode)
-                #inNode = hou.node("/mat/"+node.name()+"/"+inNode)
                 inNode.setNextInput(outNode, outNode.outputIndex(outParm))
 
     def addSpareParms(self, target):
