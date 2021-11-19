@@ -8,11 +8,11 @@
 		<subMenu id="tools_menu">
 			<label>BYUPipe</label>
 
-		<!-- ============================ Start creator subMenu =========================== -->
+		<!-- ============================ Start creator subMenu =========================== 
 		<subMenu id="creator_menu">
 			<label>Create</label>
 
-			<!-- ============================ Start Create Asset Tool =========================== 
+			 ============================ Start Create Asset Tool =========================== 
 			<scriptItem id="h.createAsset">
 				<label>Asset</label>
 				<scriptCode scriptType="python">
@@ -25,9 +25,9 @@ creator.create_asset()
 					]]>
 				</scriptCode>
 			</scriptItem>
-			 ============================ End Create Asset Tool =========================== -->
+			 ============================ End Create Asset Tool ===========================
 
-			<!-- ============================ Start Create Layout Tool =========================== -->
+			 ============================ Start Create Layout Tool =========================== 
 			<scriptItem id="h.createLayout">
 				<label>Layout</label>
 				<scriptCode scriptType="python">
@@ -40,10 +40,10 @@ creator.create_layout()
 					]]>
 				</scriptCode>
 			</scriptItem>
-			<!-- ============================ End Create Layout Tool =========================== -->
+			 ============================ End Create Layout Tool =========================== 
 
 		</subMenu>
-		<!-- ============================ End creator subMenu =========================== -->
+		 ============================ End creator subMenu =========================== -->
 
 		<!-- ============================ Start cloner subMenu =========================== -->
 		<subMenu id="cloner_menu">
@@ -111,13 +111,13 @@ cloner.clone()
 			<scriptItem id="h.cloner_layout">
 				<label>Layout</label>
 				<scriptCode scriptType="python">
-					<![CDATA[
-from pipe.tools.houdiniTools.cloner import layout_cloner
+				<![CDATA[
+from pipe.tools.houdiniTools.cloner import layout_unpacker
 import hou
-cloner = layout_cloner.LayoutCloner()
-hou.session.cloner = cloner
-cloner.clone()
-]]>
+unpack = layout_unpacker.LayoutUnpacker()
+hou.session.unpack = unpack
+unpack.clone()
+				]]>
 				</scriptCode>
 			</scriptItem>
 			<!-- ============================ End Layout cloner Tool =========================== -->
@@ -165,7 +165,7 @@ cloner.clone()
 ]]>
 				</scriptCode>
 			</scriptItem>
-			<!-- ============================ End Lights cloner Tool =========================== -->
+			<!--============================ End Lights cloner Tool =========================== -->
 
 			<!-- ============================ Start Tool cloner Tool =========================== -->
 			<scriptItem id="h.cloner_tool">
@@ -182,13 +182,42 @@ cloner.clone()
 			</scriptItem>
 			<!-- ============================ End Tool cloner Tool =========================== -->
 
+			<!-- ============================ Start Tool cloner Tool =========================== -->
+			<scriptItem id="h.cloner_fx">
+				<label>Sequence FX</label>
+				<scriptCode scriptType="python">
+					<![CDATA[
+from pipe.tools.houdiniTools.cloner import seq_fx_cloner
+import hou
+cloner = seq_fx_cloner.FXCloner()
+hou.session.cloner = cloner
+cloner.clone()
+					]]>
+				</scriptCode>
+			</scriptItem>
+			<!-- ============================ End Tool cloner Tool =========================== -->
+
 		</subMenu>
 		<!-- ============================ End cloner subMenu =========================== -->
 
 		<!-- ============================ Start Publish subMenu =========================== -->
 		<subMenu id="publish_menu">
 			<label>Publish</label>
-			<!-- ============================ Start Asset Publish Tool =========================== -->
+			<!-- ============================ Start Geo Publish Tool =========================== -->
+			<scriptItem id="h.publishGeo">
+				<label>Geometry</label>
+				<scriptCode scriptType="python">
+				<![CDATA[
+from pipe.tools.houdiniTools.publisher import obj_publisher
+import hou
+publisher = obj_publisher.ObjPublisher()
+hou.session.publisher = publisher
+publisher.publish()
+				]]>
+				</scriptCode>
+			</scriptItem> 
+			<!-- ============================ End Geo Publish Tool =========================== -->
+			<!-- ============================ Start Asset Publish Tool =========================== 
 			<scriptItem id="h.publishAsset">
 				<label>Asset</label>
 				<scriptCode scriptType="python">
@@ -201,7 +230,7 @@ publisher.publish()
 					]]>
 				</scriptCode>
 			</scriptItem>
-			<!-- ============================ End Asset Publish Tool =========================== -->
+			 ============================ End Asset Publish Tool =========================== -->
 
 			<!-- ============================ Start Material Publish Tool =========================== -->
 			<scriptItem id="h.publishMaterial">
@@ -231,18 +260,18 @@ publisher.publish()
 					]]>
 				</scriptCode>
 			</scriptItem>
-			 ============================ End Shot Publish Tool =========================== -->
+			< ============================ End Shot Publish Tool =========================== -->
 
 			<!-- ============================ Start Lights Publish Tool =========================== -->
 			<scriptItem id="h.publish_lights">
 				<label>Lights</label>
 				<scriptCode scriptType="python">
 					<![CDATA[
-from pipe.tools.houdiniTools.publisher import light_publisher
+from pipe.tools.houdiniTools.publisher import light_publisher_2
 import hou
-publisher = light_publisher.LightPublisher()
+publisher = light_publisher_2.LightPublisher()
 hou.session.publisher = publisher
-publisher.publish()
+publisher.go()
 					]]>
 				</scriptCode>
 			</scriptItem>
@@ -282,6 +311,26 @@ publisher.publish()
 				</scriptCode>
 			</scriptItem>
 			<!-- ============================ End Tool Publish Tool =========================== -->
+
+			<!-- ============================ Start Seq FX Publish Tool =========================== -->
+			<scriptItem id="h.publish_seq_fx">
+				<label>Sequence FX</label>
+				<!--expression>
+import hou
+good = len(hou.selectedNodes())==0
+return good
+				</expression-->
+				<scriptCode scriptType="python">
+					<![CDATA[
+from pipe.tools.houdiniTools.publisher import seq_fx_publisher
+import hou
+publisher = seq_fx_publisher.FXPublisher()
+hou.session.publisher = publisher
+publisher.go()
+					]]>
+				</scriptCode>
+			</scriptItem>
+			<!-- ============================ End Seq FX Publish Tool =========================== -->
 
 		</subMenu>
 		<!-- ============================ End Publish subMenu =========================== -->
@@ -376,18 +425,18 @@ reload.run()
 				</scriptCode>
 			</scriptItem>
 			
-			<scriptItem id="h.test">
+			<!--scriptItem id="h.test">
 				<label>Test</label>
 				<scriptCode scriptType="python">
 				<![CDATA[
-from pipe.tools.houdiniTools.cloner import layout_unpacker
+from pipe.tools.houdiniTools.publisher import obj_publisher
 import hou
-unpack = layout_unpacker.LayoutUnpacker()
-hou.session.unpack = unpack
-unpack.clone()
+publisher = obj_publisher.ObjPublisher()
+hou.session.publisher = publisher
+publisher.publish()
 				]]>
 				</scriptCode>
-			</scriptItem>
+			</scriptItem--> 
 		</subMenu>
 
 	</subMenu>

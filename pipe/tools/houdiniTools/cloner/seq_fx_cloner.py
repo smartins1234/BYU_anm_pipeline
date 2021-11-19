@@ -9,33 +9,42 @@ from pipe.pipeHandlers.element import Element
 from pipe.pipeHandlers.environment import Environment
 import pipe.pipeHandlers.pipeline_io as pio
 
-class ToolCloner:
+class FXCloner:
 
     def __init__(self):
         self.project = Project()
 
     def clone(self):
-        tool_list = self.project.list_tools()
+        sequence_list = self.project.list_sequences()
 
         self.item_gui = sfl.SelectFromList(
-            l=tool_list, parent=hou.ui.mainQtWindow(), title="Select a tool to clone")
+            l=sequence_list, parent=hou.ui.mainQtWindow(), title="Select a sequence")
+        self.item_gui.submitted.connect(self.seq_results)
+
+    def seq_results(self, value):
+        self.seq_name = value[0]
+        self.sequence = self.project.get_sequence(self.seq_name)
+        element = self.sequence.get_element(Asset.HDA)
+
+        fx_list = next(os.walk(element._filepath))[1]
+        for name in fx_list:
+            if name == "cache":
+                fx_list.remove(name)
+        fx_list.sort(key=unicode.lower)
+
+        self.item_gui = sfl.SelectFromList(l=fx_list, parent=hou.ui.mainQtWindow(), title="Select an effect to clone")
         self.item_gui.submitted.connect(self.results)
 
     def results(self, value):
         name = value[0]
+        element = self.sequence.get_element(os.path.join(Asset.HDA, name))
 
-        body = self.project.get_tool(name)
-        element = body.get_element(Asset.HDA)
 
         if element.get_last_version() < 0:
-            qd.error("Nothing has been published for this tool")
+            qd.error("Nothing has been published for this effect")
             return
         filepath = element.get_last_publish()[3]
 
-        panes = self.getCurrentNetworkEditorPane()
-        paths = []
-        for pane in panes:
-            paths.append(pane.currentNode())
 
         try:
             hou.hda.installFile(filepath)
@@ -44,18 +53,9 @@ class ToolCloner:
             print(e)
             return
 
-        hda = None
-        for p in paths:
-            try:
-                print(p)
-                hda = p.createNode(name)
-                break
-            except Exception as e:
-                #qd.error("Couldn't create node of type " + name + ". You should still be able to tab in the node manually.")
-                print(e)
-                return
-
-        if not hda:
+        try:
+            hda = hou.node("/obj").createNode(name)
+        except Exception as e:
             qd.error("Couldn't create node of type " + name + ". You should still be able to tab in the node manually.")
 
         try:
@@ -67,9 +67,3 @@ class ToolCloner:
             hda.allowEditOfContents()
         except:
             pass
-
-    def getCurrentNetworkEditorPane(self):
-        editors = [pane for pane in hou.ui.paneTabs() if isinstance(pane, hou.NetworkEditor) and pane.isCurrentTab()]
-        return editors
-
-        
