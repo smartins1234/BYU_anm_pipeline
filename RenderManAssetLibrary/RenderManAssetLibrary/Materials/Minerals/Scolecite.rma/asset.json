@@ -1,0 +1,2437 @@
+{
+    "RenderManAsset": {
+        "usedNodeTypes": [
+            "PxrManifold2D",
+            "PxrManifold3D",
+            "PxrChecker",
+            "shadingEngine",
+            "PxrRamp",
+            "PxrWorley",
+            "PxrToFloat",
+            "PxrRemap",
+            "PxrBump",
+            "PxrSurface"
+        ],
+        "version": 1.1,
+        "previewType": "std",
+        "asset": {
+            "nodeGraph": {
+                "dependencies": [],
+                "nodeList": {
+                    "PxrManifold2D6": {
+                        "params": {
+                            "angle": {
+                                "default": 0,
+                                "type": "float",
+                                "name": "angle",
+                                "value": 35.573123931884766
+                            },
+                            "scaleS": {
+                                "default": 1,
+                                "type": "float",
+                                "name": "scaleS",
+                                "value": 0.10000000149011612
+                            },
+                            "scaleT": {
+                                "default": 1,
+                                "type": "float",
+                                "name": "scaleT",
+                                "value": 100.0
+                            },
+                            "offsetS": {
+                                "default": 0,
+                                "type": "float",
+                                "name": "offsetS",
+                                "value": 0.0
+                            },
+                            "offsetT": {
+                                "default": 0,
+                                "type": "float",
+                                "name": "offsetT",
+                                "value": 0.0
+                            },
+                            "invertS": {
+                                "default": 0,
+                                "type": "int",
+                                "name": "invertS",
+                                "value": 0
+                            },
+                            "invertT": {
+                                "default": 1,
+                                "type": "int",
+                                "name": "invertT",
+                                "value": 1
+                            },
+                            "primvarS": {
+                                "default": "",
+                                "type": "string",
+                                "name": "primvarS",
+                                "value": ""
+                            },
+                            "primvarT": {
+                                "default": "",
+                                "type": "string",
+                                "name": "primvarT",
+                                "value": ""
+                            }
+                        },
+                        "rmanNode": "PxrManifold2D",
+                        "type": "PxrManifold2D",
+                        "nodeClass": "pattern"
+                    },
+                    "PxrRemap9": {
+                        "params": {
+                            "inputRGB": {
+                                "type": "reference color",
+                                "value": null
+                            },
+                            "inputMin": {
+                                "default": 0.0,
+                                "type": "float",
+                                "name": "inputMin",
+                                "value": 0.0
+                            },
+                            "inputMax": {
+                                "default": 1.0,
+                                "type": "float",
+                                "name": "inputMax",
+                                "value": 1.0
+                            },
+                            "clampInput": {
+                                "default": 1,
+                                "type": "int",
+                                "name": "clampInput",
+                                "value": 1
+                            },
+                            "bias": {
+                                "default": [
+                                    0.5,
+                                    0.5,
+                                    0.5
+                                ],
+                                "type": "color",
+                                "name": "bias",
+                                "value": [
+                                    0.08163265138864517,
+                                    0.08163265138864517,
+                                    0.08163265138864517
+                                ]
+                            },
+                            "gain": {
+                                "default": [
+                                    0.5,
+                                    0.5,
+                                    0.5
+                                ],
+                                "type": "color",
+                                "name": "gain",
+                                "value": [
+                                    0.10204081982374191,
+                                    0.10204081982374191,
+                                    0.10204081982374191
+                                ]
+                            },
+                            "outputMin": {
+                                "default": 0.0,
+                                "type": "float",
+                                "name": "outputMin",
+                                "value": 0.10000000149011612
+                            },
+                            "outputMax": {
+                                "default": 1.0,
+                                "type": "float",
+                                "name": "outputMax",
+                                "value": 0.800000011920929
+                            },
+                            "clampOutput": {
+                                "default": 1,
+                                "type": "int",
+                                "name": "clampOutput",
+                                "value": 1
+                            }
+                        },
+                        "rmanNode": "PxrRemap",
+                        "type": "PxrRemap",
+                        "nodeClass": "pattern"
+                    },
+                    "scolecite_ShaderSG": {
+                        "params": {
+                            "rman__surface": {
+                                "type": "reference float3",
+                                "value": null
+                            },
+                            "rman__displacement": {
+                                "type": "float3",
+                                "name": "rman__displacement",
+                                "value": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ]
+                            }
+                        },
+                        "rmanNode": "shadingEngine",
+                        "type": "shadingEngine",
+                        "nodeClass": "root"
+                    },
+                    "PxrWorley9": {
+                        "params": {
+                            "surfacePosition": {
+                                "default": 0,
+                                "type": "int",
+                                "name": "surfacePosition",
+                                "value": 0
+                            },
+                            "frequency": {
+                                "default": "4.0f",
+                                "type": "float",
+                                "name": "frequency",
+                                "value": 4.0
+                            },
+                            "distancemetric": {
+                                "default": 0,
+                                "type": "int",
+                                "name": "distancemetric",
+                                "value": 4
+                            },
+                            "jitter": {
+                                "default": "0.75f",
+                                "type": "float",
+                                "name": "jitter",
+                                "value": 0.9762845635414124
+                            },
+                            "c1": {
+                                "default": "0.8f",
+                                "type": "float",
+                                "name": "c1",
+                                "value": 0.7154150009155273
+                            },
+                            "c2": {
+                                "default": "-0.2f",
+                                "type": "float",
+                                "name": "c2",
+                                "value": 0.8260869383811951
+                            },
+                            "minkowskiExponent": {
+                                "default": 4.0,
+                                "type": "float",
+                                "name": "minkowskiExponent",
+                                "value": 15.55871868133545
+                            },
+                            "shape": {
+                                "default": 0,
+                                "type": "int",
+                                "name": "shape",
+                                "value": 0
+                            },
+                            "clamp": {
+                                "default": 1,
+                                "type": "int",
+                                "name": "clamp",
+                                "value": 0
+                            },
+                            "invert": {
+                                "default": 0,
+                                "type": "int",
+                                "name": "invert",
+                                "value": 0
+                            },
+                            "randomScale": {
+                                "type": "reference float",
+                                "value": null
+                            },
+                            "randomScaleCenter": {
+                                "default": "0.f",
+                                "type": "float",
+                                "name": "randomScaleCenter",
+                                "value": 0.0
+                            },
+                            "manifold": {
+                                "type": "reference struct",
+                                "value": null
+                            }
+                        },
+                        "rmanNode": "PxrWorley",
+                        "type": "PxrWorley",
+                        "nodeClass": "pattern"
+                    },
+                    "PxrToFloat1": {
+                        "params": {
+                            "input": {
+                                "type": "reference color",
+                                "value": null
+                            },
+                            "mode": {
+                                "default": 0,
+                                "type": "int",
+                                "name": "mode",
+                                "value": 3
+                            }
+                        },
+                        "rmanNode": "PxrToFloat",
+                        "type": "PxrToFloat",
+                        "nodeClass": "pattern"
+                    },
+                    "PxrChecker2": {
+                        "params": {
+                            "colorA": {
+                                "default": [
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ],
+                                "type": "color",
+                                "name": "colorA",
+                                "value": [
+                                    0.24901185929775238,
+                                    0.24901185929775238,
+                                    0.24901185929775238
+                                ]
+                            },
+                            "colorB": {
+                                "default": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ],
+                                "type": "color",
+                                "name": "colorB",
+                                "value": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ]
+                            },
+                            "dimensions": {
+                                "default": 2,
+                                "type": "int",
+                                "name": "dimensions",
+                                "value": 2
+                            },
+                            "manifold": {
+                                "type": "reference struct",
+                                "value": null
+                            }
+                        },
+                        "rmanNode": "PxrChecker",
+                        "type": "PxrChecker",
+                        "nodeClass": "pattern"
+                    },
+                    "PxrBump2": {
+                        "params": {
+                            "scale": {
+                                "default": 1.0,
+                                "type": "float",
+                                "name": "scale",
+                                "value": 0.009999999776482582
+                            },
+                            "disable": {
+                                "default": 0,
+                                "type": "int",
+                                "name": "disable",
+                                "value": 0
+                            },
+                            "inputBump": {
+                                "type": "reference float",
+                                "value": null
+                            },
+                            "filename": {
+                                "default": "",
+                                "type": "string",
+                                "name": "filename",
+                                "value": ""
+                            },
+                            "firstChannel": {
+                                "default": 0,
+                                "type": "int",
+                                "name": "firstChannel",
+                                "value": 0
+                            },
+                            "atlasStyle": {
+                                "default": 0,
+                                "type": "int",
+                                "name": "atlasStyle",
+                                "value": 0
+                            },
+                            "invertT": {
+                                "default": 1,
+                                "type": "int",
+                                "name": "invertT",
+                                "value": 1
+                            },
+                            "blur": {
+                                "default": 0.0,
+                                "type": "float",
+                                "name": "blur",
+                                "value": 0.0
+                            },
+                            "lerp": {
+                                "default": 1,
+                                "type": "int",
+                                "name": "lerp",
+                                "value": 1
+                            },
+                            "mipBias": {
+                                "default": 0,
+                                "type": "int",
+                                "name": "mipBias",
+                                "value": 0
+                            },
+                            "maxResolution": {
+                                "default": 0,
+                                "type": "float",
+                                "name": "maxResolution",
+                                "value": 0.0
+                            },
+                            "inputN": {
+                                "default": [
+                                    1.0,
+                                    0.0,
+                                    0.0
+                                ],
+                                "type": "normal",
+                                "name": "inputN",
+                                "value": [
+                                    1.0,
+                                    0.0,
+                                    0.0
+                                ]
+                            },
+                            "reverse": {
+                                "default": 0,
+                                "type": "int",
+                                "name": "reverse",
+                                "value": 0
+                            },
+                            "adjustAmount": {
+                                "default": 1.0,
+                                "type": "float",
+                                "name": "adjustAmount",
+                                "value": 1.0
+                            },
+                            "surfaceNormalMix": {
+                                "default": 0.0,
+                                "type": "float",
+                                "name": "surfaceNormalMix",
+                                "value": 0.0
+                            }
+                        },
+                        "rmanNode": "PxrBump",
+                        "type": "PxrBump",
+                        "nodeClass": "pattern"
+                    },
+                    "scolecite_Shader": {
+                        "params": {
+                            "inputMaterial": {
+                                "default": "",
+                                "type": "vstruct",
+                                "name": "inputMaterial",
+                                "value": 0.0
+                            },
+                            "diffuseGain": {
+                                "default": 1.0,
+                                "vstructmember": "inputMaterial.diffuseGain",
+                                "type": "float",
+                                "name": "diffuseGain",
+                                "value": 0.0
+                            },
+                            "diffuseColor": {
+                                "default": [
+                                    0.18,
+                                    0.18,
+                                    0.18
+                                ],
+                                "vstructmember": "inputMaterial.diffuseColor",
+                                "type": "color",
+                                "name": "diffuseColor",
+                                "value": [
+                                    0.18000000715255737,
+                                    0.18000000715255737,
+                                    0.18000000715255737
+                                ]
+                            },
+                            "diffuseRoughness": {
+                                "default": 0.0,
+                                "vstructmember": "inputMaterial.diffuseRoughness",
+                                "type": "float",
+                                "name": "diffuseRoughness",
+                                "value": 0.0
+                            },
+                            "diffuseExponent": {
+                                "default": 1.0,
+                                "vstructmember": "inputMaterial.diffuseExponent",
+                                "type": "float",
+                                "name": "diffuseExponent",
+                                "value": 1.0
+                            },
+                            "diffuseBumpNormal": {
+                                "default": [
+                                    0,
+                                    0,
+                                    0
+                                ],
+                                "vstructmember": "inputMaterial.diffuseBumpNormal",
+                                "type": "normal",
+                                "name": "diffuseBumpNormal",
+                                "value": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ]
+                            },
+                            "diffuseDoubleSided": {
+                                "default": 0,
+                                "type": "int",
+                                "name": "diffuseDoubleSided",
+                                "value": 0
+                            },
+                            "diffuseBackUseDiffuseColor": {
+                                "default": 1,
+                                "vstructmember": "inputMaterial.diffuseBackUseDiffuseColor",
+                                "type": "int",
+                                "name": "diffuseBackUseDiffuseColor",
+                                "value": 1
+                            },
+                            "diffuseBackColor": {
+                                "default": [
+                                    0.18,
+                                    0.18,
+                                    0.18
+                                ],
+                                "vstructmember": "inputMaterial.diffuseBackColor",
+                                "type": "color",
+                                "name": "diffuseBackColor",
+                                "value": [
+                                    0.18000000715255737,
+                                    0.18000000715255737,
+                                    0.18000000715255737
+                                ]
+                            },
+                            "diffuseTransmitGain": {
+                                "default": 0.0,
+                                "vstructmember": "inputMaterial.diffuseTransmitGain",
+                                "type": "float",
+                                "name": "diffuseTransmitGain",
+                                "value": 0.0
+                            },
+                            "diffuseTransmitColor": {
+                                "default": [
+                                    0.18,
+                                    0.18,
+                                    0.18
+                                ],
+                                "vstructmember": "inputMaterial.diffuseTransmitColor",
+                                "type": "color",
+                                "name": "diffuseTransmitColor",
+                                "value": [
+                                    0.18000000715255737,
+                                    0.18000000715255737,
+                                    0.18000000715255737
+                                ]
+                            },
+                            "specularFresnelMode": {
+                                "default": 0,
+                                "type": "int",
+                                "name": "specularFresnelMode",
+                                "value": 0
+                            },
+                            "specularFaceColor": {
+                                "default": [
+                                    0,
+                                    0,
+                                    0
+                                ],
+                                "vstructmember": "inputMaterial.specularFaceColor",
+                                "type": "color",
+                                "name": "specularFaceColor",
+                                "value": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ]
+                            },
+                            "specularEdgeColor": {
+                                "default": [
+                                    0,
+                                    0,
+                                    0
+                                ],
+                                "vstructmember": "inputMaterial.specularEdgeColor",
+                                "type": "color",
+                                "name": "specularEdgeColor",
+                                "value": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ]
+                            },
+                            "specularFresnelShape": {
+                                "default": 5.0,
+                                "vstructmember": "inputMaterial.specularFresnelShape",
+                                "type": "float",
+                                "name": "specularFresnelShape",
+                                "value": 5.0
+                            },
+                            "specularIor": {
+                                "default": [
+                                    1.5,
+                                    1.5,
+                                    1.5
+                                ],
+                                "vstructmember": "inputMaterial.specularIor",
+                                "type": "color",
+                                "name": "specularIor",
+                                "value": [
+                                    1.5,
+                                    1.5,
+                                    1.5
+                                ]
+                            },
+                            "specularExtinctionCoeff": {
+                                "default": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ],
+                                "vstructmember": "inputMaterial.specularExtinctionCoeff",
+                                "type": "color",
+                                "name": "specularExtinctionCoeff",
+                                "value": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ]
+                            },
+                            "specularRoughness": {
+                                "default": 0.2,
+                                "vstructmember": "inputMaterial.specularRoughness",
+                                "type": "float",
+                                "name": "specularRoughness",
+                                "value": 0.20000000298023224
+                            },
+                            "specularModelType": {
+                                "default": 0,
+                                "type": "int",
+                                "name": "specularModelType",
+                                "value": 0
+                            },
+                            "specularAnisotropy": {
+                                "default": 0.0,
+                                "vstructmember": "inputMaterial.specularAnisotropy",
+                                "type": "float",
+                                "name": "specularAnisotropy",
+                                "value": 0.0
+                            },
+                            "specularAnisotropyDirection": {
+                                "default": [
+                                    0,
+                                    0,
+                                    0
+                                ],
+                                "vstructmember": "inputMaterial.specularAnisotropyDirection",
+                                "type": "vector",
+                                "name": "specularAnisotropyDirection",
+                                "value": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ]
+                            },
+                            "specularBumpNormal": {
+                                "default": [
+                                    0,
+                                    0,
+                                    0
+                                ],
+                                "vstructmember": "inputMaterial.specularBumpNormal",
+                                "type": "normal",
+                                "name": "specularBumpNormal",
+                                "value": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ]
+                            },
+                            "specularDoubleSided": {
+                                "default": 0,
+                                "type": "int",
+                                "name": "specularDoubleSided",
+                                "value": 0
+                            },
+                            "roughSpecularFresnelMode": {
+                                "default": 0,
+                                "type": "int",
+                                "name": "roughSpecularFresnelMode",
+                                "value": 1
+                            },
+                            "roughSpecularFaceColor": {
+                                "default": [
+                                    0,
+                                    0,
+                                    0
+                                ],
+                                "vstructmember": "inputMaterial.roughSpecularFaceColor",
+                                "type": "color",
+                                "name": "roughSpecularFaceColor",
+                                "value": [
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ]
+                            },
+                            "roughSpecularEdgeColor": {
+                                "default": [
+                                    0,
+                                    0,
+                                    0
+                                ],
+                                "vstructmember": "inputMaterial.roughSpecularEdgeColor",
+                                "type": "color",
+                                "name": "roughSpecularEdgeColor",
+                                "value": [
+                                    0.29613733291625977,
+                                    0.29613733291625977,
+                                    0.29613733291625977
+                                ]
+                            },
+                            "roughSpecularFresnelShape": {
+                                "default": 5.0,
+                                "vstructmember": "inputMaterial.roughSpecularFresnelShape",
+                                "type": "float",
+                                "name": "roughSpecularFresnelShape",
+                                "value": 5.0
+                            },
+                            "roughSpecularIor": {
+                                "default": [
+                                    1.5,
+                                    1.5,
+                                    1.5
+                                ],
+                                "vstructmember": "inputMaterial.roughSpecularIor",
+                                "type": "color",
+                                "name": "roughSpecularIor",
+                                "value": [
+                                    1.600000023841858,
+                                    1.600000023841858,
+                                    1.600000023841858
+                                ]
+                            },
+                            "roughSpecularExtinctionCoeff": {
+                                "default": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ],
+                                "vstructmember": "inputMaterial.roughSpecularExtinctionCoeff",
+                                "type": "color",
+                                "name": "roughSpecularExtinctionCoeff",
+                                "value": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ]
+                            },
+                            "roughSpecularRoughness": {
+                                "type": "reference float",
+                                "value": null
+                            },
+                            "roughSpecularModelType": {
+                                "default": 0,
+                                "type": "int",
+                                "name": "roughSpecularModelType",
+                                "value": 1
+                            },
+                            "roughSpecularAnisotropy": {
+                                "default": 0.0,
+                                "vstructmember": "inputMaterial.roughSpecularAnisotropy",
+                                "type": "float",
+                                "name": "roughSpecularAnisotropy",
+                                "value": 0.8999999761581421
+                            },
+                            "roughSpecularAnisotropyDirection": {
+                                "default": [
+                                    0,
+                                    0,
+                                    0
+                                ],
+                                "vstructmember": "inputMaterial.roughSpecularAnisotropyDirection",
+                                "type": "vector",
+                                "name": "roughSpecularAnisotropyDirection",
+                                "value": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ]
+                            },
+                            "roughSpecularBumpNormal": {
+                                "type": "reference normal",
+                                "value": null
+                            },
+                            "roughSpecularDoubleSided": {
+                                "default": 0,
+                                "type": "int",
+                                "name": "roughSpecularDoubleSided",
+                                "value": 0
+                            },
+                            "clearcoatFresnelMode": {
+                                "default": 0,
+                                "type": "int",
+                                "name": "clearcoatFresnelMode",
+                                "value": 2
+                            },
+                            "clearcoatFaceColor": {
+                                "default": [
+                                    0,
+                                    0,
+                                    0
+                                ],
+                                "vstructmember": "inputMaterial.clearcoatFaceColor",
+                                "type": "color",
+                                "name": "clearcoatFaceColor",
+                                "value": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ]
+                            },
+                            "clearcoatEdgeColor": {
+                                "default": [
+                                    0,
+                                    0,
+                                    0
+                                ],
+                                "vstructmember": "inputMaterial.clearcoatEdgeColor",
+                                "type": "color",
+                                "name": "clearcoatEdgeColor",
+                                "value": [
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ]
+                            },
+                            "clearcoatFresnelShape": {
+                                "default": 5.0,
+                                "vstructmember": "inputMaterial.clearcoatFresnelShape",
+                                "type": "float",
+                                "name": "clearcoatFresnelShape",
+                                "value": 5.0
+                            },
+                            "clearcoatIor": {
+                                "default": [
+                                    1.5,
+                                    1.5,
+                                    1.5
+                                ],
+                                "vstructmember": "inputMaterial.clearcoatIor",
+                                "type": "color",
+                                "name": "clearcoatIor",
+                                "value": [
+                                    1.5,
+                                    1.5,
+                                    1.5
+                                ]
+                            },
+                            "clearcoatExtinctionCoeff": {
+                                "default": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ],
+                                "vstructmember": "inputMaterial.clearcoatExtinctionCoeff",
+                                "type": "color",
+                                "name": "clearcoatExtinctionCoeff",
+                                "value": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ]
+                            },
+                            "clearcoatThickness": {
+                                "default": 0.0,
+                                "vstructmember": "inputMaterial.clearcoatThickness",
+                                "type": "float",
+                                "name": "clearcoatThickness",
+                                "value": 0.0
+                            },
+                            "clearcoatAbsorptionTint": {
+                                "default": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ],
+                                "vstructmember": "inputMaterial.clearcoatAborptionTint",
+                                "type": "color",
+                                "name": "clearcoatAbsorptionTint",
+                                "value": [
+                                    0.8841201663017273,
+                                    0.8841201663017273,
+                                    0.8841201663017273
+                                ]
+                            },
+                            "clearcoatRoughness": {
+                                "default": 0.0,
+                                "vstructmember": "inputMaterial.clearcoatRoughness",
+                                "type": "float",
+                                "name": "clearcoatRoughness",
+                                "value": 0.05000000074505806
+                            },
+                            "clearcoatModelType": {
+                                "default": 0,
+                                "type": "int",
+                                "name": "clearcoatModelType",
+                                "value": 1
+                            },
+                            "clearcoatAnisotropy": {
+                                "default": 0.0,
+                                "vstructmember": "inputMaterial.clearcoatAnisotropy",
+                                "type": "float",
+                                "name": "clearcoatAnisotropy",
+                                "value": 0.0
+                            },
+                            "clearcoatAnisotropyDirection": {
+                                "default": [
+                                    0,
+                                    0,
+                                    0
+                                ],
+                                "vstructmember": "inputMaterial.clearcoatAnisotropyDirection",
+                                "type": "vector",
+                                "name": "clearcoatAnisotropyDirection",
+                                "value": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ]
+                            },
+                            "clearcoatBumpNormal": {
+                                "default": [
+                                    0,
+                                    0,
+                                    0
+                                ],
+                                "vstructmember": "inputMaterial.clearcoatBumpNormal",
+                                "type": "normal",
+                                "name": "clearcoatBumpNormal",
+                                "value": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ]
+                            },
+                            "clearcoatDoubleSided": {
+                                "default": 0,
+                                "type": "int",
+                                "name": "clearcoatDoubleSided",
+                                "value": 0
+                            },
+                            "specularEnergyCompensation": {
+                                "default": 0.0,
+                                "type": "float",
+                                "name": "specularEnergyCompensation",
+                                "value": 1.0
+                            },
+                            "clearcoatEnergyCompensation": {
+                                "default": 0.0,
+                                "type": "float",
+                                "name": "clearcoatEnergyCompensation",
+                                "value": 1.0
+                            },
+                            "iridescenceFaceGain": {
+                                "default": 0,
+                                "vstructmember": "inputMaterial.iridescenceFaceGain",
+                                "type": "float",
+                                "name": "iridescenceFaceGain",
+                                "value": 0.0
+                            },
+                            "iridescenceEdgeGain": {
+                                "default": 0,
+                                "vstructmember": "inputMaterial.iridescenceEdgeGain",
+                                "type": "float",
+                                "name": "iridescenceEdgeGain",
+                                "value": 0.0
+                            },
+                            "iridescenceFresnelShape": {
+                                "default": 5.0,
+                                "vstructmember": "inputMaterial.iridescenceFresnelshape",
+                                "type": "float",
+                                "name": "iridescenceFresnelShape",
+                                "value": 5.0
+                            },
+                            "iridescenceMode": {
+                                "default": 0,
+                                "type": "int",
+                                "name": "iridescenceMode",
+                                "value": 0
+                            },
+                            "iridescencePrimaryColor": {
+                                "default": [
+                                    1,
+                                    0,
+                                    0
+                                ],
+                                "vstructmember": "inputMaterial.iridescencePrimaryColor",
+                                "type": "color",
+                                "name": "iridescencePrimaryColor",
+                                "value": [
+                                    1.0,
+                                    0.0,
+                                    0.0
+                                ]
+                            },
+                            "iridescenceSecondaryColor": {
+                                "default": [
+                                    0,
+                                    0,
+                                    1
+                                ],
+                                "vstructmember": "inputMaterial.iridescenceSecondaryColor",
+                                "type": "color",
+                                "name": "iridescenceSecondaryColor",
+                                "value": [
+                                    0.0,
+                                    0.0,
+                                    1.0
+                                ]
+                            },
+                            "iridescenceRoughness": {
+                                "default": 0.2,
+                                "vstructmember": "inputMaterial.iridescenceRoughness",
+                                "type": "float",
+                                "name": "iridescenceRoughness",
+                                "value": 0.20000000298023224
+                            },
+                            "iridescenceAnisotropy": {
+                                "default": 0.0,
+                                "vstructmember": "inputMaterial.iridescenceAnisotropy",
+                                "type": "float",
+                                "name": "iridescenceAnisotropy",
+                                "value": 0.0
+                            },
+                            "iridescenceAnisotropyDirection": {
+                                "default": [
+                                    0,
+                                    0,
+                                    0
+                                ],
+                                "vstructmember": "inputMaterial.iridescenceAnisotropyDirection",
+                                "type": "vector",
+                                "name": "iridescenceAnisotropyDirection",
+                                "value": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ]
+                            },
+                            "iridescenceBumpNormal": {
+                                "default": [
+                                    0,
+                                    0,
+                                    0
+                                ],
+                                "vstructmember": "inputMaterial.iridescenceBumpNormal",
+                                "type": "normal",
+                                "name": "iridescenceBumpNormal",
+                                "value": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ]
+                            },
+                            "iridescenceCurve": {
+                                "default": 1,
+                                "vstructmember": "inputMaterial.iridescenceCurve",
+                                "type": "float",
+                                "name": "iridescenceCurve",
+                                "value": 1.0
+                            },
+                            "iridescenceScale": {
+                                "default": 1,
+                                "vstructmember": "inputMaterial.iridescenceScale",
+                                "type": "float",
+                                "name": "iridescenceScale",
+                                "value": 1.0
+                            },
+                            "iridescenceFlip": {
+                                "default": 0,
+                                "vstructmember": "inputMaterial.iridescenceFlip",
+                                "type": "int",
+                                "name": "iridescenceFlip",
+                                "value": 0
+                            },
+                            "iridescenceThickness": {
+                                "default": 800,
+                                "vstructmember": "inputMaterial.iridescenceThickness",
+                                "type": "float",
+                                "name": "iridescenceThickness",
+                                "value": 800.0
+                            },
+                            "iridescenceDoubleSided": {
+                                "default": 0,
+                                "type": "int",
+                                "name": "iridescenceDoubleSided",
+                                "value": 0
+                            },
+                            "fuzzGain": {
+                                "default": 0.0,
+                                "vstructmember": "inputMaterial.fuzzGain",
+                                "type": "float",
+                                "name": "fuzzGain",
+                                "value": 0.0
+                            },
+                            "fuzzColor": {
+                                "default": [
+                                    1,
+                                    1,
+                                    1
+                                ],
+                                "vstructmember": "inputMaterial.fuzzColor",
+                                "type": "color",
+                                "name": "fuzzColor",
+                                "value": [
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ]
+                            },
+                            "fuzzConeAngle": {
+                                "default": 8,
+                                "vstructmember": "inputMaterial.fuzzConeAngle",
+                                "type": "float",
+                                "name": "fuzzConeAngle",
+                                "value": 8.0
+                            },
+                            "fuzzBumpNormal": {
+                                "default": [
+                                    0,
+                                    0,
+                                    0
+                                ],
+                                "vstructmember": "inputMaterial.fuzzBumpNormal",
+                                "type": "normal",
+                                "name": "fuzzBumpNormal",
+                                "value": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ]
+                            },
+                            "fuzzDoubleSided": {
+                                "default": 0,
+                                "type": "int",
+                                "name": "fuzzDoubleSided",
+                                "value": 0
+                            },
+                            "subsurfaceType": {
+                                "default": 0,
+                                "type": "int",
+                                "name": "subsurfaceType",
+                                "value": 6
+                            },
+                            "subsurfaceGain": {
+                                "default": 0.0,
+                                "vstructmember": "inputMaterial.subsurfaceGain",
+                                "type": "float",
+                                "name": "subsurfaceGain",
+                                "value": 1.0
+                            },
+                            "subsurfaceColor": {
+                                "type": "reference color",
+                                "value": null
+                            },
+                            "subsurfaceDmfp": {
+                                "default": 10,
+                                "vstructmember": "inputMaterial.subsurfaceDmfp",
+                                "type": "float",
+                                "name": "subsurfaceDmfp",
+                                "value": 10.0
+                            },
+                            "subsurfaceDmfpColor": {
+                                "default": [
+                                    0.851,
+                                    0.557,
+                                    0.395
+                                ],
+                                "vstructmember": "inputMaterial.subsurfaceDmfpColor",
+                                "type": "color",
+                                "name": "subsurfaceDmfpColor",
+                                "value": [
+                                    1.0,
+                                    0.8968426585197449,
+                                    0.8400000333786011
+                                ]
+                            },
+                            "shortSubsurfaceGain": {
+                                "default": 0.0,
+                                "vstructmember": "inputMaterial.shortSubsurfaceGain",
+                                "type": "float",
+                                "name": "shortSubsurfaceGain",
+                                "value": 0.0
+                            },
+                            "shortSubsurfaceColor": {
+                                "default": [
+                                    0.9,
+                                    0.9,
+                                    0.9
+                                ],
+                                "vstructmember": "inputMaterial.shortSubsurfaceColor",
+                                "type": "color",
+                                "name": "shortSubsurfaceColor",
+                                "value": [
+                                    0.8999999761581421,
+                                    0.8999999761581421,
+                                    0.8999999761581421
+                                ]
+                            },
+                            "shortSubsurfaceDmfp": {
+                                "default": 5,
+                                "vstructmember": "inputMaterial.shortSubsurfaceDmfp",
+                                "type": "float",
+                                "name": "shortSubsurfaceDmfp",
+                                "value": 5.0
+                            },
+                            "longSubsurfaceGain": {
+                                "default": 0.0,
+                                "vstructmember": "inputMaterial.longSubsurfaceGain",
+                                "type": "float",
+                                "name": "longSubsurfaceGain",
+                                "value": 0.0
+                            },
+                            "longSubsurfaceColor": {
+                                "default": [
+                                    0.8,
+                                    0.0,
+                                    0.0
+                                ],
+                                "vstructmember": "inputMaterial.longSubsurfaceColor",
+                                "type": "color",
+                                "name": "longSubsurfaceColor",
+                                "value": [
+                                    0.800000011920929,
+                                    0.0,
+                                    0.0
+                                ]
+                            },
+                            "longSubsurfaceDmfp": {
+                                "default": 20,
+                                "vstructmember": "inputMaterial.longSubsurfaceDmfp",
+                                "type": "float",
+                                "name": "longSubsurfaceDmfp",
+                                "value": 20.0
+                            },
+                            "subsurfaceDirectionality": {
+                                "default": 0.0,
+                                "vstructmember": "inputMaterial.subsurfaceDirectionality",
+                                "type": "float",
+                                "name": "subsurfaceDirectionality",
+                                "value": 0.0
+                            },
+                            "subsurfaceBleed": {
+                                "default": 0.0,
+                                "vstructmember": "inputMaterial.subsurfaceBleed",
+                                "type": "float",
+                                "name": "subsurfaceBleed",
+                                "value": 0.0
+                            },
+                            "subsurfaceDiffuseBlend": {
+                                "default": 0.0,
+                                "vstructmember": "inputMaterial.subsurfaceDiffuseBlend",
+                                "type": "float",
+                                "name": "subsurfaceDiffuseBlend",
+                                "value": 0.20000000298023224
+                            },
+                            "subsurfaceResolveSelfIntersections": {
+                                "default": 0,
+                                "type": "int",
+                                "name": "subsurfaceResolveSelfIntersections",
+                                "value": 0
+                            },
+                            "subsurfaceIor": {
+                                "default": 1.4,
+                                "type": "float",
+                                "name": "subsurfaceIor",
+                                "value": 1.399999976158142
+                            },
+                            "subsurfacePostTint": {
+                                "default": [
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ],
+                                "vstructmember": "inputMaterial.subsurfacePostTint",
+                                "type": "color",
+                                "name": "subsurfacePostTint",
+                                "value": [
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ]
+                            },
+                            "subsurfaceDiffuseSwitch": {
+                                "default": 1.0,
+                                "type": "float",
+                                "name": "subsurfaceDiffuseSwitch",
+                                "value": 0.0
+                            },
+                            "subsurfaceDoubleSided": {
+                                "default": 0,
+                                "type": "int",
+                                "name": "subsurfaceDoubleSided",
+                                "value": 0
+                            },
+                            "subsurfaceTransmitGain": {
+                                "default": 0.0,
+                                "vstructmember": "inputMaterial.subsurfaceTransmitGain",
+                                "type": "float",
+                                "name": "subsurfaceTransmitGain",
+                                "value": 0.0
+                            },
+                            "considerBackside": {
+                                "default": 1,
+                                "type": "int",
+                                "name": "considerBackside",
+                                "value": 1
+                            },
+                            "continuationRayMode": {
+                                "default": 0,
+                                "type": "int",
+                                "name": "continuationRayMode",
+                                "value": 0
+                            },
+                            "maxContinuationHits": {
+                                "default": 2,
+                                "type": "int",
+                                "name": "maxContinuationHits",
+                                "value": 2
+                            },
+                            "followTopology": {
+                                "default": 0.0,
+                                "type": "float",
+                                "name": "followTopology",
+                                "value": 0.0
+                            },
+                            "subsurfaceSubset": {
+                                "default": "",
+                                "type": "string",
+                                "name": "subsurfaceSubset",
+                                "value": ""
+                            },
+                            "singlescatterGain": {
+                                "default": 0.0,
+                                "vstructmember": "inputMaterial.singlescatterGain",
+                                "type": "float",
+                                "name": "singlescatterGain",
+                                "value": 0.0
+                            },
+                            "singlescatterColor": {
+                                "default": [
+                                    0.83,
+                                    0.791,
+                                    0.753
+                                ],
+                                "vstructmember": "inputMaterial.singlescatterColor",
+                                "type": "color",
+                                "name": "singlescatterColor",
+                                "value": [
+                                    0.8299999833106995,
+                                    0.7910000085830688,
+                                    0.753000020980835
+                                ]
+                            },
+                            "singlescatterMfp": {
+                                "default": 10,
+                                "vstructmember": "inputMaterial.singlescatterMfp",
+                                "type": "float",
+                                "name": "singlescatterMfp",
+                                "value": 10.0
+                            },
+                            "singlescatterMfpColor": {
+                                "default": [
+                                    0.851,
+                                    0.557,
+                                    0.395
+                                ],
+                                "vstructmember": "inputMaterial.singlescatterMfpColor",
+                                "type": "color",
+                                "name": "singlescatterMfpColor",
+                                "value": [
+                                    0.8510000109672546,
+                                    0.5569999814033508,
+                                    0.39500001072883606
+                                ]
+                            },
+                            "singlescatterDirectionality": {
+                                "default": 0,
+                                "vstructmember": "inputMaterial.singlescatterDirectionality",
+                                "type": "float",
+                                "name": "singlescatterDirectionality",
+                                "value": 0.0
+                            },
+                            "singlescatterIor": {
+                                "default": 1.3,
+                                "vstructmember": "inputMaterial.singlescatterIor",
+                                "type": "float",
+                                "name": "singlescatterIor",
+                                "value": 1.2999999523162842
+                            },
+                            "singlescatterBlur": {
+                                "default": 0.0,
+                                "vstructmember": "inputMaterial.singlescatterBlur",
+                                "type": "float",
+                                "name": "singlescatterBlur",
+                                "value": 0.0
+                            },
+                            "singlescatterDirectGain": {
+                                "default": 0.0,
+                                "vstructmember": "inputMaterial.singlescatterDirectGain",
+                                "type": "float",
+                                "name": "singlescatterDirectGain",
+                                "value": 0.0
+                            },
+                            "singlescatterDirectGainTint": {
+                                "default": [
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ],
+                                "vstructmember": "inputMaterial.singlescatterDirectGainTint",
+                                "type": "color",
+                                "name": "singlescatterDirectGainTint",
+                                "value": [
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ]
+                            },
+                            "singlescatterDoubleSided": {
+                                "default": 0,
+                                "type": "int",
+                                "name": "singlescatterDoubleSided",
+                                "value": 0
+                            },
+                            "singlescatterConsiderBackside": {
+                                "default": 1,
+                                "type": "int",
+                                "name": "singlescatterConsiderBackside",
+                                "value": 1
+                            },
+                            "singlescatterContinuationRayMode": {
+                                "default": 0,
+                                "type": "int",
+                                "name": "singlescatterContinuationRayMode",
+                                "value": 0
+                            },
+                            "singlescatterMaxContinuationHits": {
+                                "default": 2,
+                                "type": "int",
+                                "name": "singlescatterMaxContinuationHits",
+                                "value": 2
+                            },
+                            "singlescatterDirectGainMode": {
+                                "default": 0,
+                                "type": "int",
+                                "name": "singlescatterDirectGainMode",
+                                "value": 0
+                            },
+                            "singlescatterSubset": {
+                                "default": "",
+                                "type": "string",
+                                "name": "singlescatterSubset",
+                                "value": ""
+                            },
+                            "irradianceTint": {
+                                "default": [
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ],
+                                "vstructmember": "inputMaterial.irradianceTint",
+                                "type": "color",
+                                "name": "irradianceTint",
+                                "value": [
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ]
+                            },
+                            "irradianceRoughness": {
+                                "default": 0.0,
+                                "vstructmember": "inputMaterial.irradianceRoughness",
+                                "type": "float",
+                                "name": "irradianceRoughness",
+                                "value": 0.0
+                            },
+                            "unitLength": {
+                                "default": 0.1,
+                                "type": "float",
+                                "name": "unitLength",
+                                "value": 0.10000000149011612
+                            },
+                            "refractionGain": {
+                                "default": 0.0,
+                                "vstructmember": "inputMaterial.refractionGain",
+                                "type": "float",
+                                "name": "refractionGain",
+                                "value": 0.0
+                            },
+                            "reflectionGain": {
+                                "default": 0.0,
+                                "vstructmember": "inputMaterial.reflectionGain",
+                                "type": "float",
+                                "name": "reflectionGain",
+                                "value": 0.0
+                            },
+                            "refractionColor": {
+                                "default": [
+                                    1,
+                                    1,
+                                    1
+                                ],
+                                "vstructmember": "inputMaterial.refractionColor",
+                                "type": "color",
+                                "name": "refractionColor",
+                                "value": [
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ]
+                            },
+                            "glassRoughness": {
+                                "default": 0.1,
+                                "vstructmember": "inputMaterial.glassRoughness",
+                                "type": "float",
+                                "name": "glassRoughness",
+                                "value": 0.10000000149011612
+                            },
+                            "glassAnisotropy": {
+                                "default": 0.0,
+                                "vstructmember": "inputMaterial.glassAnisotropy",
+                                "type": "float",
+                                "name": "glassAnisotropy",
+                                "value": 0.949999988079071
+                            },
+                            "glassAnisotropyDirection": {
+                                "default": [
+                                    0,
+                                    0,
+                                    0
+                                ],
+                                "vstructmember": "inputMaterial.glassAnisotropyDirection",
+                                "type": "vector",
+                                "name": "glassAnisotropyDirection",
+                                "value": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ]
+                            },
+                            "glassBumpNormal": {
+                                "default": [
+                                    0,
+                                    0,
+                                    0
+                                ],
+                                "vstructmember": "inputMaterial.glassBumpNormal",
+                                "type": "normal",
+                                "name": "glassBumpNormal",
+                                "value": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ]
+                            },
+                            "glassIor": {
+                                "default": 1.5,
+                                "vstructmember": "inputMaterial.glassIor",
+                                "type": "float",
+                                "name": "glassIor",
+                                "value": 1.5
+                            },
+                            "mwWalkable": {
+                                "default": 0,
+                                "type": "int",
+                                "name": "mwWalkable",
+                                "value": 0
+                            },
+                            "mwIor": {
+                                "default": -1,
+                                "vstructmember": "inputMaterial.mwIor",
+                                "type": "float",
+                                "name": "mwIor",
+                                "value": -1.0
+                            },
+                            "thinGlass": {
+                                "default": 0,
+                                "type": "int",
+                                "name": "thinGlass",
+                                "value": 0
+                            },
+                            "ignoreFresnel": {
+                                "default": 0,
+                                "type": "int",
+                                "name": "ignoreFresnel",
+                                "value": 0
+                            },
+                            "ignoreAccumOpacity": {
+                                "default": 0,
+                                "type": "int",
+                                "name": "ignoreAccumOpacity",
+                                "value": 0
+                            },
+                            "blocksVolumes": {
+                                "default": 0,
+                                "type": "int",
+                                "name": "blocksVolumes",
+                                "value": 0
+                            },
+                            "ssAlbedo": {
+                                "default": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ],
+                                "type": "color",
+                                "name": "ssAlbedo",
+                                "value": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ]
+                            },
+                            "extinction": {
+                                "default": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ],
+                                "type": "color",
+                                "name": "extinction",
+                                "value": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ]
+                            },
+                            "g": {
+                                "default": 0.0,
+                                "type": "float",
+                                "name": "g",
+                                "value": 0.0
+                            },
+                            "multiScatter": {
+                                "default": 0,
+                                "type": "int",
+                                "name": "multiScatter",
+                                "value": 0
+                            },
+                            "enableOverlappingVolumes": {
+                                "default": 0,
+                                "type": "int",
+                                "name": "enableOverlappingVolumes",
+                                "value": 0
+                            },
+                            "glowGain": {
+                                "default": 0.0,
+                                "vstructmember": "inputMaterial.glowGain",
+                                "type": "float",
+                                "name": "glowGain",
+                                "value": 0.0
+                            },
+                            "glowColor": {
+                                "default": [
+                                    1,
+                                    1,
+                                    1
+                                ],
+                                "vstructmember": "inputMaterial.glowColor",
+                                "type": "color",
+                                "name": "glowColor",
+                                "value": [
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ]
+                            },
+                            "bumpNormal": {
+                                "default": [
+                                    0,
+                                    0,
+                                    0
+                                ],
+                                "vstructmember": "inputMaterial.bumpNormal",
+                                "type": "normal",
+                                "name": "bumpNormal",
+                                "value": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ]
+                            },
+                            "shadowColor": {
+                                "default": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ],
+                                "vstructmember": "inputMaterial.shadowColor",
+                                "type": "color",
+                                "name": "shadowColor",
+                                "value": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ]
+                            },
+                            "shadowMode": {
+                                "default": 0,
+                                "type": "int",
+                                "name": "shadowMode",
+                                "value": 0
+                            },
+                            "presence": {
+                                "default": 1,
+                                "vstructmember": "inputMaterial.presence",
+                                "type": "float",
+                                "name": "presence",
+                                "value": 1.0
+                            },
+                            "presenceCached": {
+                                "default": 1,
+                                "type": "int",
+                                "name": "presenceCached",
+                                "value": 1
+                            },
+                            "mwStartable": {
+                                "default": 0,
+                                "type": "int",
+                                "name": "mwStartable",
+                                "value": 0
+                            },
+                            "roughnessMollificationClamp": {
+                                "default": 32,
+                                "type": "float",
+                                "name": "roughnessMollificationClamp",
+                                "value": 32.0
+                            },
+                            "utilityPattern": {
+                                "default": 0,
+                                "type": "int[1]",
+                                "name": "utilityPattern",
+                                "value": [
+                                    0.0
+                                ]
+                            }
+                        },
+                        "rmanNode": "PxrSurface",
+                        "type": "PxrSurface",
+                        "nodeClass": "bxdf"
+                    },
+                    "PxrRamp1": {
+                        "params": {
+                            "rampType": {
+                                "default": 0,
+                                "type": "int",
+                                "name": "rampType",
+                                "value": 1
+                            },
+                            "tile": {
+                                "default": 0,
+                                "type": "int",
+                                "name": "tile",
+                                "value": 0
+                            },
+                            "useNewRamp": {
+                                "default": 1,
+                                "type": "int",
+                                "name": "useNewRamp",
+                                "value": 1
+                            },
+                            "colorRamp": {
+                                "default": 4,
+                                "type": "int",
+                                "name": "colorRamp",
+                                "value": 47
+                            },
+                            "colorRamp_Knots": {
+                                "default": [
+                                    0,
+                                    0,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1
+                                ],
+                                "type": "float[47]",
+                                "name": "colorRamp_Knots",
+                                "value": [
+                                    0.0,
+                                    0.03387096896767616,
+                                    0.04838709533214569,
+                                    0.06290320307016373,
+                                    0.07258059829473495,
+                                    0.08064515888690948,
+                                    0.09677419066429138,
+                                    0.10161300003528595,
+                                    0.11612900346517563,
+                                    0.1564520001411438,
+                                    0.17903225123882294,
+                                    0.20967741310596466,
+                                    0.21612903475761414,
+                                    0.22741936147212982,
+                                    0.26774200797080994,
+                                    0.27903226017951965,
+                                    0.30000001192092896,
+                                    0.32096773386001587,
+                                    0.33548399806022644,
+                                    0.33709678053855896,
+                                    0.3532260060310364,
+                                    0.4000000059604645,
+                                    0.4435479938983917,
+                                    0.4629029929637909,
+                                    0.4693549871444702,
+                                    0.4887099862098694,
+                                    0.5032259821891785,
+                                    0.5258064270019531,
+                                    0.5739129781723022,
+                                    0.5806451439857483,
+                                    0.5903229713439941,
+                                    0.6193550229072571,
+                                    0.6338710188865662,
+                                    0.645160973072052,
+                                    0.6741935610771179,
+                                    0.6838709712028503,
+                                    0.7177420258522034,
+                                    0.7419354915618896,
+                                    0.7739130258560181,
+                                    0.7935479879379272,
+                                    0.8016129732131958,
+                                    0.814516007900238,
+                                    0.8516129851341248,
+                                    0.8629032373428345,
+                                    0.8693548440933228,
+                                    0.9387099742889404,
+                                    0.9516128897666931
+                                ]
+                            },
+                            "colorRamp_Colors": {
+                                "default": [
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1,
+                                    1
+                                ],
+                                "type": "color[47]",
+                                "name": "colorRamp_Colors",
+                                "value": [
+                                    [
+                                        0.8764045238494873,
+                                        0.8764045238494873,
+                                        0.8764045238494873
+                                    ],
+                                    [
+                                        0.7603999972343445,
+                                        0.7603999972343445,
+                                        0.7603999972343445
+                                    ],
+                                    [
+                                        0.4708999991416931,
+                                        0.4708999991416931,
+                                        0.4708999991416931
+                                    ],
+                                    [
+                                        1.0,
+                                        0.8319000005722046,
+                                        0.8039000034332275
+                                    ],
+                                    [
+                                        1.0,
+                                        0.8823000192642212,
+                                        0.9229999780654907
+                                    ],
+                                    [
+                                        0.5955055952072144,
+                                        0.279239684343338,
+                                        0.22138619422912598
+                                    ],
+                                    [
+                                        0.8426966071128845,
+                                        0.8426966071128845,
+                                        0.8426966071128845
+                                    ],
+                                    [
+                                        0.932584285736084,
+                                        0.932584285736084,
+                                        0.932584285736084
+                                    ],
+                                    [
+                                        0.9213483333587646,
+                                        0.9213483333587646,
+                                        0.9213483333587646
+                                    ],
+                                    [
+                                        0.898876428604126,
+                                        0.898876428604126,
+                                        0.898876428604126
+                                    ],
+                                    [
+                                        0.7752808928489685,
+                                        0.7752808928489685,
+                                        0.7752808928489685
+                                    ],
+                                    [
+                                        1.0,
+                                        0.8823000192642212,
+                                        0.9229999780654907
+                                    ],
+                                    [
+                                        0.617977499961853,
+                                        0.617977499961853,
+                                        0.617977499961853
+                                    ],
+                                    [
+                                        0.6404494643211365,
+                                        0.6404494643211365,
+                                        0.6404494643211365
+                                    ],
+                                    [
+                                        0.871999979019165,
+                                        0.5322999954223633,
+                                        0.4957999885082245
+                                    ],
+                                    [
+                                        0.6741573214530945,
+                                        0.6741573214530945,
+                                        0.6741573214530945
+                                    ],
+                                    [
+                                        0.871999979019165,
+                                        0.5322999954223633,
+                                        0.4957999885082245
+                                    ],
+                                    [
+                                        0.7865168452262878,
+                                        0.7865168452262878,
+                                        0.7865168452262878
+                                    ],
+                                    [
+                                        0.871999979019165,
+                                        0.5322999954223633,
+                                        0.4957999885082245
+                                    ],
+                                    [
+                                        0.871999979019165,
+                                        0.5322999954223633,
+                                        0.4957999885082245
+                                    ],
+                                    [
+                                        0.6966292262077332,
+                                        0.6966292262077332,
+                                        0.6966292262077332
+                                    ],
+                                    [
+                                        0.6404494643211365,
+                                        0.6404494643211365,
+                                        0.6404494643211365
+                                    ],
+                                    [
+                                        0.8314606547355652,
+                                        0.8314606547355652,
+                                        0.8314606547355652
+                                    ],
+                                    [
+                                        1.0,
+                                        0.8823000192642212,
+                                        0.9229999780654907
+                                    ],
+                                    [
+                                        0.7415730357170105,
+                                        0.7415730357170105,
+                                        0.7415730357170105
+                                    ],
+                                    [
+                                        0.7191011309623718,
+                                        0.7191011309623718,
+                                        0.7191011309623718
+                                    ],
+                                    [
+                                        0.449438214302063,
+                                        0.449438214302063,
+                                        0.449438214302063
+                                    ],
+                                    [
+                                        0.9213483333587646,
+                                        0.9213483333587646,
+                                        0.9213483333587646
+                                    ],
+                                    [
+                                        0.9101123809814453,
+                                        0.9101123809814453,
+                                        0.9101123809814453
+                                    ],
+                                    [
+                                        1.0,
+                                        0.8823000192642212,
+                                        0.9229999780654907
+                                    ],
+                                    [
+                                        0.8651685118675232,
+                                        0.8651685118675232,
+                                        0.8651685118675232
+                                    ],
+                                    [
+                                        0.9438202381134033,
+                                        0.9438202381134033,
+                                        0.9438202381134033
+                                    ],
+                                    [
+                                        0.8089887499809265,
+                                        0.8089887499809265,
+                                        0.8089887499809265
+                                    ],
+                                    [
+                                        0.7865168452262878,
+                                        0.7865168452262878,
+                                        0.7865168452262878
+                                    ],
+                                    [
+                                        0.8651685118675232,
+                                        0.8651685118675232,
+                                        0.8651685118675232
+                                    ],
+                                    [
+                                        0.8539325594902039,
+                                        0.8539325594902039,
+                                        0.8539325594902039
+                                    ],
+                                    [
+                                        0.898876428604126,
+                                        0.898876428604126,
+                                        0.898876428604126
+                                    ],
+                                    [
+                                        1.0,
+                                        0.8823000192642212,
+                                        0.9229999780654907
+                                    ],
+                                    [
+                                        0.47191011905670166,
+                                        0.1660424917936325,
+                                        0.12024323642253876
+                                    ],
+                                    [
+                                        0.8089887499809265,
+                                        0.8089887499809265,
+                                        0.8089887499809265
+                                    ],
+                                    [
+                                        1.0,
+                                        0.8823000192642212,
+                                        0.9229999780654907
+                                    ],
+                                    [
+                                        0.7528089880943298,
+                                        0.7528089880943298,
+                                        0.7528089880943298
+                                    ],
+                                    [
+                                        0.6869999766349792,
+                                        0.5108247399330139,
+                                        0.17518499493598938
+                                    ],
+                                    [
+                                        0.9213483333587646,
+                                        0.9213483333587646,
+                                        0.9213483333587646
+                                    ],
+                                    [
+                                        0.8314606547355652,
+                                        0.8314606547355652,
+                                        0.8314606547355652
+                                    ],
+                                    [
+                                        0.6150000095367432,
+                                        0.4410000145435333,
+                                        0.35109999775886536
+                                    ],
+                                    [
+                                        0.8651685118675232,
+                                        0.8275163173675537,
+                                        0.780381977558136
+                                    ]
+                                ]
+                            },
+                            "colorRamp_Interpolation": {
+                                "default": "catmull-rom",
+                                "type": "string",
+                                "name": "colorRamp_Interpolation",
+                                "value": "linear"
+                            },
+                            "positions": {
+                                "default": 0,
+                                "type": "float[1]",
+                                "name": "positions",
+                                "value": [
+                                    0.0
+                                ]
+                            },
+                            "colors": {
+                                "default": -3.0,
+                                "type": "color[1]",
+                                "name": "colors",
+                                "value": [
+                                    [
+                                        -1.0,
+                                        -1.0,
+                                        -1.0
+                                    ]
+                                ]
+                            },
+                            "basis": {
+                                "default": 4,
+                                "type": "int",
+                                "name": "basis",
+                                "value": 4
+                            },
+                            "reverse": {
+                                "default": 0,
+                                "type": "int",
+                                "name": "reverse",
+                                "value": 1
+                            },
+                            "splineMap": {
+                                "default": 0,
+                                "type": "float",
+                                "name": "splineMap",
+                                "value": 0.0
+                            },
+                            "randomSource": {
+                                "default": 0,
+                                "type": "int",
+                                "name": "randomSource",
+                                "value": 0
+                            },
+                            "randomSeed": {
+                                "default": 0,
+                                "type": "float",
+                                "name": "randomSeed",
+                                "value": 1.0
+                            },
+                            "manifold": {
+                                "type": "reference struct",
+                                "value": null
+                            }
+                        },
+                        "rmanNode": "PxrRamp",
+                        "type": "PxrRamp",
+                        "nodeClass": "pattern"
+                    },
+                    "PxrRemap10": {
+                        "params": {
+                            "inputRGB": {
+                                "type": "reference color",
+                                "value": null
+                            },
+                            "inputMin": {
+                                "default": 0.0,
+                                "type": "float",
+                                "name": "inputMin",
+                                "value": 0.0
+                            },
+                            "inputMax": {
+                                "default": 1.0,
+                                "type": "float",
+                                "name": "inputMax",
+                                "value": 1.0
+                            },
+                            "clampInput": {
+                                "default": 1,
+                                "type": "int",
+                                "name": "clampInput",
+                                "value": 1
+                            },
+                            "bias": {
+                                "default": [
+                                    0.5,
+                                    0.5,
+                                    0.5
+                                ],
+                                "type": "color",
+                                "name": "bias",
+                                "value": [
+                                    0.5,
+                                    0.5,
+                                    0.5
+                                ]
+                            },
+                            "gain": {
+                                "default": [
+                                    0.5,
+                                    0.5,
+                                    0.5
+                                ],
+                                "type": "color",
+                                "name": "gain",
+                                "value": [
+                                    0.5,
+                                    0.5,
+                                    0.5
+                                ]
+                            },
+                            "outputMin": {
+                                "default": 0.0,
+                                "type": "float",
+                                "name": "outputMin",
+                                "value": 0.0
+                            },
+                            "outputMax": {
+                                "default": 1.0,
+                                "type": "float",
+                                "name": "outputMax",
+                                "value": 1.0
+                            },
+                            "clampOutput": {
+                                "default": 1,
+                                "type": "int",
+                                "name": "clampOutput",
+                                "value": 1
+                            }
+                        },
+                        "rmanNode": "PxrRemap",
+                        "type": "PxrRemap",
+                        "nodeClass": "pattern"
+                    },
+                    "PxrManifold3D1": {
+                        "params": {
+                            "scale": {
+                                "type": "reference float",
+                                "value": null
+                            },
+                            "use": {
+                                "default": 0,
+                                "type": "int",
+                                "name": "use",
+                                "value": 0
+                            },
+                            "pref": {
+                                "default": "",
+                                "type": "string",
+                                "name": "pref",
+                                "value": ""
+                            },
+                            "coordsys": {
+                                "default": "object",
+                                "type": "string",
+                                "name": "coordsys",
+                                "value": "object"
+                            }
+                        },
+                        "rmanNode": "PxrManifold3D",
+                        "type": "PxrManifold3D",
+                        "nodeClass": "pattern"
+                    }
+                },
+                "compatibility": {
+                    "hostNodeTypes": [],
+                    "host": {
+                        "version": "2018.0",
+                        "name": "Maya"
+                    },
+                    "renderer": {
+                        "version": "22.4"
+                    }
+                },
+                "connectionList": [
+                    {
+                        "src": {
+                            "node": "PxrRemap9",
+                            "param": "resultRGB"
+                        },
+                        "dst": {
+                            "node": "PxrToFloat1",
+                            "param": "input"
+                        }
+                    },
+                    {
+                        "src": {
+                            "node": "PxrManifold2D6",
+                            "param": "result"
+                        },
+                        "dst": {
+                            "node": "PxrWorley9",
+                            "param": "manifold"
+                        }
+                    },
+                    {
+                        "src": {
+                            "node": "PxrToFloat1",
+                            "param": "resultF"
+                        },
+                        "dst": {
+                            "node": "scolecite_Shader",
+                            "param": "roughSpecularRoughness"
+                        }
+                    },
+                    {
+                        "src": {
+                            "node": "PxrChecker2",
+                            "param": "resultR"
+                        },
+                        "dst": {
+                            "node": "PxrWorley9",
+                            "param": "randomScale"
+                        }
+                    },
+                    {
+                        "src": {
+                            "node": "PxrRamp1",
+                            "param": "resultRGB"
+                        },
+                        "dst": {
+                            "node": "PxrRemap10",
+                            "param": "inputRGB"
+                        }
+                    },
+                    {
+                        "src": {
+                            "node": "PxrManifold2D6",
+                            "param": "result"
+                        },
+                        "dst": {
+                            "node": "PxrChecker2",
+                            "param": "manifold"
+                        }
+                    },
+                    {
+                        "src": {
+                            "node": "PxrRamp1",
+                            "param": "resultR"
+                        },
+                        "dst": {
+                            "node": "PxrBump2",
+                            "param": "inputBump"
+                        }
+                    },
+                    {
+                        "src": {
+                            "node": "PxrWorley9",
+                            "param": "resultF"
+                        },
+                        "dst": {
+                            "node": "PxrManifold3D1",
+                            "param": "scale"
+                        }
+                    },
+                    {
+                        "src": {
+                            "node": "PxrManifold3D1",
+                            "param": "result"
+                        },
+                        "dst": {
+                            "node": "PxrRamp1",
+                            "param": "manifold"
+                        }
+                    },
+                    {
+                        "src": {
+                            "node": "PxrBump2",
+                            "param": "resultN"
+                        },
+                        "dst": {
+                            "node": "scolecite_Shader",
+                            "param": "roughSpecularBumpNormal"
+                        }
+                    },
+                    {
+                        "src": {
+                            "node": "PxrRemap10",
+                            "param": "resultRGB"
+                        },
+                        "dst": {
+                            "node": "scolecite_Shader",
+                            "param": "subsurfaceColor"
+                        }
+                    },
+                    {
+                        "src": {
+                            "node": "PxrRamp1",
+                            "param": "resultRGB"
+                        },
+                        "dst": {
+                            "node": "PxrRemap9",
+                            "param": "inputRGB"
+                        }
+                    },
+                    {
+                        "src": {
+                            "node": "scolecite_Shader",
+                            "param": "outColor"
+                        },
+                        "dst": {
+                            "node": "scolecite_ShaderSG",
+                            "param": "rman__surface"
+                        }
+                    }
+                ],
+                "metadata": {
+                    "author": "lpedersen",
+                    "version": "1.0",
+                    "created": "2019-02-18 19:40:17"
+                }
+            }
+        },
+        "label": "Scolecite"
+    }
+}

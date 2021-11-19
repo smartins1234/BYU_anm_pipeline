@@ -281,6 +281,7 @@ class AssetType:
 	SHOT = 'shot'
 	ASSET = 'asset'
 	SET = 'set'
+	SEQUENCE = 'sequence'
 	ALL = [ASSET, SHOT, TOOL, SET]
 	MAYA = [ASSET, SHOT, SET]
 
@@ -354,6 +355,28 @@ class Shot(Body):
 	def is_crowd_cycle(self):
 		return False
 
+class Sequence(Body):
+	'''
+	Class describing a sequence body.
+	'''
+
+	@staticmethod
+	def create_new_dict(name):
+		datadict = {}
+		datadict[Body.NAME] = name
+		datadict[Body.TYPE] = AssetType.SEQUENCE
+		return datadict
+
+	@staticmethod
+	def get_parent_dir():
+		return Environment().get_sequences_dir()
+
+	def is_tool(self):
+		return False
+
+	def is_crowd_cycle(self):
+		return False
+
 class Layout(Body):
 
 	@staticmethod
@@ -362,7 +385,7 @@ class Layout(Body):
 		datadict[Body.NAME] = name
 		datadict[Body.REFERENCES] = []
 		datadict[Body.DESCRIPTION] = ''
-		datadict[Body.TYPE] = AssetType.SHOT
+		datadict[Body.TYPE] = AssetType.SET
 		datadict[Body.FRAME_RANGE] = 0
 		return datadict
 
