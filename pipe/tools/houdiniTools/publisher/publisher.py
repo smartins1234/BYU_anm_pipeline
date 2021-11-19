@@ -1,3 +1,8 @@
+'''
+THIS FILE IS DEPRICATED. I'VE KEPT IT HERE FOR MY PERSONAL REFERENCE ONLY.
+'''
+
+
 import hou
 from pxr import Sdf, Usd
 from functools import partial

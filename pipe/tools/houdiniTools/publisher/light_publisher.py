@@ -4,7 +4,7 @@ import pipe.pipeHandlers.quick_dialogs as qd
 import pipe.pipeHandlers.select_from_list as sfl
 
 from pipe.pipeHandlers.project import Project
-from pipe.pipeHandlers.body import Body, Shot, Asset
+from pipe.pipeHandlers.body import Body, Shot, Asset, Sequence
 from pipe.pipeHandlers.element import Element
 from pipe.pipeHandlers.environment import Environment
 

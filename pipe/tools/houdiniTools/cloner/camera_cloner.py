@@ -38,9 +38,15 @@ class CameraCloner:
             qd.error("There are no publishes for this camera.")
             return
         path = element.get_last_publish()[3]
-
+        '''
         stage = hou.node("/stage")
         ref = stage.createNode("reference")
         ref.setName(camera_name + "_1", 0)
         ref.parm("filepath1").set(path)
         ref.parm("primpath").set("/camera/" + camera_name)
+        '''
+        cameraNode = hou.node("/obj").createNode("cenoteCamera")
+        cameraNode.setName(self.shot_name + "_camera", 1)
+        cameraNode.parm("fileName").set(path)
+        cameraNode.parm("scale").set(0.01)
+        cameraNode.parm("buildHierarchy").pressButton()
