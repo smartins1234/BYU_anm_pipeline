@@ -21,6 +21,7 @@ bin/
 tests/
 ribs/
 geo/
+RenderManAssetLibrary/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
