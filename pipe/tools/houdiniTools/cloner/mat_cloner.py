@@ -1,4 +1,4 @@
-import hou
+import hou, re
 from pxr import Usd, UsdShade, Sdf, Gf
 import pipe.pipeHandlers.quick_dialogs as qd
 import pipe.pipeHandlers.select_from_list as sfl
@@ -28,12 +28,50 @@ class MaterialCloner:
 
             path = self.element.get_last_publish()[3]
             if path:
-                ref = hou.node("/stage").createNode("reference")
-                ref.setName(filename+"_material_ref", 1)
-                ref.parm("filepath1").set(path)
-                ref.parm("primpath").set("/materials/")
+                createNewRef = True
+                for child in hou.node("/stage").children():
+                    if child.name() == filename+"_material_ref" and child.parm("filepath1").eval() == path:
+                        child.parm("reload").pressButton()
+                        createNewRef = False
+                if createNewRef:
+                    ref = hou.node("/stage").createNode("reference")
+                    ref.setName(filename+"_material_ref", 1)
+                    ref.parm("filepath1").set(path)
+                    ref.parm("primpath").set("/materials/")
 
-                stage = ref.stage()
+                panes = self.getCurrentNetworkEditorPane()
+                paths = []
+                for pane in panes:
+                    paths.append(pane.pwd())
+
+                hdaPath = path.split(".")[0] + ".hda"
+                hou.hda.installFile(hdaPath)
+
+                success = False
+
+                for p in paths:
+                    try:
+                        for child in p.children():
+                            if child.type().name() == re.sub(r'\W+', '', filename):
+                                child.destroy()
+                        newMat = p.createNode(re.sub(r'\W+', '', filename))
+                        newMat.setName(filename, 1)
+                        newMat.setMaterialFlag(True)
+                        success = True
+                    except:
+                        pass
+
+                if not success:
+                    for child in hou.node("/mat").children():
+                        if child.type().name() == re.sub(r'\W+', '', filename):
+                            child.destroy()
+                    newMat = hou.node("/mat").createNode(re.sub(r'\W+', '', filename))
+                    newMat.setName(filename, 1)
+                    newMat.setMaterialFlag(True)
+
+                    qd.message("Material successfully cloned into /mat context.")
+
+                '''stage = ref.stage()
                 for prim in stage.Traverse():
                     if prim.GetTypeName() == "Material":
                         
@@ -46,7 +84,7 @@ class MaterialCloner:
                         matName = matNode.name()
                         matNode.setMaterialFlag(True)
 
-                        self.buildMaterial(prim, matNode)
+                        self.buildMaterial(prim, matNode)'''
 
         else:
             qd.error("Nothing was cloned")
@@ -135,3 +173,7 @@ class MaterialCloner:
 
                 outNode = hou.node("/mat/"+node.name()+"/"+outNode)
                 inNode.setNextInput(outNode, outNode.outputIndex(outParm))
+
+    def getCurrentNetworkEditorPane(self):
+        editors = [pane for pane in hou.ui.paneTabs() if isinstance(pane, hou.NetworkEditor) and pane.isCurrentTab()]
+        return editors

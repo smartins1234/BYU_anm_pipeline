@@ -1,4 +1,4 @@
-import hou, os
+import hou, os, re
 from pxr import Usd, UsdShade, Sdf, Gf
 import pipe.pipeHandlers.quick_dialogs as qd
 import pipe.pipeHandlers.select_from_list as sfl
@@ -45,10 +45,25 @@ class AnimCloner:
         animNode.setName(self.asset_name + "_anim", 1)
         animNode.parm("fileName").set(path)
         animNode.parm("scale").set(0.01)
-        animNode.parm("rendersubd").set(True)
+        animNode.parm("buildHierarchy").pressButton()
+        #animNode.parm("rendersubd").set(True)
 
         matPath = self.getMatPath()
-        ref = hou.node("/stage").createNode("reference")
+        hdaPath = matPath.split(".")[0]+".hda"
+        if os.path.exists(hdaPath):
+            hou.hda.installFile(hdaPath)
+            for child in hou.node("/mat").children():
+                if child.type().name() == re.sub(r'\W+', '', self.asset_name):
+                    child.destroy()
+            newMat = hou.node("/mat").createNode(re.sub(r'\W+', '', self.asset_name))
+            newMat.setName(self.asset_name, 1)
+            newMat.setMaterialFlag(True)
+
+            animNode.parm("materialPath").set("/mat/"+newMat.name())
+        else:
+            qd.error("The material for " + self.asset_name + " needs to be republished before it can be cloned in. Republish the material and try again.")
+
+        '''ref = hou.node("/stage").createNode("reference")
         ref.parm("filepath1").set(matPath)
         prim = ref.stage()
         matPrim = None
@@ -64,9 +79,9 @@ class AnimCloner:
                 matName = matNode.name()
                 matNode.setMaterialFlag(True)
 
-                animNode.parm("shop_materialpath").set("/mat/"+matName)
+                animNode.parm("materialPath").set("/mat/"+matName)
 
-                self.buildMaterial(p, matNode)
+                self.buildMaterial(p, matNode)'''
         
         '''stage = hou.node("/stage")
         subnet = stage.createNode("subnet")

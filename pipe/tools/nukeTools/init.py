@@ -4,8 +4,8 @@ import nuke
 
 #color = nuke.Root()["color_management"].value()
 #print(nuke.Root().knobs().keys())
-nuke.Root()["colorManagement"].setValue("OCIO")
-print(nuke.Root()["colorManagement"].value())
+#nuke.Root()["colorManagement"].setValue("OCIO")
+#print(nuke.Root()["colorManagement"].value())
 
 #print(nuke.pluginPath())
 

@@ -43,7 +43,7 @@ class LightCloner:
             return
 
         try:
-            hda.setName(name, 1)
+            hda.setName(name+"_sequence_lights", 1)
         except:
             pass
 

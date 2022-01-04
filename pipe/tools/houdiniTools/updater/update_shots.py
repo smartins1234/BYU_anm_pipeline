@@ -11,10 +11,12 @@ class UpdateShots:
 
     def update_shots(self):
         shot_list = ShotgunReader().getShotList()
+        #print(shot_list)
 
         list_file = open(os.path.join(self.project.get_shots_dir(), ".shot_list"), "w")
         list_file.truncate(0)
         for shot in shot_list:
+            #print("shot " + shot) 
             list_file.write(shot + "\n")
 
             self.create_shot(shot)
@@ -25,7 +27,7 @@ class UpdateShots:
 
     def create_shot(self, shot):
         stage = hou.node("/stage")
-
+        #print(shot)
 
         #check if there's already a shot hip file, and if so, don't do anything
         body = self.project.get_shot(shot)

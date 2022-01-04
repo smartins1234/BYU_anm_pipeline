@@ -47,6 +47,7 @@ class FXCloner:
 
 
         try:
+            hou.hda.uninstallFile(filepath)
             hou.hda.installFile(filepath)
             #print("no problem here")
         except Exception as e:
