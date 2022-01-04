@@ -1,4 +1,4 @@
-import hou, os
+import hou, os, re
 
 import pipe.pipeHandlers.quick_dialogs as qd
 import pipe.pipeHandlers.select_from_list as sfl
@@ -43,16 +43,44 @@ class MaterialPublisher:
         if shader.type().name == "materiallibrary":
             qd.error("Changes have been made to this publishing tool. Now you must select the material node itself, NOT the material library, to publish it. Please try again.")
             return
-        lib = shader.parent()
-        """if len(lib.children()) > 1:
-            qd.error("Only one material can be in the material library node. Move extra nodes to another material library and try again.")
-            return
-        if lib.type().name() != "materiallibrary":
-            qd.error("Please put your material in a material library node before publishing and try again.")
-            return"""
+
+        #check where we are and move shader node accordingly
+        deleteLib = False
+        path = shader.path()
+        first = path.split("/")[1]
+        if first != "stage":
+            lib = hou.node("/stage").createNode("materiallibrary")
+            deleteLib = True
+            shader = hou.copyNodesTo([shader], lib)[0]
+        else:
+            lib = shader.parent()
 
         lib.setInput(0, None)
         lib.parm("matpath1").set(value[0])
+        
+        #create and save material hda
+        if shader.canCreateDigitalAsset():
+            hdaPath = os.path.join(self.element._filepath, self.asset_name + "_main.hda")
+            shader = shader.createDigitalAsset(
+                name = re.sub(r'\W+', '', self.asset_name),
+                description=self.asset_name,
+                hda_file_name=hdaPath,
+                min_num_inputs=0,
+                max_num_inputs=0
+            )
+            shaderDef = shader.type().definition()
+            shaderOptions = shaderDef.options()
+            shaderOptions.setUnlockNewInstances(True)
+            shaderOptions.setSaveInitialParmsAndContents(True)
+            shaderDef.setOptions(shaderOptions)
+            shaderDef.save(hdaPath, shader, shaderOptions)
+        elif shader.type().name() == re.sub(r'\W+', '', self.asset_name):
+            shader.type().definition().updateFromNode(shader)
+            shader.type().definition().save(shader.type().definition().libraryFilePath())
+        else:
+            qd.error("Error creating/saving hda. Continuing to save USDA...")
+        
+
         shader.setName(value[0])
 
         rop = hou.node("/stage").createNode("usd_rop")
@@ -62,6 +90,8 @@ class MaterialPublisher:
         rop.parm("execute").pressButton()
 
         rop.destroy()
+        if deleteLib:
+            lib.destroy()
 
         publishes = self.element.list_publishes()
         publishes_string_list = ""

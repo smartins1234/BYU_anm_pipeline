@@ -289,6 +289,55 @@ def binary_option(text, optionOne, optionTwo, title='Question'):
         return False
     return None
 
+class CheckboxSelect(QtWidgets.QDialog):
+
+    submitted = QtCore.Signal(list)
+    
+    def __init__(self, text, options, title="", parent=None):
+        '''Creates check box options based on the given list of strings'''
+        '''returns a list of booleans, each one correstponding to its respective option'''
+        super(CheckboxSelect, self).__init__(parent=parent)
+
+        #window = QtWidgets.QDialog(parent=parent)
+        #self.setWindowTitle(title)
+
+        self.layout = QtWidgets.QVBoxLayout()
+        
+        label = QtWidgets.QLabel()
+        label.setText(text)
+        self.layout.addWidget(label)
+
+        self.boxes = []
+
+        for option in options:
+            print(option)
+            newBox = QtWidgets.QCheckBox()
+            newBox.setText(option)
+            newBox.setChecked(True)
+            self.boxes.append(newBox)
+            self.layout.addWidget(newBox)
+
+        self.initializeSubmitButton()
+
+        self.setLayout(self.layout)
+        self.show()
+
+    def initializeSubmitButton(self):
+        # Create the button widget
+        self.button = QtWidgets.QPushButton("Accept")
+        self.button.setSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Minimum)
+        self.button.clicked.connect(self.submit)
+        #self.button.setEnabled(False)
+        #self.button.setAutoDefault(True)
+        self.layout.addWidget(self.button)
+
+    def submit(self):
+        values = []
+        for box in self.boxes:
+            values.append(box.isChecked())
+        self.submitted.emit(values)
+        self.close()
+
 
 def save(text):
     '''Prompts the user to save'''

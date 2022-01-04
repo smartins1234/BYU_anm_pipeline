@@ -31,13 +31,16 @@ class ToolCloner:
             qd.error("Nothing has been published for this tool")
             return
         filepath = element.get_last_publish()[3]
+        #I am sorry stephanie I touched your pipe.
+        #I moved the uninstallFileto inside the try catch
 
         panes = self.getCurrentNetworkEditorPane()
         paths = []
         for pane in panes:
-            paths.append(pane.currentNode())
+            paths.append(pane.pwd())
 
         try:
+            hou.hda.uninstallFile(filepath)
             hou.hda.installFile(filepath)
             #print("no problem here")
         except Exception as e:
@@ -53,7 +56,7 @@ class ToolCloner:
             except Exception as e:
                 #qd.error("Couldn't create node of type " + name + ". You should still be able to tab in the node manually.")
                 print(e)
-                return
+                #return
 
         if not hda:
             qd.error("Couldn't create node of type " + name + ". You should still be able to tab in the node manually.")
@@ -71,5 +74,3 @@ class ToolCloner:
     def getCurrentNetworkEditorPane(self):
         editors = [pane for pane in hou.ui.paneTabs() if isinstance(pane, hou.NetworkEditor) and pane.isCurrentTab()]
         return editors
-
-        

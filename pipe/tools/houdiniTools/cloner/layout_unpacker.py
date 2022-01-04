@@ -1,5 +1,5 @@
 from pxr import Usd, UsdShade, Sdf, Gf
-import os, hou
+import os, hou, pprint, re, shutil
 import pipe.pipeHandlers.quick_dialogs as qd
 import pipe.pipeHandlers.select_from_list as sfl
 from pipe.pipeHandlers.project import Project
@@ -37,24 +37,24 @@ class LayoutUnpacker:
         self.unpack(path)
 
     def layout_results(self, value):
-        layout_name = value[0]
+        self.layout_name = value[0]
 
         # copy ref file into the shot
-        layout_body = self.project.get_layout(layout_name)
+        layout_body = self.project.get_layout(self.layout_name)
         element = layout_body.get_element(Asset.LAYOUT)
-        src = os.path.join(element._filepath, layout_name + "_ref.usda")
+        src = os.path.join(element._filepath, self.layout_name + "_ref.usda")
         dst = os.path.join(self.layout_element._filepath, self.shot_name + ".usda")
         shutil.copy(src, dst)
         pio.set_permissions(dst)
         self.unpack(dst)
 
     def unpack(self, file):
-        hdaFile = os.path.join(self.project.get_project_dir(), "pipe/tools/houdiniTools/custom/otls/cenoteLayout.hdanc")
-        hou.hda.installFile(hdaFile)
+        #hdaFile = os.path.join(self.project.get_project_dir(), "pipe/tools/houdiniTools/custom/otls/cenoteLayout.hdanc")
+        #hou.hda.installFile(hdaFile)
 
         #delete copies of the same layout node for simplicity
         for lopNode in hou.node("/stage").children():
-            if lopNode.type().name() == "cenoteLayout" and lopNode.parm("filepath").eval() == file:
+            if lopNode.type().name() == "loadlayer" and lopNode.parm("filepath").eval() == file:
                 lopNode.destroy()
 
         ref = hou.node("/stage").createNode("loadlayer")
@@ -71,11 +71,21 @@ class LayoutUnpacker:
 
         obj = hou.node("/obj")
         matContext = hou.node("/mat")
-        layout = obj.createNode("cenoteLayout")
-        layout.setName("layout", 1)
+
+        #layout = obj.createNode("cenoteLayout")
+        layout = obj.createNode("cenoteLayoutNet")
+        
+        layout.setName(self.shot_name + "_layout", 1)
         layout.parm("scale").set(0.01)
         
         stage = ref.stage()
+        '''
+        NEW CODE
+        '''
+        layout.parm("loppath").set(ref.path())
+        layout.parm("primpattern").set("/layout")
+        
+        matDict = {}
 
         for prim in stage.Traverse():
             #print(prim.GetName() + " " + prim.GetTypeName())
@@ -85,7 +95,21 @@ class LayoutUnpacker:
             if mat_path:
                 #print(prim.GetName() + " has a material at path " + str(mat_path.GetForwardedTargets()[0]))
 
-                geo = layout.createNode("geo")
+                #primPath = str(prim.GetPath())
+                primPaths = ""
+                '''children = self.getDescendants(prim)
+                print(prim.GetName() + " " + prim.GetTypeName())
+                for child in children:
+                    print(child.GetName() + " " + child.GetTypeName())'''
+
+                if prim.GetTypeName() == "Mesh":
+                    primPaths = primPaths + "@path=" + str(prim.GetPath()) + " "
+                else:
+                    children = self.getDescendants(prim)
+                    for child in children:
+                        if child.GetTypeName() == "Mesh":
+                            primPaths = primPaths + "@path=" + str(child.GetPath()) + " "
+                '''geo = layout.createNode("geo")
                 geo.setName(prim.GetName(), 1)
                 #add renderman spare parameters and set default to subdivide
                 try:
@@ -102,7 +126,7 @@ class LayoutUnpacker:
                 unpack.parm("unpack_geomtype").set(1)
                 unpack.setInput(0, im)
                 unpack.setDisplayFlag(True)
-                unpack.setRenderFlag(True)
+                unpack.setRenderFlag(True)'''
                 
                 '''transform = geo.createNode("xform")
                 transform.parm("scale").set(0.01)
@@ -116,9 +140,14 @@ class LayoutUnpacker:
                     mat_name = os.path.basename(str(mat_path[0]))
                     print("\t" + mat_name)
 
+                    if mat_name in matDict.keys():
+                        matDict[mat_name] += primPaths
+                    else:
+                        matDict[mat_name] = primPaths
+
                     #if the material already exists in /mat, delete it, as it
                     #may have been updated since the layout was last cloned
-                    oldMat = hou.node("/mat/"+mat_name)
+                    '''oldMat = hou.node("/mat/"+mat_name)
                     if oldMat:
                         oldMat.destroy()
                     
@@ -130,7 +159,47 @@ class LayoutUnpacker:
                     geo.parm("shop_materialpath").set("/mat/"+mat_name)
                     
                     matPrim = stage.GetPrimAtPath(mat_path[0])
-                    self.buildMaterial(matPrim, matNode)
+                    self.buildMaterial(matPrim, matNode)'''
+
+        #pprint.pprint(matDict)
+        library = None
+        for child in layout.children():
+            if child.type().name() == "matnet":
+                library = child
+        if not library:
+            library = layout.createNode("matnet")
+        
+        layout.parm("num_materials").set(len(matDict.keys()))
+        index = 1
+
+        for mat in matDict.keys():
+            #clone in that material's hda to the network
+            asset = self.project.get_asset(mat)
+            if not asset:
+                print("Well there's your problem :/")
+                continue
+                
+            element = asset.get_element(Asset.MATERIALS)
+            matNode = None
+            if element.get_last_version() >= 0:
+                path = element.get_last_publish()[3]
+                hdaPath = path.split(".")[0] + ".hda"
+                try:
+                    hou.hda.installFile(hdaPath)
+
+                    matNode = library.createNode(re.sub(r'\W+', '', mat))
+                    matNode.setName(mat, 1)
+                    matNode.setMaterialFlag(True)
+                except:
+                    qd.error("The material for " + mat + " needs to be republished. Sorry for the inconvenience.")
+
+            #assign the material to all the paths
+            layout.parm("group"+str(index)).set(matDict[mat])
+            if matNode:
+                layout.parm("shop_materialpath"+str(index)).set(matNode.path())
+
+            index += 1
+
 
     def buildMaterial(self, prim, node):
         output = node.createNode("collect")
@@ -226,3 +295,12 @@ class LayoutUnpacker:
             target.setParmTemplateGroup(grp)
 
         hou.hscript("opproperty %s prman24geo *" % target.path())
+
+    def getDescendants(self, prim):
+        all = []
+        children = prim.GetChildren()
+        all.extend(children)
+        for child in children:
+            all.extend(self.getDescendants(child))
+
+        return all

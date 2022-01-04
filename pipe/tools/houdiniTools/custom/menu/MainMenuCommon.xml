@@ -369,6 +369,21 @@ publisher.publish()
 			</scriptItem>
 			<!-- ============================ End Shot Return Tool =========================== -->
 
+			<!-- ============================ Start Shot Build Tool =========================== -->
+			<scriptItem id="h.shotBuild">
+				<label>Quick Build</label>
+				<scriptCode scriptType="python">
+					<![CDATA[
+from pipe.tools.houdiniTools.cloner import shot_build
+import hou
+builder = shot_build.BuildShot()
+hou.session.builder = builder
+builder.build()
+					]]>
+				</scriptCode>
+			</scriptItem>
+			<!-- ============================ End Shot Build Tool =========================== -->
+
 		</subMenu>
 		<!-- ============================ End Shot subMenu =========================== -->
 
@@ -425,18 +440,18 @@ reload.run()
 				</scriptCode>
 			</scriptItem>
 			
-			<!--scriptItem id="h.test">
+			<scriptItem id="h.test">
 				<label>Test</label>
 				<scriptCode scriptType="python">
 				<![CDATA[
-from pipe.tools.houdiniTools.publisher import obj_publisher
+from pipe.tools.houdiniTools.cloner import shot_build
 import hou
-publisher = obj_publisher.ObjPublisher()
-hou.session.publisher = publisher
-publisher.publish()
+test = shot_build.BuildShot()
+hou.session.test = test
+test.build()
 				]]>
 				</scriptCode>
-			</scriptItem--> 
+			</scriptItem> 
 		</subMenu>
 
 	</subMenu>
