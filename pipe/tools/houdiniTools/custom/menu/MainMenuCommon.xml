@@ -384,6 +384,22 @@ builder.build()
 			</scriptItem>
 			<!-- ============================ End Shot Build Tool =========================== -->
 
+			<!-- ============================ Start Shot Update Tool =========================== -->
+			<scriptItem id="h.shotUpdate">
+				<label>Update</label>
+				<scriptCode scriptType="python">
+				<![CDATA[
+from pipe.tools.houdiniTools.updater import update_file
+import hou
+updater = update_file.FileUpdater()
+hou.session.updater = updater
+updater.update()
+				]]>
+				</scriptCode>
+			</scriptItem>
+			<!-- ============================ End Shot Update Tool =========================== -->
+			
+
 		</subMenu>
 		<!-- ============================ End Shot subMenu =========================== -->
 
@@ -444,11 +460,11 @@ reload.run()
 				<label>Test</label>
 				<scriptCode scriptType="python">
 				<![CDATA[
-from pipe.tools.houdiniTools.cloner import shot_build
+from pipe.tools.houdiniTools.updater import update_file
 import hou
-test = shot_build.BuildShot()
+test = update_file.FileUpdater()
 hou.session.test = test
-test.build()
+test.update()
 				]]>
 				</scriptCode>
 			</scriptItem> 

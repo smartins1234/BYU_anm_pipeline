@@ -19,6 +19,9 @@ from pipe.tools.houdiniTools.updater import update_shots
 from pipe.tools.houdiniTools.cloner import layout_unpacker
 from pipe.tools.houdiniTools.cloner import parser
 from pipe.tools.houdiniTools.cloner import shot_build
+from pipe.tools.houdiniTools.updater import update_layout
+from pipe.tools.houdiniTools.updater import update_materials
+from pipe.tools.houdiniTools.updater import update_file
 #from pipe.tools.houdiniTools.cloner import parser as hou_parser
 import pipe.pipeHandlers.quick_dialogs as qd
 
@@ -46,6 +49,8 @@ class ReloadScripts:
         reload(layout_unpacker)
         reload(parser)
         reload(shot_build)
-        
+        reload(update_layout)
+        reload(update_materials)
+        reload(update_file)
         #reload(hou_parser)
         reload(qd)
