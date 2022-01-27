@@ -81,42 +81,6 @@ class Assembler:
 
         geo.layoutChildren()
 
-
-        #clean slate HDA is now created and ready to fill
-        #sop_create = HDA.createNode("sopcreate", "import_geo")
-        #sop_create.parm("enable_pathattr").set(True)
-        #sop_create.parm("enable_kindschema").set(True)
-        #sop_create.parm("enable_subsetgroups").set(True)
-        #sop_create.parm("kindschema").set("Nested assembly, groups, and components")
-        #sop_create.parm("subsetgroups").set("*")
-        #sop_create.setDisplayFlag(True)
-        #sop_view = sop_create.children()[0].children()[0]
-
-        '''create import nodes if no hda exists
-        if selected_nodes == None:
-            usd_import = sop_view.createNode("usdimport")
-            usd_import.parm("input_unpack").set(True)
-            usd_import.parm("pathattrib").set("")
-            element = Element(os.path.join(body.get_filepath(), "geo")).get_last_publish()
-            if not element == None:
-                print(element)
-                print("\n\nImport filepath:  " + element[3])
-                usd_import.parm("filepath1").set(element[3])
-            wrangle = sop_view.createNode("attribwrangle")
-            wrangle.setInput(0, usd_import, 0)
-            wrangle.parm("snippet").set("s@path = \"/" + asset_name + "\";")
-            wrangle.parm("class").set(1)
-
-            output = sop_view.createNode("output")
-            output.setInput(0, wrangle, 0)
-            output.setDisplayFlag(True)
-            output.setRenderFlag(True)
-        else:
-            hou.moveNodesTo(selected_nodes, sop_view)'''
-
-        #childs = sop_create.children()[0].children()[0]
-        #sop_create.children()[0].layoutChildren()
-
         return HDA
 
     def add_spare_parameters(self, target):

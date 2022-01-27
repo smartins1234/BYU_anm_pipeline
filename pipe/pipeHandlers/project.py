@@ -66,7 +66,6 @@ class Project:
 		'''
 		return self._env.get_tools_dir()
 
-		#TODO create a get tabs dir in the byuam environment module
 	def get_tabs_dir(self):
 		'''
 		return the absolute filepath to the xml tabs directory of this project
@@ -270,6 +269,9 @@ class Project:
 		return bodylist
 
 	def list_assets(self):
+		'''
+		returns the names of all assets in the production
+		'''
 		path = self._env.get_assets_dir() + ".asset_list.txt"
 		assets = []
 		f = open(path, "r")
@@ -282,6 +284,9 @@ class Project:
 		return assets
 
 	def list_existing_assets(self):
+		'''
+		lists only assets that have already been created
+		'''
 		list = self._list_bodies_in_dir(self._env.get_assets_dir())
 		assets = []
 
@@ -293,6 +298,9 @@ class Project:
 		return assets
 
 	def list_assets_short(self):
+		'''
+		returns the shortlist of assets
+		'''
 		path = self._env.get_assets_dir() + ".short_asset_list"
 		assets = []
 		f = open(path, "r")
@@ -315,17 +323,6 @@ class Project:
 
 		shots.sort(key=str.lower)
 		return shots
-
-	'''def list_existing_shots(self):
-		list = self._list_bodies_in_dir(self._env.get_shots_dir())
-		shots = []
-
-		for item in list:
-			shot = self.get_shot(item)
-			if asset.get_type() == AssetType.ASSET:
-				assets.append(str(item))
-		assets.sort(key=str.lower)
-		return assets'''
 
 	def list_layouts(self):
 		path = self._env.get_layouts_dir() + ".layout_list"

@@ -1,3 +1,8 @@
+'''
+This file is not used in the current version of the pipeline,
+and is only kept for reference.
+'''
+
 import hou, os
 
 import pipe.pipeHandlers.quick_dialogs as qd

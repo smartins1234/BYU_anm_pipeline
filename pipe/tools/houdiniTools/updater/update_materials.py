@@ -2,6 +2,10 @@ import hou, re
 from pipe.pipeHandlers.project import Project
 import pipe.pipeHandlers.quick_dialogs as qd
 
+'''
+updates all materials in the hip file to their
+most recent versions
+'''
 class MatUpdater:
     def __init__(self):
         self.project = Project()

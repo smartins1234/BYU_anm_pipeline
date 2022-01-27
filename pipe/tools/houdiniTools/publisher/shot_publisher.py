@@ -11,6 +11,9 @@ from pipe.pipeHandlers.element import Element
 from pipe.pipeHandlers.environment import Environment
 from pipe.pipeHandlers import pipeline_io
 
+'''
+saves and returns a shot's hip file
+'''
 class ShotPublisher:
     def __init__(self):
         self.project = Project()

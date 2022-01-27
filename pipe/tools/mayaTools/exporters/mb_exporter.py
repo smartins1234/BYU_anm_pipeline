@@ -11,13 +11,10 @@ import pipe.pipeHandlers.pipeline_io as pio
 from pipe.tools.mayaTools.utilities.utils import *
 from pipe.pipeHandlers.environment import Environment
 from pipeHandlers.body import Asset
-#from pipe.pipeHandlers.environment import Department
 from pipe.pipeHandlers.body import AssetType
 from pipe.pipeHandlers.project import Project
 from pipe.pipeHandlers import quick_dialogs as qd
 import pipe.pipeHandlers.select_from_list as sfl
-#import pipe.pipeHandlers.tests as sfl
-#from PySide2.QtCore import QObject, Signal, Slot
 
 from pipe.pipeHandlers.environment import Environment
 
@@ -46,18 +43,7 @@ class MbExporter:
         return publish_info
 
     def exportSelected(self, assetName):
-
-        """path = self.getFilePath(assetName)
-
-        command = self.buildMbCommand(path)
-
-        pm.Mel.eval(command)
-
-        publish_info = []
-        publish_info.append(self.element)
-        publish_info.append(path)
-
-        return publish_info"""
+        pass
 
     def buildMbCommand(self, outFilePath):
         command = "file -force -options \"v=0;\" -type \"mayaBinary\" -pr -ea \"" + outFilePath + "\""

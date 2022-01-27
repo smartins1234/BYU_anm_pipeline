@@ -1,3 +1,7 @@
+'''
+this script was given to me by the rigging team to be added to their shelf
+'''
+
 # uncompyle6 version 3.5.0
 # Python bytecode 2.6 (62161)
 # Decompiled from: Python 2.7.5 (default, Aug  7 2019, 00:51:29) 

@@ -1,5 +1,8 @@
 import pymel.core as pm
 
+'''
+runs a mel script for the Rigging team
+'''
 class createControl:
     def __init__(self):
         pass

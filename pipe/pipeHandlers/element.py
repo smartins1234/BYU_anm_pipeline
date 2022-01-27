@@ -5,7 +5,13 @@ import shutil
 from pipe.pipeHandlers.environment import Environment
 from pipe.pipeHandlers import pipeline_io
 
+'''
+This Checkout class is not used in the Cenote pipeline, it's
+just included because it was part of the old DCC Pipe.
 
+Rather, the functionality of checking-in or checking-out
+a shot was included as part of the Element class.
+'''
 class Checkout:
     """
     class describing the result of an element checkout
@@ -273,9 +279,8 @@ class Element:
         """
         return self._datadict[self.CACHE_EXT]
 
-    def get_cache_dir(self):
+    def get_cache_dir(self): 
 
-        # return self._datadict[self.CACHE_FILEPATH]
         return os.path.join(self._filepath, self.DEFAULT_CACHE_DIR)
 
     def get_render_dir(self):
@@ -292,6 +297,9 @@ class Element:
         return self._datadict[self.CHECKOUT_USER]
 
     def is_assigned(self):
+        """
+        return whether or not there's an assigned user
+        """
         if not self._datadict.has_key(self.ASSIGNED_USER):
             self._datadict[self.ASSIGNED_USER] = ""
             self._update_pipeline_file()
@@ -317,27 +325,6 @@ class Element:
             return
         self._datadict[self.ASSIGNED_USER] = username
         self._update_pipeline_file()
-        '''if old_username:
-            old_user = self._env.get_user(old_username)
-            if old_user and old_user.has_email():
-                subject = self.get_long_name()+" reassigned to "+username
-                message = "you are no longer assigned to "+self.get_long_name()+"."
-                self._env.sendmail([old_user.get_email()], subject, message)
-        new_user = self._env.get_user(username)
-        if new_user and new_user.has_email():
-            subject = self.get_long_name()+" assigned"
-            message = "you have been assigned to work on "+self.get_long_name()+"."
-            start = self.get_start_date()
-            if start:
-                message = message + " you can start on "+start+"."
-            end = self.get_end_date()
-            if end:
-                message = message + " the end date is "+end+"."
-
-            note = self.get_last_note()
-            if note:
-                message = message + " note: "+note
-            self._env.sendmail([new_user.get_email()], subject, message)'''
 
     def update_start_date(self, date):
         """
@@ -450,53 +437,6 @@ class Element:
         self._datadict[self.PUBLISHES].append((username, timestamp, comment, main_path))
         self._update_pipeline_file()
 
-
-        """if not os.path.exists(src):
-            raise EnvironmentError("file does not exist: " + src)
-
-        self._datadict[self.APP_EXT] = os.path.splitext(src)[1]
-        dst = self.get_app_filepath()
-        timestamp = pipeline_io.timestamp()
-        try:
-            shutil.copyfile(src, dst)
-        except Exception as e:
-            print(str(e))
-
-        new_version = self._datadict[self.LATEST_VERSION] + 1
-        self._datadict[self.LATEST_VERSION] = new_version
-        new_version_dir = self.get_version_dir(new_version)
-        pipeline_io.mkdir(new_version_dir)
-        shutil.copy(src, new_version_dir)
-
-        # get the filepath for this publish and add it to list of publishes
-        old_filepath, new_filename = os.path.split(src)
-        new_publish = os.path.join(new_version_dir, new_filename)
-        pipeline_io.set_permissions(new_publish)
-        self._datadict[self.PUBLISHES].append((username, timestamp, comment, new_publish))
-
-        if status is not None:
-            pass
-
-        self._update_pipeline_file()
-
-        dst_addresses = []
-        for checkout_username in self.list_checkout_users():
-            try:
-                checkout_user = self._env.get_user(checkout_username)
-            except:
-                print('User ' + str(checkout_username) + ' does not exist.')
-                continue
-            if checkout_user and checkout_user.has_email() and checkout_username != username:
-                dst_addresses.append(checkout_user.get_email())
-        if dst_addresses:
-            subject = self.get_long_name()+" new publish"
-            publish_user = self._env.get_user(username)
-            message = publish_user.get_fullname() + " has published a new version of "+self.get_long_name()
-            if comment!="":
-                message += "\ncomment: "+comment
-            self._env.sendmail(dst_addresses, subject, message)
-
-        return dst"""
 
     def update_cache(self, src, reference=False):
         """

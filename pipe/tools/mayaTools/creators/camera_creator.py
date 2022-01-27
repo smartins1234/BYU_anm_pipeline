@@ -5,6 +5,14 @@ from pipe.tools.mayaTools.utilities.utils import *
 import pipe.pipeHandlers.select_from_list as sfl
 import pipe.pipeHandlers.quick_dialogs as qd
 
+'''
+I added this so that we could have more than one
+camera associated with a shot. In retrospect, this
+wasn't really a good idea, and made things more
+complicated than they needed to be. I'd recommend
+forcing only one camera per shot. If there needs to
+be another camera, that should just be a new shot.
+'''
 class CameraCreator:
 
     def __init__(self):

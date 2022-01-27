@@ -9,6 +9,9 @@ from pipe.pipeHandlers.element import Element
 from pipe.pipeHandlers.environment import Environment
 import pipe.pipeHandlers.pipeline_io as pio
 
+'''
+pulls in an hda to the current context
+'''
 class ToolCloner:
 
     def __init__(self):
@@ -31,8 +34,6 @@ class ToolCloner:
             qd.error("Nothing has been published for this tool")
             return
         filepath = element.get_last_publish()[3]
-        #I am sorry stephanie I touched your pipe.
-        #I moved the uninstallFileto inside the try catch
 
         panes = self.getCurrentNetworkEditorPane()
         paths = []

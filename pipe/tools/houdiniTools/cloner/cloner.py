@@ -1,3 +1,7 @@
+'''
+This class is depricated, and only kept for reference.
+'''
+
 import hou, os
 import pipe.pipeHandlers.quick_dialogs as qd
 import pipe.pipeHandlers.select_from_list as sfl

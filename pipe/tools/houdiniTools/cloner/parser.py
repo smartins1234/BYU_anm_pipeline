@@ -1,3 +1,9 @@
+'''
+This was my attempt at creating a usda file parser.
+I ended up not using it.
+:')
+'''
+
 #from pxr import Usd
 import os
 

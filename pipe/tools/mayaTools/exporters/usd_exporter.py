@@ -12,12 +12,6 @@ class USDExporter:
         self.project = Project()
         pm.loadPlugin("mayaUsdPlugin")
 
-    def save_usd(self, filepath, asset_name):
-        # okay, so try to make a bash script that can open houdini in the background, then run a script that saves
-        # the usd file and then publishes it (looks like using hython is a good bet, i think i could write a hython
-        # script then run it from a bash script)
-        print("please work")
-
     def exportSelected(self, assetName):
 
         path = self.getFilePath(assetName)

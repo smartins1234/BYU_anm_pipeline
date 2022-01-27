@@ -10,6 +10,9 @@ from pipe.pipeHandlers.element import Element
 from pipe.pipeHandlers.environment import Environment
 from pipe.pipeHandlers import pipeline_io
 
+'''
+publishes an hda as a sequence effect hda
+'''
 class FXPublisher:
     def __init__(self):
         self.project = Project()
@@ -30,26 +33,6 @@ class FXPublisher:
         if not self.sequence:
             qd.error("Bro, Stephanie really fumbled this one. No such sequence exists.")
             return
-
-        '''asset_list = next(os.walk(element._filepath))[1]
-        for name in asset_list:
-            if name == "cache":
-                asset_list.remove(name)
-        asset_list.sort(key=unicode.lower)
-        asset_list.append("NEW_FX")
-
-        self.item_gui = sfl.SelectFromList(l=asset_list, parent=hou.ui.mainQtWindow(), title="Select an effect publish to")
-        self.item_gui.submitted.connect(self.asset_results)
-
-    def asset_results(self, value):
-        fxName = value[0]
-        if fxName == "NEW_FX":
-            #get new effect name
-            #then publish it
-            #print("cool, i haven't implemented this yet")
-            self.input = qd.HoudiniInput(
-                parent=hou.qt.mainWindow(), title="Comment ", info=publishes_string_list)
-            self.input.submitted.connect(self.name_results)'''
 
         selection = hou.selectedNodes()
         if len(selection) != 1:

@@ -8,6 +8,9 @@ from pipe.pipeHandlers.body import Asset
 from pipe.tools.houdiniTools.cloner.anim_cloner import AnimCloner
 from pipe.tools.houdiniTools.cloner.layout_unpacker import LayoutUnpacker
 
+'''
+pulls in all of the assests for a specific shot
+'''
 class BuildShot:
 
     def __init__(self):

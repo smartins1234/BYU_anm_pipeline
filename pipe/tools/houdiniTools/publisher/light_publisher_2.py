@@ -10,6 +10,9 @@ from pipe.pipeHandlers.element import Element
 from pipe.pipeHandlers.environment import Environment
 from pipe.pipeHandlers import pipeline_io
 
+'''
+publishes lights as hda files
+'''
 class LightPublisher:
     def __init__(self):
         self.project = Project()

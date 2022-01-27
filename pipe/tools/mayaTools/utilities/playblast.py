@@ -5,6 +5,9 @@ from pymel.core import *
 import pipe.pipeHandlers.quick_dialogs as qd
 from pipe.tools.mayaTools.utilities.utils import *
 
+'''
+sets options for and creates playblasts
+'''
 class playblast:
     def __init__(self):
         pass

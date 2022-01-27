@@ -1,3 +1,8 @@
+'''
+this is an attempt at a usd parser that was never used, and kept
+only for reference
+'''
+
 from pxr import Usd, UsdShade, Sdf
 import os, hou
 

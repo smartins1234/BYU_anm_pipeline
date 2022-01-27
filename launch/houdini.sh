@@ -29,14 +29,15 @@ cd -
 
 # We need this line in order for gridmarkets to work.
 #export HOUDINI_USE_HFS_PYTHON=1
-export JOB=${MEDIA_PROJECT_DIR}
+export JOB=${MEDIA_PROJECT_DIR}/production
 HOUDINI_TOOLS=${MEDIA_PROJECT_DIR}/pipe/tools/houdiniTools
 export PYTHONPATH=${PYTHONPATH}:${HOUDINI_TOOLS}
 export HOUDINI_PATH=${HOUDINI_PATH}:${HOUDINI_TOOLS}"/custom;&":${HOUDINI_TOOLS}"/custom/otls;&":${HOUDINI_TOOLS}:${MEDIA_PROJECT_DIR}"/production;&":${MEDIA_PROJECT_DIR}"/production/tools;&"
+#export HOUDINI_OTLSCAN_PATH=${HOUDINI_TOOLS}"/custom/otls;&"
 export HOUDINI_DSO_PATH=${HOUDINI_DSO_PATH}:${MEDIA_PROJECT_DIR}"/production/dso;&"
 
 export HOUDINI_MENU_PATH=${HOUDINI_TOOLS}"/custom/menu;&"
-export HOUDINI_TOOLBAR_PATH=${MEDIA_PROJECT_DIR}"/production/tabs;&"
+export HOUDINI_TOOLBAR_PATH="/groups/cenote/Pipeline/houdini_pipe_scripts:&"
 export HOUDINI_UI_ICON_PATH=${MEDIA_PROJECT_DIR}"icons/tool-icons;&"
 
 export HSITE = ${HOUDINI_TOOLS}"/custom;&"

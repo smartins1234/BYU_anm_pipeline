@@ -1,3 +1,6 @@
+'''
+quick utility function to check which assets have published materials
+'''
 import os
 
 from pipe.pipeHandlers.project import Project

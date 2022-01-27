@@ -11,6 +11,9 @@ from pipe.pipeHandlers.element import Element
 from pipe.pipeHandlers.environment import Environment
 from pipe.pipeHandlers import pipeline_io
 
+'''
+publishes materials as hda and usda files
+'''
 class MaterialPublisher:
     def __init__(self):
         self.project = Project()

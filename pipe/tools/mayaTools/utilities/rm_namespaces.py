@@ -1,5 +1,8 @@
 import pymel.core as pm
 
+'''
+runs a mel script to remove all namespaces
+'''
 class RemoveNamespaces:
     def __init__(self):
         pass

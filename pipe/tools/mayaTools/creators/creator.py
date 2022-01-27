@@ -1,3 +1,4 @@
+'''I don't think we ever used this class'''
 import os
 
 import pipe.pipeHandlers.quick_dialogs as qd

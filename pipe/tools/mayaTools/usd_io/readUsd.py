@@ -1,9 +1,3 @@
-# TODO
-# pull up shot list, have user choose
-# if shot has no layout yet, make them choose one
-# then
-# do the thing, ig
-
 from pipe.pipeHandlers import *
 from pipe.pipeHandlers import quick_dialogs
 import os
@@ -56,14 +50,6 @@ class UsdReader:
             else:
                 self.choose_layout()
                 return
-            '''latest = self.element.get_last_publish()
-            if latest is None:
-                self.choose_layout()
-                return
-            else:
-                selected_scene_file = latest[3]
-                self.open_scene_file(selected_scene_file)
-                return'''
 
         self.publishes = self.element.list_publishes()
 

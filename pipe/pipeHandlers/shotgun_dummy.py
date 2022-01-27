@@ -10,8 +10,12 @@ SHOT_SCRIPT_KEY = ''
 
 PROJECT_ID = -1
 
+'''
+This class uses the Shotgun API to get data from Shotgrid Studio
+'''
 class ShotgunReader:
     def __init__(self):
+        #getAssetLists();
         pass
 
     def getAssetLists(self):
@@ -26,11 +30,6 @@ class ShotgunReader:
             ["sg_asset_type", "is_not", "Environment"]
         ]
         result = sg.find("Asset", filters=filters, fields=fields)
-        '''result = sg.schema_field_read("Asset", project_entity={"type": "Project", "id": PROJECT_ID})
-        result = pprint.pformat(result)
-        result_file = open("result.txt", "w")
-        result_file.write(str(result))
-        result_file.close()'''
 
         #pprint.pprint(result)
 
@@ -47,7 +46,7 @@ class ShotgunReader:
             name_list.append(asset["code"].replace(" ", ""))
 
         short_name_list = name_list[:]
-            
+
         for asset in result:
             for par in asset["parents"]:
                 if par["name"].replace(" ", "") in name_list:
@@ -61,6 +60,7 @@ class ShotgunReader:
                     else:
                         parent_asset = parent_asset[0]
                     parent_asset["children"].append(asset["code"].replace(" ", ""))
+                    #print(asset["code"].replace(" ", ""))
                     short_name_list.remove(asset["code"].replace(" ", ""))
 
         for name in short_name_list:
@@ -93,5 +93,6 @@ class ShotgunReader:
         for shot in result:
             name = shot["code"]
             shot_list.append(name)
-
+        #print(shot_list)
+        #print("done")
         return shot_list

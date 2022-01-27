@@ -22,6 +22,7 @@ from pipe.tools.houdiniTools.cloner import shot_build
 from pipe.tools.houdiniTools.updater import update_layout
 from pipe.tools.houdiniTools.updater import update_materials
 from pipe.tools.houdiniTools.updater import update_file
+from pipe.tools.houdiniTools.cloner import seq_fx_cloner
 #from pipe.tools.houdiniTools.cloner import parser as hou_parser
 import pipe.pipeHandlers.quick_dialogs as qd
 
@@ -52,5 +53,5 @@ class ReloadScripts:
         reload(update_layout)
         reload(update_materials)
         reload(update_file)
-        #reload(hou_parser)
+        reload(seq_fx_cloner)
         reload(qd)

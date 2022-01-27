@@ -6,6 +6,9 @@ from pipe.pipeHandlers.body import Body, Asset
 from pipe.pipeHandlers.element import Element
 from pipe.pipeHandlers.environment import Environment
 
+'''
+opens a shot's hip file, but only if it's not checked out already by another user
+'''
 class ShotCloner:
 
     def __init__(self):

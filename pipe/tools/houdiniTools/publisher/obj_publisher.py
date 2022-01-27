@@ -10,6 +10,9 @@ from pipe.pipeHandlers.element import Element
 from pipe.pipeHandlers.environment import Environment
 from pipe.pipeHandlers import pipeline_io
 
+'''
+publishes geometry from the obj context as obj and usda files
+'''
 class ObjPublisher:
     def __init__(self):
         self.project = Project()

@@ -3,20 +3,16 @@ import os #, hou        we can't have import hou here because it makes it break 
 from pipe.pipeHandlers.project import Project
 
 '''Reports a critical error'''
-
-
 def error(errMsg, details=None, title='Error'):
     message(errMsg, details=details, title=title)
 
-    '''Reports a non-critical warning'''
 
-
+'''Reports a non-critical warning'''
 def warning(warnMsg, details=None, title='Warning'):
     message(warnMsg, details=details, title=title)
 
-    '''Reports a message'''
 
-
+'''Reports a message'''
 def message(msg=' ', details=None, title='Message'):
     print(msg)
 
@@ -36,9 +32,8 @@ def message(msg=' ', details=None, title='Message'):
 
     msgBox.exec_()
 
-    '''Reports an informational message'''
 
-
+'''Reports an informational message'''
 def info(infoMsg, title='Info'):
     message(msg=infoMsg, title=title)
 
@@ -87,14 +82,16 @@ def input(label, title='Input', text=None):
         return None
 
 def chooseFile(parent=None, caption=None, dir="/"):
+    '''
+    Allows the user to select a file location
+    '''
     fileName = QtWidgets.QFileDialog.getSaveFileName(parent, caption, dir)
     return fileName
+
 
 '''
 	Have to use this instead of input in houdini to avoid black text on black bar
 '''
-
-
 class HoudiniInput(QtWidgets.QDialog):
     '''
     submitted is a class variable that must be instantiated outside of __init__
@@ -182,7 +179,9 @@ class HoudiniInput(QtWidgets.QDialog):
         self.close()
 
 
-
+'''
+I don't think this was ever used.
+'''
 class VersionWindow(QtWidgets.QMainWindow):
 
     def __init__(self, parent):#=hou.qt.mainWindow()):  # you're going to have to set the parent explicitly when you call this function
@@ -323,12 +322,9 @@ class CheckboxSelect(QtWidgets.QDialog):
         self.show()
 
     def initializeSubmitButton(self):
-        # Create the button widget
         self.button = QtWidgets.QPushButton("Accept")
         self.button.setSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Minimum)
         self.button.clicked.connect(self.submit)
-        #self.button.setEnabled(False)
-        #self.button.setAutoDefault(True)
         self.layout.addWidget(self.button)
 
     def submit(self):

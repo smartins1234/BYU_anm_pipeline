@@ -7,6 +7,10 @@ from pipe.pipeHandlers.body import Body, Asset
 from pipe.pipeHandlers.element import Element
 import pipe.pipeHandlers.pipeline_io as pio
 
+'''
+updates layouts and their associated materials to
+their most recent versions
+'''
 class LayoutUpdater:
     def __init__(self):
         self.project = Project()
@@ -102,7 +106,8 @@ class LayoutUpdater:
         for mat in matDict.keys():
             if re.sub(r'\W+', '', mat) in matList:
                 #this material is already up to date
-                pass
+                matNode = hou.node(library.path() + "/" + mat)
+                
             else:
                 #clone in that material's hda to the network
                 asset = self.project.get_asset(mat)
@@ -125,10 +130,10 @@ class LayoutUpdater:
                         qd.error("The material for " + mat + " needs to be republished. Sorry for the inconvenience.")
                         #print(e)
 
-                #assign the material to all the paths
-                layout.parm("group"+str(index)).set(matDict[mat])
-                if matNode:
-                    layout.parm("shop_materialpath"+str(index)).set(matNode.path())
+            #assign the material to all the paths
+            layout.parm("group"+str(index)).set(matDict[mat])
+            if matNode:
+                layout.parm("shop_materialpath"+str(index)).set(matNode.path())
 
             index += 1
 

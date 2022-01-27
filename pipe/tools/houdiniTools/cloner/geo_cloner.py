@@ -5,6 +5,9 @@ from pipe.pipeHandlers.project import Project
 from pipe.pipeHandlers.body import Body, Asset
 from pipe.pipeHandlers.element import Element
 
+'''
+pulls geometry into the stage
+'''
 class GeoCloner:
     
     def __init__(self):
@@ -31,5 +34,17 @@ class GeoCloner:
             ref = hou.node("/stage").createNode("reference")
             ref.setName(filename+"_geo", 1)
             ref.parm("filepath1").set(path)
+
+            #also clone into the geo context from the obj file
+            parts = path.split(".")
+            path = parts[0] + ".obj"
+            geo = hou.node("/obj").createNode("geo")
+            geo.setName(filename + "_geoRef", 1)
+            geo.parm("scale").set(0.01)
+
+            fileNode = geo.createNode("file")
+            fileNode.parm("file").set(path)
+
+
         else:
             qd.error("Nothing was cloned")

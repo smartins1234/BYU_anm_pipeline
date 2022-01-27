@@ -11,6 +11,9 @@ from pipe.tools.mayaTools.utilities.utils import *
 
 import maya.cmds as mc
 
+'''
+Saves maya files to the production folder for the Animation department.
+'''
 class ShotSaver:
     def __init__(self):
         self.project = Project()

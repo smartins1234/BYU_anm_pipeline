@@ -8,6 +8,9 @@ from pipe.tools.mayaTools.utilities.utils import *
 
 import maya.cmds as mc
 
+'''
+Opens maya files used by the Animation department.
+'''
 class ShotOpener:
     def __init__(self):
         self.project = Project()

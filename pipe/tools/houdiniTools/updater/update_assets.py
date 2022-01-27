@@ -16,13 +16,17 @@ def filter(string, substr):
     return [str for str in string if
              substr in string]
 
+'''
+gets list of assets from Shotgun Studio and creates them in the pipeline
+
+where applicable, assets are automatically organized into variant sets
+'''
 class UpdateAssets:
     def __init__(self):
         self.project = Project()
 
     def update_assets(self):
         lists = ShotgunReader().getAssetLists()
-        #asset_list = self.project.list_assets()
         asset_list = lists[0]
         assets = lists[1]
 
@@ -49,39 +53,7 @@ class UpdateAssets:
 
         list_file.close()
 
-        qd.message("Assets updated successfully.")
-
-        '''finished = []
-
-        for asset in asset_list:
-            #check if asset has a number, and therefore variants
-            print(asset)
-            if asset in finished:
-                pass
-            elif asset[-1].isdigit():
-                main_name = ""
-                for char in asset:
-                    if char.isdigit():
-                        break
-                    else:
-                        main_name += char
-
-                variants = [name for name in asset_list if main_name in name]
-                finished.extend(variants)
-
-
-                self.build_asset(main_name, variants)
-                
-                #print(asset)
-                #print(main_name)
-                #print(variants)
-            else:
-                main_name = asset
-                variants = [asset]
-                finished.extend(variants)
-
-                self.build_asset(main_name, variants)'''
-                
+        qd.message("Assets updated successfully.")                
 
 
     def build_asset(self, main_name, variants):
@@ -214,12 +186,6 @@ class UpdateAssets:
 
         else:
             #create and publish a basic material, return the path
-            '''src = self.project.get_project_dir()
-            src = os.path.join(src, "blank.usda")
-            
-
-            shutil.copyfile(src, dst)
-            pio.set_permissions(dst)'''
             dst = os.path.join(element._filepath, var + "_main.usda")
 
             mat_lib = hou.node("/stage").createNode("materiallibrary")

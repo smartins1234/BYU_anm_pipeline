@@ -1,5 +1,8 @@
 import pymel.core as pm
 
+'''
+runs a mel script to remove all unknown nodes
+'''
 class rmNodes:
     def __init__(self):
         pass

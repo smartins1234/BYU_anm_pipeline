@@ -1,9 +1,6 @@
-# TODO: removing the next line to be able to load departments from a config file down the line. Once config is ready, load depts from there.
-# from pipe.am.environment import Department
 import pipe.pipeHandlers.select_from_list as sfl
 import pipe.pipeHandlers.quick_dialogs as qd
 from pipe.tools.mayaTools.utilities.utils import *
-# from pipe.tools.mayaTools.publishers.publisher import MayaPublisher as Publisher
 from pipe.pipeHandlers.project import Project
 from pipe.pipeHandlers.body import Body
 from pipe.pipeHandlers.body import Asset
@@ -18,14 +15,16 @@ import os
 
 class Cloner:
 	def __init__(self):
-		# self.maya_checkout_dialog = None
-		# self.quick = False
 		pass
 
 	def rollback(self):
+		#this was obviously never implemented
 		print("Rollin' Rollin' Rollin' (Back)")
 
 	def quick_clone(self):
+		'''
+		Clone the most recent version by default
+		'''
 		self.quick = True
 		self.go()
 
@@ -38,8 +37,6 @@ class Cloner:
 		    l=type_list, parent=maya_main_window(), title="Select a type of asset to clone")
 		self.item_gui.submitted.connect(self.type_results)
 
-		# pick which type of asset your cloning
-		# then go to the specific type of function needed
 
 	def type_results(self, value):
 		self.type = value[0]
@@ -68,7 +65,6 @@ class Cloner:
 			print('File does not exist: '+assetName)
 
 	def clone_geo(self):
-		#pm.loadPlugin("objImport")
 		self.type = Asset.GEO
 
 		asset_list = self.project.list_existing_assets()
@@ -110,7 +106,6 @@ class Cloner:
 
 		if self.type == Asset.CAMERA:
 			self.element = self.shot.get_element(Asset.CAMERA)
-			#cam_list = os.listdir(self.element._filepath)
 			cam_list = next(os.walk(self.element._filepath))[1]
 			for name in cam_list:
 				if not name.startswith(Asset.CAMERA):
@@ -124,7 +119,6 @@ class Cloner:
 
 		elif self.type == Asset.ANIMATION:
 			self.element = self.shot.get_element(Asset.ANIMATION)
-			#asset_list = os.listdir(self.element._filepath)
 			asset_list = next(os.walk(self.element._filepath))[1]
 			for name in asset_list:
 				if name == "cache":
@@ -140,38 +134,6 @@ class Cloner:
 		print(asset_name)
 
 		self.type = os.path.join(self.type, asset_name)
-
-	'''def clone_prop(self):
-		self.quick = True
-		project = Project()
-		asset_list = project.list_props()
-		self.item_gui = sfl.SelectFromList(
-		    l=asset_list, parent=maya_main_window(), title="Select a prop to clone")
-		self.item_gui.submitted.connect(self.results)
-
-	def clone_actor(self):
-		self.quick = True
-		project = Project()
-		asset_list = project.list_actors()
-		self.item_gui = sfl.SelectFromList(
-		    l=asset_list, parent=maya_main_window(), title="Select an actor to clone")
-		self.item_gui.submitted.connect(self.results)
-
-	def clone_set(self):
-		self.quick = True
-		project = Project()
-		asset_list = project.list_sets()
-		self.item_gui = sfl.SelectFromList(
-		    l=asset_list, parent=maya_main_window(), title="Select a set to clone")
-		self.item_gui.submitted.connect(self.results)
-
-	def clone_shot(self):
-		self.quick = True
-		project = Project()
-		asset_list = project.list_shots()
-		self.item_gui = sfl.SelectFromList(
-		    l=asset_list, parent=maya_main_window(), title="Select a shot to clone")
-		self.item_gui.submitted.connect(self.results)'''
 
 	def get_asset(self, value):
 		asset_name = value[0]
@@ -189,45 +151,6 @@ class Cloner:
 		self.item_gui = sfl.SelectFromList(
 		    l=asset_list, parent=maya_main_window(), title="Select an asset to clone")
 		self.item_gui.submitted.connect(self.results)
-
-	'''def get_element_option(self, type, body):  # FIXME: this would go better in Body()
-		element = None
-
-		if type == AssetType.PROP:
-			element = body.get_element("model")
-			self.department = "model"
-
-		elif type == AssetType.ACTOR:
-			response = qd.binary_option(
-			    "Which department for " + str(body.get_name()) + "?", "model", "rig")
-			if response:
-				element = body.get_element("model")
-				self.department = "model"
-			elif response is not None:
-				element = body.get_element("rig")
-				self.department = "rig"
-			else:
-				return None
-
-		elif type == AssetType.SET:
-			element = body.get_element("model")
-			self.department = "model"
-
-		elif type == AssetType.SHOT:
-			response = qd.binary_option(
-			    "Which department for " + str(body.get_name()) + "?", "model", "anim")
-			if response:
-				element = body.get_element("model")
-				self.department = "model"
-			elif response is not None:
-				element = body.get_element("anim")
-				self.department = "anim"
-			else:
-				return None
-
-		print("element: ", element)
-
-		return element'''
 
 	def results(self, value):
 		print("Final value: ", value[0])
@@ -274,10 +197,6 @@ class Cloner:
 		# make the list a list of strings, not tuples
 		self.sanitized_publish_list=[]
 		for publish in self.publishes:
-			'''path = publish[3]
-			file_ext = path.split('.')[-1]
-			if not file_ext == "mb":
-				continue'''
 			label=publish[0] + " " + publish[1] + " " + publish[2]
 			self.sanitized_publish_list.append(label)
 

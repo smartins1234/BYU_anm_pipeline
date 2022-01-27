@@ -1,21 +1,16 @@
-# Interfacing with maya through pymel commands
 import pymel.core as pm
 import os
 import glob
 import re
 from PySide2 import QtWidgets
-#from PySide6 import QtWidgets
 
 #from pipe.pipeHandlers import *
 from pipe.pipeHandlers.environment import Environment
-#from pipe.pipeHandlers.environment import Department
 from pipe.pipeHandlers.project import Project
 from pipe.pipeHandlers.element import Element
 from pipe.pipeHandlers.body import Body, AssetType
 import pipe.pipeHandlers.quick_dialogs as qd
 import pipe.pipeHandlers.pipeline_io as pipeline_io
-#from pipe.tools.mayaTools.exporters.exporter import Exporter
-#from pipe.tools.mayaTools.publishers.publisher import MayaPublisher as Publisher
 
 import maya.cmds as mc
 
@@ -35,43 +30,6 @@ def maya_main_window():
         if obj.objectName() == 'MayaWindow':
             return obj
     raise RuntimeError('Could not find MayaWindow instance')
-
-'''
-    Prepare the scene for a publish. Called from creator and publisher.
-'''
-"""def prepare_scene_file(quick_publish=False, department=None, body=None):
-    scene_prep(quick_publish, body=body, department=department)
-    file_path = Environment().get_user_workspace()
-    file_path = os.path.join(file_path, 'untitled.mb')
-    file_path = pipeline_io.version_file(file_path)
-    mc.file(rename=file_path)
-    print("saving file: ", file_path)
-    mc.file(save=True)"""
-
-'''
-    Publish the asset. Called from creator and publisher.
-'''
-# def post_publish(element, user, export, published=True, comment="No comment."):
-#     scene_file, new_file = get_scene_file()
-#
-#     username = user.get_username()
-#     dst = element.publish(username, scene_file, comment)
-#
-#     #Ensure file has correct permissions
-#     try:
-#         os.chmod(dst, 0660)
-#     except:
-#         print("Setting file permissions failed.")
-#
-#     print('Publish Complete.')
-#     body = Project().get_body(element.get_parent())
-#
-#     if export:
-#         print("Begin export process.")
-#         exporter = Exporter()
-#         exporter.auto_export_all()
-#
-#     convert_to_education()
 
 '''
     check if user has unsaved changes before performing action, and if so, save as new publish
@@ -118,83 +76,6 @@ def get_scene_file():
         return filename, True
     else:
         return filename, False
-
-'''
-    Helper function for post_publish()
-'''
-"""def scene_prep(quick_publish, body=None, department=None):
-    if quick_publish:
-        print("skipping check for unsaved changes")
-    else:
-        pass
-        #check_unsaved_changes()
-        # save_scene_file()
-
-    freeze_and_clear = True
-    if department == Department.RIG:
-        freeze_and_clear = False
-
-    if body.is_shot() or body.get_type() == AssetType.SET:
-        freeze_and_clear = False
-
-    if body.get_type() == AssetType.PROP:
-        #remove References
-        print("removing name references")
-        names = mc.ls(tr=True)
-        names = remove_cameras(names)
-        print(names)
-        for i in names:
-            mc.select(i)
-            newName = strip_reference(i)
-            mc.rename(newName)
-
-        #center prop at the origin
-        #center_object_at_origin()
-
-    if not body.get_type() == AssetType.SHOT:
-        # delete cameras
-        cam_list = pm.ls(ca=True)
-        print("deleting cameras:", cam_list)
-
-        for cam in cam_list:
-            if str(cam) == "perspShape" or str(cam) == "topShape" or str(cam) == "frontShape" or str(cam) == "sideShape":
-                continue
-
-            cam_response = qd.yes_or_no("Camera " + str(cam) + " found in scene. Cameras will cause problems if left in the asset. \n\nProceed to delete this camera?")
-            if cam_response:
-                parents = cam.listRelatives(p=True)
-                while parents:
-                    if "camera" in str(parents[0]):
-                        cam = parents[0]
-                    else:
-                        break
-
-                    parents = cam.listRelatives(p=True)
-
-                print("parents: ", parents)
-                pm.delete(cam)
-
-    if freeze_and_clear:
-        print("clearing construction history")
-        try:
-            clear_construction_history()
-        except:
-            qd.warning("Clear construction history failed. There may be something unusual in the history that's causing this.")
-
-        try:
-            freeze_transformations()
-        except:
-            qd.warning("Freeze transform failed. There may be 1+ keyframed values in object. Remove all keyframed values and expressions from object.")
-
-    try:
-        delete_image_planes()
-    except:
-        qd.warning("Delete image planes failed.")
-
-    try:
-        group_top_level()
-    except:
-        qd.warning("Group top level failed.")"""
 
 '''
     Helper function for scene_prep()
@@ -253,24 +134,6 @@ def group_top_level():
         shapes = node.listRelatives(shapes=True)
         if shapes and "group" not in str(node):
             pm.group(top_level_nodes)
-
-'''def get_departments_by_type(asset_type, export=False):
-    department_list = []
-    project = Project()
-
-    if asset_type == AssetType.PROP:
-        department_list = project.prop_export_departments()
-    elif asset_type == AssetType.ACTOR:
-        if export is True:
-            department_list = ["model"]
-        else:
-            department_list = ["model", "rig"]
-    elif asset_type == AssetType.SET:
-        department_list = project.set_export_departments()
-    elif asset_type == AssetType.SHOT:
-        department_list = ["anim"]
-
-    return department_list'''
 
 '''
     Helper function for scene_prep()

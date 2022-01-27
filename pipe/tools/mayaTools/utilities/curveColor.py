@@ -1,4 +1,6 @@
 '''
+this script was created by the rigging team to be added to their shelf
+
 changes the display setting of each shape node so only the objects selected will change color
 adding color will add it to each shape node of the selected objects
 reseting it will put the display options back to the default

@@ -1,5 +1,9 @@
 import maya.cmds as cmds
 
+'''
+Creates a nurbs circle around the selected object to be used
+as a control by animators.
+'''
 class AutoControl:
     def __init__(self):
         pass

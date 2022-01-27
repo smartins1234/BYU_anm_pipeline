@@ -1,5 +1,8 @@
 import pymel.core as pm
 
+'''
+runs the overlapper tool
+'''
 class Overlapper:
     def __init__(self):
         pass

@@ -2,7 +2,8 @@
 	Welcome to the Maya shelf script!
 
 	If you'd like to add a shelf button, you can add it to
-	shelf.json. Follow the example of the other buttons in there.
+	the json file for that shelf. Follow the example of the 
+	other buttons in json shelf files.
 	Remember, the icon should be a .svg and the function
 	must be implemented in the specified tool location
 '''
@@ -10,12 +11,9 @@ import pymel.core as pm
 import os
 import sys
 import json
-# from pipe.pipeHandlers.environment import Environment
 from pipe.tools.mayaTools.utilities.reload_scripts import *
 
 
-# environment = Environment()
-# PROJ = environment.get_project_name()
 SHELF_DIR = os.environ.get('MAYA_SHELF_DIR')
 ICON_DIR = os.environ.get('MAYA_ICONS_DIR')
 os.environ["DCC_ASSET_NAME"] = ""

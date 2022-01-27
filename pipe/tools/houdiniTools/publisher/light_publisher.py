@@ -1,3 +1,7 @@
+'''
+this file is not used in the current version of the pipe,
+and is kept only for reference.
+'''
 import hou, os
 
 import pipe.pipeHandlers.quick_dialogs as qd
@@ -8,6 +12,9 @@ from pipe.pipeHandlers.body import Body, Shot, Asset, Sequence
 from pipe.pipeHandlers.element import Element
 from pipe.pipeHandlers.environment import Environment
 
+'''
+publishes lights from the stage as a usda file
+'''
 class LightPublisher:
     def __init__(self):
         self.project = Project()

@@ -1,3 +1,7 @@
+'''
+This file is depricated, and only kept here as a reference.
+'''
+
 import os, hou
 
 import pipe.pipeHandlers.quick_dialogs as qd

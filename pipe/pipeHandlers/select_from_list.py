@@ -58,8 +58,6 @@ class SelectFromList(QtWidgets.QDialog):
 
     def initializeVBox(self):
         self.vbox = QtWidgets.QVBoxLayout()
-        #QtWidgets.raise()
-        #QApplication.setActiveWindow()
         self.initializeSearchBar()
         self.initializeListWidget()
         self.initializeSubmitButton()

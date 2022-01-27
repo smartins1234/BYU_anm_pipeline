@@ -6,6 +6,9 @@ from pipe.pipeHandlers.body import Body, Asset
 from pipe.pipeHandlers.element import Element
 import pipe.pipeHandlers.pipeline_io as pio
 
+'''
+pulls layouts into the stage
+'''
 class LayoutCloner:
 
     def __init__(self):

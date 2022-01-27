@@ -176,11 +176,10 @@ class Body(object):
 		dept_dir = os.path.join(self._filepath, department)
 		if not os.path.exists(dept_dir):
 			pipeline_io.mkdir(dept_dir)
-		#empty_element = self.set_app_ext(department)
+		
 		empty_element = Element()
 		datadict = empty_element.create_new_dict(name, department, self.get_name())
 		if os.path.exists(os.path.join(dept_dir, empty_element.PIPELINE_FILENAME)):
-			#raise EnvironmentError('element already exists: ' + dept_dir)
 			print("element already exists: " + dept_dir)
 			return None
 
@@ -189,16 +188,10 @@ class Body(object):
 
 	def set_app_ext(self, department, filepath=None):
 		'''
-		this function replaces the old registry class and sets the extension for an element.
+		this function sets the file extension for an element.
 		'''
 		element = Element(filepath)
-		'''
-		if department == Asset.GEO or department == Asset.ANIMATION or department == Asset.RIG:
-			element.set_app_ext(".mb")
-			return element
-		elif department == Asset.HDA:
-			element.set_app_ext(".hdanc")
-			return element'''
+
 		if department == Asset.GEO:
 			element.update_app_ext(".obj")
 			return element
@@ -282,7 +275,7 @@ class AssetType:
 	ASSET = 'asset'
 	SET = 'set'
 	SEQUENCE = 'sequence'
-	ALL = [ASSET, SHOT, TOOL, SET]
+	ALL = [ASSET, SHOT, TOOL, SET, SEQUENCE]
 	MAYA = [ASSET, SHOT, SET]
 
 	def __init__(self):
@@ -310,6 +303,10 @@ class Asset(Body):
 	LAYOUT = 'layout'
 	USD = 'usd'
 	MAYA = 'maya'
+	'''
+	These are the "departments" refered to in the Element class. The current pipeline creates
+	all of these departments for every type of Body object.
+	'''
 	ALL = [GEO, CAMERA, ANIMATION, RIG, HDA, TEXTURES, MATERIALS, LIGHTS, HIP, LAYOUT, USD, MAYA]
 
 	@staticmethod
@@ -378,6 +375,9 @@ class Sequence(Body):
 		return False
 
 class Layout(Body):
+	'''
+	Class describing a layout body.
+	'''
 
 	@staticmethod
 	def create_new_dict(name):
@@ -439,7 +439,7 @@ class Tool(Body):
 
 class CrowdCycle(Body):
 	'''
-	Class describing a tool body.
+	Class describing a crowd cycle body.
 	'''
 
 	@staticmethod

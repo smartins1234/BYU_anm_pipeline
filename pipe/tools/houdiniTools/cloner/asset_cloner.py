@@ -5,6 +5,9 @@ from pipe.pipeHandlers.project import Project
 from pipe.pipeHandlers.body import Body, Asset
 from pipe.pipeHandlers.element import Element
 
+'''
+pulls a USD asset into the stage
+'''
 class AssetCloner:
 
     def __init__(self):

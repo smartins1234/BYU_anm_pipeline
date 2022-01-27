@@ -11,6 +11,9 @@ from pipe.pipeHandlers.element import Element
 from pipe.pipeHandlers.environment import Environment
 from pipe.pipeHandlers import pipeline_io as pio
 
+'''
+publishes a layout from the stage as a usda file
+'''
 class LayoutPublisher:
 
     def __init__(self):

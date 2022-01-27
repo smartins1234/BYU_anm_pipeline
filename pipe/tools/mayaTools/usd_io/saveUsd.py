@@ -13,7 +13,6 @@ import pymel.core as pm
 import pipe.pipeHandlers.pipeline_io as pio
 from pipe.tools.mayaTools.utilities.utils import *
 from pipe.pipeHandlers.environment import Environment
-#from pipe.pipeHandlers.environment import Department
 from pipe.pipeHandlers.body import Asset
 from pipe.pipeHandlers.project import Project
 from pipe.pipeHandlers import quick_dialogs as qd

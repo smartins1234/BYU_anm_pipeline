@@ -9,6 +9,9 @@ from pipe.pipeHandlers.element import Element
 from pipe.pipeHandlers.environment import Environment
 import pipe.pipeHandlers.pipeline_io as pio
 
+'''
+pulls lights into the obj context
+'''
 class LightCloner:
 
     def __init__(self):

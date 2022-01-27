@@ -9,6 +9,9 @@ from pipe.pipeHandlers.element import Element
 from pipe.pipeHandlers.environment import Environment
 import pipe.pipeHandlers.pipeline_io as pio
 
+'''
+clones in effects saved in a specific sequence
+'''
 class FXCloner:
 
     def __init__(self):
@@ -48,8 +51,13 @@ class FXCloner:
 
         try:
             hou.hda.uninstallFile(filepath)
-            hou.hda.installFile(filepath)
             #print("no problem here")
+        except Exception as e:
+            #print(e)
+            print("No library to uninstall")
+        
+        try:
+            hou.hda.installFile(filepath)
         except Exception as e:
             print(e)
             return

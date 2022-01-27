@@ -11,13 +11,10 @@ import pipe.pipeHandlers.pipeline_io as pio
 from pipe.tools.mayaTools.utilities.utils import *
 from pipe.pipeHandlers.environment import Environment
 from pipeHandlers.body import Asset
-#from pipe.pipeHandlers.environment import Department
 from pipe.pipeHandlers.body import AssetType
 from pipe.pipeHandlers.project import Project
 from pipe.pipeHandlers import quick_dialogs as qd
 import pipe.pipeHandlers.select_from_list as sfl
-#import pipe.pipeHandlers.tests as sfl
-#from PySide2.QtCore import QObject, Signal, Slot
 
 from pipe.pipeHandlers.environment import Environment
 
@@ -36,12 +33,10 @@ class ObjExporter:
         print(chosen_asset)
         self.exportSelected(chosen_asset)
 
-    # , element, selection=None, startFrame=None, endFrame=None):
     def export(self):
 
         project = Project()
         asset_list = project.list_assets()
-        #asset_list = ["TEST"]
 
         self.item_gui = sfl.SelectFromList(
             l=asset_list, parent=maya_main_window(), title="Select an asset to export to")
@@ -54,20 +49,6 @@ class ObjExporter:
         command = self.buildObjCommand(path)
 
         pm.Mel.eval(command)
-
-        """self.publishes = self.element.list_publishes()
-        self.publishes_string_list = ""
-        for publish in self.publishes:
-            label = publish[0] + " " + publish[1] + " " + publish[2] + "\n"
-            self.publishes_string_list += label
-
-        print(self.publishes_string_list)
-        # get comment and update element file with publish info
-        comment = qd.input(title="Comment for publish", label=self.publishes_string_list)
-        if comment is None:
-            comment = "No comment."
-        username = Environment().get_user().get_username()
-        self.element.publish(username, path, comment)"""
 
         publish_info = []
         publish_info.append(self.element)

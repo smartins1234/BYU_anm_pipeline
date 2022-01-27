@@ -1,3 +1,7 @@
+'''
+this script was created by the rigging team to be added to their shelf
+'''
+
 import maya.cmds as cmds;
 toolName = 'nurbs_curve_follow'
 total_width = 225

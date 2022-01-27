@@ -2,7 +2,6 @@ import os
 import pymel.core as pm
 
 from pipe.pipeHandlers.project import Project
-#import pipe.pipeHandlers.checkbox_options as co
 import pipe.pipeHandlers.quick_dialogs as qd
 from pipe.tools.mayaTools.utilities.utils import *
 from pipe.tools.mayaTools.exporters.alembic_exporter import AlembicExporter
@@ -10,16 +9,12 @@ from pipe.tools.mayaTools.exporters.obj_exporter import ObjExporter
 from pipe.tools.mayaTools.exporters.mb_exporter import MbExporter
 from pipe.tools.mayaTools.exporters.usd_exporter import USDExporter
 import pipe.pipeHandlers.select_from_list as sfl
-# from pipe.tools.mayaTools.exporters.fbx_exporter import FbxExporter
-# from pipe.tools.mayaTools.exporters.json_exporter import JSONExporter
+
 
 class Exporter:
 
     def __init__(self):
-        '''self.body = None
-        self.item_gui = None
-        self.list = ["alembic", "fbx", "json", "usd", "obj"]
-        self.cameras = True'''
+        pass
 
     def go(self, alembic=False, usd=False, obj=False, mb=False, camera=False):
         self.alembic = alembic
@@ -43,12 +38,6 @@ class Exporter:
             self.item_gui = sfl.SelectFromList(l=asset_list, parent=maya_main_window(), title="Select an asset to export to")
             self.item_gui.submitted.connect(self.asset_results)
 
-    def auto_export_all(self):
-        '''self.export()'''
-
-    def export_one(self, alembic=False, fbx=False, json=False, usd=False, methods=None):
-        '''self.export(alembic=alembic, fbx=fbx, json=json, usd=usd, methods=methods)'''
-
     def export(self):
         publish_info = []
         if self.obj:    #modeling publish case
@@ -69,84 +58,6 @@ class Exporter:
             publish_info.append(MbExporter().export(self.chosen_asset))
             self.publish(publish_info)
 
-        '''if methods is None:
-            methods = self.list
-
-        asset_name = os.environ.get("DCC_ASSET_NAME")
-        if not asset_name:
-            qd.error("You must first create or clone an asset.")
-            return
-
-        self.body = Project().get_body(asset_name)
-
-        if alembic:
-            AlembicExporter().auto_export(asset_name, self.cameras)
-
-        if self.body and self.body.is_asset():
-            if json:
-                if self.body.get_type() == AssetType.SET or self.body.get_type() == AssetType.SHOT:
-                    json_export = JSONExporter()
-                    json_export.go(self.body, self.body.get_type())
-                else:
-                    methods.remove("json")
-
-            if fbx:
-                if self.body.get_type() == AssetType.PROP or self.body.get_type() == AssetType.ACTOR:
-                    FbxExporter().auto_export(asset_name)
-                else:
-                    methods.remove("fbx")
-
-        if usd:
-            print("USD isn't supported... yet :|")
-            methods.remove("usd")
-
-        if methods:
-            qd.info("Successfully exported " + str(asset_name) + " as " + str(methods))
-        else:
-            qd.info("Nothing was exported.")'''
-
-    def export_without_cameras(self):
-        '''self.cameras = False
-        self.export()'''
-
-    def export_with_options(self):
-        '''self.item_gui = co.CheckBoxOptions(parent=maya_main_window(), title="Select export methods:", options=self.list)
-        self.item_gui.submitted.connect(self.export_results)'''
-
-    def export_results(self, export_results):
-        '''fbx = True
-        alembic = True
-        json = True
-        usd = True
-        methods=[]
-
-        for item in export_results.items():
-            if item[0] == "fbx":
-                if item[1] is False:
-                    fbx = False
-                else:
-                    methods.append("fbx")
-
-            elif item[0] == "alembic":
-                if item[1] is False:
-                    alembic = False
-                else:
-                    methods.append("alembic")
-
-            elif item[0] == "json":
-                if item[1] is False:
-                    json = False
-                else:
-                    methods.append("json")
-
-            elif item[0] == "usd":
-                if item[1] is False:
-                    usd = False
-                else:
-                    methods.append("usd")
-
-        self.export(alembic=alembic, fbx=fbx, json=json, usd=usd, methods=methods)'''
-    
     def asset_results(self, value):
         self.chosen_asset = value[0]
 
@@ -164,18 +75,7 @@ class Exporter:
 
         #if the shot didn't exist already, set the frame range
         if shot is not None:    
-            '''qd.warning("You are creating this shot in the pipe. Check with your team lead that the following information you enter is correct.")
-            frame_range = qd.input("How many frames are in this shot?")
-
-            if frame_range is None or frame_range == u'':
-                frame_range = 1
-
-            frame_range = str(frame_range)
-            if not frame_range.isdigit():
-                qd.error("Invalid frame range input. Setting to 1.")
-
-            shot.set_frame_range(int(frame_range))
-            print(str(shot.get_frame_range()))'''
+            pass
 
         else:
             print("we're here")
