@@ -10,7 +10,7 @@ The BYU_anm_pipeline is designed to run on the Fedora operating system and allow
 ### Basic install for developers
 To install all development packages, execute the following in a bash terminal:
 ```
-git clone https://github.com/jasonwadewilliams/BYU_anm_pipeline.git
+git clone https://github.com/smartins1234/BYU_anm_pipeline.git
 cd BYU_anm_pipeline
 source setup/install.sh --dev
 ```
@@ -24,7 +24,7 @@ python
 
 ### Release/update in production directory
 ```
-git clone https://github.com/jasonwadewilliams/BYU_anm_pipeline.git
+git clone https://github.com/smartins1234/BYU_anm_pipeline.git
 cd BYU_anm_pipeline
 source setup/install.sh --clean
 ```
@@ -60,7 +60,6 @@ sudo config/unix/fedora/install.sh --installmissing
 This project is based off of the previous BYU Animation pipeline. [DCC Pipe.](https://github.com/byu-animation/dccpipe) That, in turn, succeeeded the previous pipeline repositories [BYU Animation Tools](https://github.com/byu-animation/byu-animation-tools) and [BYU Pipeline Tools](https://github.com/byu-animation/byu-pipeline-tools). This pipeline was created with a very specific use case, and is not intended to be used outside of the BYU Center for Animation labs. However, the pipeline is designed so that other distros/operating systems can be supported in a future release, given appropriate modifications.
 
 ### System Requirements
-### FIXME: update
 
 | Requirements    | Description                                                                         |
 |:----------------|:------------------------------------------------------------------------------------|
@@ -74,17 +73,15 @@ This project is based off of the previous BYU Animation pipeline. [DCC Pipe.](ht
 \* Will be automatically installed using the `--installmissing/-im` flag.
 
 ### Supported DCC's
-### FIXME: update
 
 | DCC                             | Version | Module          |
 |:--------------------------------|--------:|:----------------|
-| Autodesk Maya                   | 2019    | pipe.tools.maya |
-| SideFX Houdini                  | 18.0    | pipe.tools.hou  |
-| Foundry Nuke                    | 11.3    | pipe.tools.nuke |
+| Autodesk Maya                   | 2022    | pipe.tools.maya |
+| SideFX Houdini                  | 18.5    | pipe.tools.hou  |
+| Foundry Nuke                    | 13.0    | pipe.tools.nuke |
 | Allegorithmic Substance Painter | 2018.3  | pipe.tools.sbs  |
 
 ### Packages Managed by Pipenv
-### FIXME: update
 Note: All packages will be installed in the project's directory in the .venv folder.
 
 | Pipenv Package | `--dev` only |
